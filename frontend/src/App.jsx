@@ -1,12 +1,13 @@
 import { Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Navbar from "./components/base/Navbar";
 
 function App() {
   return (
     <>
-      <h1>Hello World</h1>
       <ToastContainer/>
+      <Navbar/>
       <main className="py-3">
         <Outlet/>
       </main>
