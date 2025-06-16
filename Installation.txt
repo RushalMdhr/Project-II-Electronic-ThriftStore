@@ -1,0 +1,11 @@
+___________________ Installation ___________________
+npm create vite@latest my-project -- --template react
+npm i nodemon multer mongoose jsonwebtoken express-formidable express-async-handler express dotenv cors cookie-parser concurrently bcryptjs
+npm i slick-carousel react-slick react-toastify react-router react-router-dom react-redux react-icons apexcharts react-apexcharts moment flowbite axios @reduxjs/toolkit
+npm install -D @tailwindcss/vite
+npm install -D tailwindcss @tailwindcss/vite
+___________________ .env ___________________
+PORT=5000
+DATABASE_URI=mongodb://127.0.0.1:27017/test
+JWT_SECRET=abcdefjkjkjkss
+NODE_ENV=development
