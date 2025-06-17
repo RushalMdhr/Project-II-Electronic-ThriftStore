@@ -10,6 +10,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store.js";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import Profile from "./pages/User/Profile.jsx";
+import VendorRegister from "./pages/Vendor/VendorRegister.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -18,6 +19,7 @@ const router = createBrowserRouter(
       <Route path="/register" element={<Register />} />
       <Route path="/" element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile/>} />
+        <Route path="/vendor" element={<VendorRegister/>} />
       </Route>
     </Route>
   )
