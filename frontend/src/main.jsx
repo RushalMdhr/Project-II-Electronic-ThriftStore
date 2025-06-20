@@ -15,11 +15,27 @@ import VendorRegister from "./pages/Vendor/VendorRegister.jsx";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
+      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/aboutus" element={<AboutUs />} />
+      <Route path="/contactus" element={<ContactUs />} />
+      <Route path="/vendor/register" element={<VendorRegister />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+
+      {/* Protected routes */}
       <Route path="/" element={<PrivateRoute />}>
-        <Route path="/profile" element={<Profile/>} />
-        <Route path="/vendor" element={<VendorRegister/>} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/vendor" element={<VendorRegister />} />
+        <Route path="/upload" element={<Upload />} />
+
+        <Route path="/admin/productcard" element={<ProductList />} />
+      </Route>
+
+      <Route element={<AdminRoute />}>
+        <Route path="/admin/usercard" element={<UserList />} />
+        <Route path="/admin/orderlist" element={<OrderList />} />
       </Route>
     </Route>
   )
