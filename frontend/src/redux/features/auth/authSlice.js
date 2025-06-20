@@ -18,8 +18,8 @@ const authSlice = createSlice({
         },
 
         logout : (state)=>{
-            state.userInfo = null;
-            localStorage.clear();
+          state.userInfo = null;
+          localStorage.removeItem("userInfo"); // safer than localStorage.clear()
         },
     },
 });
