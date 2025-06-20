@@ -1,0 +1,48 @@
+.Aboutus{
+    background-color:rgb(248, 248, 248);
+    height:100%;
+}   
+.bg-image{
+    height:316px;
+    width:100%;
+    margin: 0 auto;
+}
+.Title{
+    color:black;
+    font-size:30px;
+    position: relative;
+    text-align: center;
+    margin-bottom: 4px;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+.subtopic{
+    color:black;
+    font-size:21px;
+    margin: 0;
+
+   
+    text-align: center;
+
+}
+.sub-paragraph{
+ color:black;
+ font-size: 17px;
+ margin-right: 10px;
+ margin-left: 10px;
+ font-family: 'Times New Roman', Times, serif;
+
+
+}
+.sub-title{
+    color:black;
+    font-size:30px;
+   
+    margin-bottom: 4px;
+}
+.slogan{
+    font-weight: 700;
+    color:black;
+    text-align: center;
+}

@@ -1,0 +1,89 @@
+/* UserCard.css */
+.user-card-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.user-card {
+  width: 60%;
+  min-width: 300px;
+  max-width: 800px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background-color: var(--card-bg, #1a1a1a);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.user-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary, rgba(255, 255, 255, 0.87));
+}
+
+.user-info p {
+  margin: 4px 0 0;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  color: var(--icon-color, rgba(255, 255, 255, 0.87));
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background-color: var(--icon-hover-bg, rgba(255, 255, 255, 0.1));
+}
+
+.action-btn svg {
+  width: 20px;
+  height: 20px;
+}
