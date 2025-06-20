@@ -7,7 +7,7 @@ import createToken from "../utils/createToken.js";
 const SECRET_KEY = "bgtery";
 // salt is random
 
-const registerUser = asyncHandler(async (req, res) => {
+const createUser = asyncHandler(async (req, res) => {
   console.log("req.body:", req.body); // Debug log to see incoming data
   const { username, email, password } = req.body;
 
@@ -135,4 +135,4 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     throw new Error("user not found");
   }
 });
-export { createUser, loginUser, logout, getAllUsers,updateCurrentUserProfile };
+export { createUser, loginUser, logout, getAllUsers,deleteUser,updateCurrentUserProfile };
