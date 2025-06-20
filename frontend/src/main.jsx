@@ -11,6 +11,16 @@ import store from "./redux/store.js";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import Profile from "./pages/User/Profile.jsx";
 import VendorRegister from "./pages/Vendor/VendorRegister.jsx";
+import Home from "./pages/User/Home.jsx";
+import AboutUs from "./pages/User/AboutUs.jsx";
+import ContactUs from "./pages/User/ContactUs.jsx";
+import FAQ from "./pages/User/FAQ.jsx";
+import Unauthorized from "./pages/User/Unauthorized.jsx";
+import Upload from "./components/Product/Upload.jsx";
+import ProductList from "./components/Product/ProductList.jsx";
+import AdminRoute from "./components/Admin/AdminRoute.jsx";
+import UserList from "./pages/Admin/UserList.jsx";
+import OrderList from "./components/Admin/OrderList.jsx"
 
 const router = createBrowserRouter(
   createRoutesFromElements(

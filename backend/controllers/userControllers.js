@@ -1,5 +1,5 @@
 import User from "../models/userModel.js";
-import asyncHandler from "../middlewares/asyncHandlers.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import createToken from "../utils/createToken.js";
@@ -66,6 +66,14 @@ const loginUser = asyncHandler(async (req, res) => {
       return;
     }
   }
+});
+
+const logout = asyncHandler(async (req, res) => {
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+  res.status(200).json({ message: "Logged out successfully" });
 });
 
 // const uploadFile = (req, res) => {

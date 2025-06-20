@@ -10,6 +10,7 @@ import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 
+dotenv.config();
 connectDB();
 
 //app using
@@ -23,7 +24,7 @@ app.use("/api/users",userRoutes);
 app.use("/api", productRoutes);
 
 //host port
-dotenv.config();
+
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`server running in ${port}`));
 

@@ -1,5 +1,5 @@
 
-import "./Footer.css"; // Link to external CSS
+import "../../styles/Footer.css"; // Link to external CSS
 
 const Footer = () => {
   return (
