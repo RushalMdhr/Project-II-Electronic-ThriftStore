@@ -54,7 +54,12 @@ const loginUser = asyncHandler(async (req, res) => {
           isAdmin: exitingUser.isAdmin,
         });
         return;
+      } else {
+        res.status(401).json({ message: "Incorrect password" });
+        return;
       }
+    }else{
+      res.status(404).json({ message : "User not found "})
     }
   } catch (error) {
     res.status(500);
