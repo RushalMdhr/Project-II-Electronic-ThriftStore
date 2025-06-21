@@ -25,10 +25,12 @@
     "react-slick": "^0.30.3",
     "react-toastify": "^11.0.5",
     "remixicon": "^4.6.0",
-    "slick-carousel": "^1.8.1"
+    "slick-carousel": "^1.8.1",
+    "sweetalert2": "^11.6.13"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@tailwindcss/vite": "^4.1.10",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react-swc": "^3.9.0",
