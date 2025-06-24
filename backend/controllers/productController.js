@@ -1,3 +1,4 @@
+
 import asyncHandler from "../middlewares/asyncHandler.js";
 import Product from "../models/productModel.js";
 import mongoose from "mongoose";
@@ -78,10 +79,11 @@ const deleteProductById = asyncHandler(async (req, res) => {
     if (mongoose.connection.readyState !== 1) {
       throw new Error("MongoDB not connected");
     }
-
+    
     if (typeof id !== "string" || id.length === 0) {
       return res.status(400).json({ error: "Invalid ID format" });
     }
+
 
     const result = await Product.findOneAndDelete({ _id: req.params.id });
     if (!result) {

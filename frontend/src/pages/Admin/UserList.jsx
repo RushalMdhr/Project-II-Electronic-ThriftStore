@@ -1,8 +1,10 @@
 // components/UserList.jsx
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchUsers, deleteUser } from "../../redux/features/users/userSlice";
-import UserCard from "./UserCard";
+
+import { fetchUsers, deleteUser } from "../../redux/features/users/userSlice.js";
+import UserCard from "../../components/Admin/UserCard";
+
 
 const UserList = () => {
   const dispatch = useDispatch();

@@ -19,6 +19,7 @@ const MessageSchema = new mongoose.Schema({
     ref: "Product",
     default: null,
   },
+
   isFromBuyer: { type: Boolean, default: true },
   timestamp: { type: Date, default: Date.now },
 });
