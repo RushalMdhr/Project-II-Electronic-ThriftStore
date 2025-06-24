@@ -23,6 +23,7 @@ import ProductList from "./components/Product/ProductList.jsx";
 import AdminRoute from "./components/Admin/AdminRoute.jsx";
 import UserList from "./pages/Admin/UserList.jsx";
 import OrderList from "./components/Admin/OrderList.jsx"
+import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -44,12 +45,12 @@ const router = createBrowserRouter(
         <Route path="/upload" element={<Upload />} />
         <Route path="/admin/productcard" element={<ProductList />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
-          
       </Route>
 
       <Route element={<AdminRoute />}>
         <Route path="/admin/usercard" element={<UserList />} />
         <Route path="/admin/orderlist" element={<OrderList />} />
+        <Route path="/admin/" element={<AdminDashboard />} />
       </Route>
     </Route>
   )
