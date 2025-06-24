@@ -1,90 +1,44 @@
-import { use, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { useProfileMutation, useUpdateUserMutation } from "../../redux/api/usersApiSlice";
-import { setCredentials } from "../../redux/features/auth/authSlice";
-
+import { useSelector } from "react-redux";
+import { Link } from "react-router";
 const Profile = () => {
   const { userInfo } = useSelector((state) => state.auth);
-
-  const [username, setusername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const [updateProfile, { isloading }] = useProfileMutation();
-
-  useEffect(() => {
-    setusername(userInfo.username);
-    setEmail(userInfo.email);
-  }, [userInfo.username, userInfo.email]);
-
-  const dispatch = useDispatch();
-
-  const updateHandler = async (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-    } else {
-      try {
-        const res = await updateProfile({
-          _id: userInfo._id,
-          username,
-          email,
-          password,
-        }).unwrap();
-        dispatch(setCredentials({ ...res }));
-        toast.success("Profile Sucessfully Updated");
-      } catch (error) {
-        toast.error(error?.data?.message || error.message);
-      }
-    }
-  };
-
   return (
-    <>
-      <h1>This is profile</h1>
-      <form onSubmit={updateHandler}>
-        <div>
-          <label>username</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setusername(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>email</label>
-          <input
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>confirm Password</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-        </div>
-        <button
-          type="submit"
-          className="border rounded-2xl bg-amber-100 hover:bg-amber-500"
+    <div className="flex flex-col gap-4 items-start p-6">
+      <Link
+        to="/updateProfile"
+        className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition"
+      >
+        Update Profile
+      </Link>
+      {userInfo.isVendor ? (
+        <Link
+          to="/dashboard"
+          className="px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition"
         >
-          UPDATE
-        </button>
-      </form>
-    </>
+          My Dashboard
+        </Link>
+      ) : (
+        <h1 className="text-red-600 font-semibold">BE A Vendor ?</h1>
+      )}
+      <Link
+        to="/orderHistory"
+        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-2xl hover:bg-gray-300 transition"
+      >
+        Order History
+      </Link>
+      <Link
+        to="/wishlist"
+        className="px-4 py-2 bg-pink-500 text-white rounded-2xl hover:bg-pink-600 transition"
+      >
+        Wishlist
+      </Link>
+      <Link
+        to="/portfolio"
+        className="px-4 py-2 bg-yellow-400 text-black rounded-2xl hover:bg-yellow-500 transition"
+      >
+        Reviews & Ratings
+      </Link>
+    </div>
   );
 };
 
