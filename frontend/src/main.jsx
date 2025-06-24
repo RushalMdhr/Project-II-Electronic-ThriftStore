@@ -10,6 +10,8 @@ import { Provider } from "react-redux";
 import store from "./redux/store.js";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import Profile from "./pages/User/Profile.jsx";
+import UpdateProfile from "./pages/User/UpdateProfile.jsx";
+
 import VendorRegister from "./pages/Vendor/VendorRegister.jsx";
 import Home from "./pages/User/Home.jsx";
 import AboutUs from "./pages/User/AboutUs.jsx";
@@ -30,6 +32,7 @@ const router = createBrowserRouter(
       <Route path="/register" element={<Register />} />
       <Route path="/aboutus" element={<AboutUs />} />
       <Route path="/contactus" element={<ContactUs />} />
+
       <Route path="/vendor/register" element={<VendorRegister />} />
       <Route path="/faq" element={<FAQ />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
@@ -39,8 +42,9 @@ const router = createBrowserRouter(
         <Route path="/profile" element={<Profile />} />
         <Route path="/vendor" element={<VendorRegister />} />
         <Route path="/upload" element={<Upload />} />
-
         <Route path="/admin/productcard" element={<ProductList />} />
+        <Route path="/updateProfile" element={<UpdateProfile />} />
+          
       </Route>
 
       <Route element={<AdminRoute />}>

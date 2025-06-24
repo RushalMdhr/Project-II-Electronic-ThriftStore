@@ -1,5 +1,6 @@
 // import React,{ useState,useEffect } from 'react'
 import "../../styles/AboutUs.css";
+
 // import BackgroundImage from '../assets/Background-Image.jpg';
 
 export default function AboutUs() {

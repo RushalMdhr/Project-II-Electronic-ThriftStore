@@ -45,26 +45,36 @@ const createUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const exitingUser = await User.findOne({ email });
+  try {
+    const exitingUser = await User.findOne({ email });
 
-  if (exitingUser) {
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      exitingUser.password
-    );
+    if (exitingUser) {
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        exitingUser.password
+      );
 
-    if (isPasswordValid) {
-      createToken(res, exitingUser._id);
+      if (isPasswordValid) {
+        createToken(res, exitingUser._id);
 
-      res.status(201).json({
-        _id: exitingUser._id,
-        username: exitingUser.username,
-        email: exitingUser.email,
-        isAdmin: exitingUser.isAdmin,
-        isVendor: exitingUser.isVendor,
-      });
-      return;
+        res.status(201).json({
+          _id: exitingUser._id,
+          username: exitingUser.username,
+          email: exitingUser.email,
+          isAdmin: exitingUser.isAdmin,
+        });
+        return;
+      } else {
+        res.status(401).json({ message: "Incorrect password" });
+        return;
+      }
+    }else{
+      res.status(404).json({ message : "User not found "})
+
     }
+  }
+  catch (error) {
+    res.status(500).json({ message: "Server error" });
   }
 });
 

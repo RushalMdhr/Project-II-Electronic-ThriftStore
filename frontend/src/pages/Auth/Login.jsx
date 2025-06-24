@@ -52,11 +52,12 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <button type="submit">Login</button>
+          <button type="submit" className="text-blue-500 bg-blue-200 border-4 border-blue-200 rounded-2xl">Login</button>
           <div>
             r u new ?{" "}
             <Link
               to={redirect ? `/register?redirect=${redirect}` : "/register"}
+              className="text-red-500"
             >
               Register
             </Link>
