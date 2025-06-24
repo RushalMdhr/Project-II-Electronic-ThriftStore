@@ -39,7 +39,6 @@ const router = createBrowserRouter(
         <Route path="/profile" element={<Profile />} />
         <Route path="/vendor" element={<VendorRegister />} />
         <Route path="/upload" element={<Upload />} />
-
         <Route path="/admin/productcard" element={<ProductList />} />
       </Route>
 
