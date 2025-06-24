@@ -1,31 +1,26 @@
+// components/Admin/UserCard.jsx
 import React from "react";
 import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
 import "../../styles/UserCard.css";
-import { useDispatch } from "react-redux";
-import { deleteUser } from "../../redux/features/users/userSlice";
 
-const UserCard = ({ user }) => {
-  const dispatch = useDispatch();
-
+const UserCard = ({ user, onDelete }) => {
   const handleDelete = () => {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete ${user.username}?`
     );
     if (confirmDelete) {
-      dispatch(deleteUser(user._id))
-        .unwrap()
-        .then(() => alert(`${user.username} has been deleted`))
-        .catch((err) => alert("Delete failed: " + err));
+      onDelete(user._id);
     }
   };
 
   const handleEdit = () => {
     console.log("Edit user:", user);
-    // You can trigger modal or navigate here
+    // You can trigger a modal or navigate to edit page
   };
 
   const handleView = () => {
     console.log("View user:", user);
+    // You can trigger a modal or navigate to user details page
   };
 
   return (
