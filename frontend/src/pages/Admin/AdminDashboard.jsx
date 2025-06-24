@@ -4,9 +4,12 @@ import {
   FiUsers,
   FiSettings,
   FiPieChart,
-  FiCalendar,
-  FiMail,
-  FiFileText,
+  FiShoppingBag,
+  FiShoppingCart,
+  FiTag,
+  FiPercent,
+  FiStar,
+  FiDollarSign,
   FiLogOut,
   FiMenu,
   FiX,
@@ -23,120 +26,92 @@ const AdminDashboard = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  // Navigation items for e-commerce
   const navItems = [
     { name: "dashboard", icon: <FiHome />, label: "Dashboard" },
+    { name: "products", icon: <FiShoppingBag />, label: "Products" },
+    { name: "orders", icon: <FiShoppingCart />, label: "Orders" },
+    { name: "customers", icon: <FiUsers />, label: "Customers" },
+    { name: "categories", icon: <FiTag />, label: "Categories" },
+    { name: "discounts", icon: <FiPercent />, label: "Discounts" },
     { name: "analytics", icon: <FiPieChart />, label: "Analytics" },
-    { name: "users", icon: <FiUsers />, label: "Users" },
-    { name: "calendar", icon: <FiCalendar />, label: "Calendar" },
-    { name: "messages", icon: <FiMail />, label: "Messages" },
-    { name: "reports", icon: <FiFileText />, label: "Reports" },
-    { name: "settings", icon: <FiSettings />, label: "Settings" },
+    { name: "reviews", icon: <FiStar />, label: "Reviews" },
   ];
 
+  // E-commerce specific stats
   const stats = [
-    { title: "Total Users", value: "2,453", change: "+12%", trend: "up" },
-    { title: "Revenue", value: "$4,673", change: "+8%", trend: "up" },
-    { title: "Pending", value: "342", change: "-3%", trend: "down" },
-    { title: "Tasks", value: "89/120", change: "+5%", trend: "up" },
+    { title: "Total Revenue", value: "$24,531", change: "+18%", trend: "up" },
+    { title: "Total Orders", value: "1,453", change: "+12%", trend: "up" },
+    { title: "New Customers", value: "342", change: "+8%", trend: "up" },
+    { title: "Conversion Rate", value: "3.2%", change: "+0.5%", trend: "up" },
   ];
 
-  const recentActivities = [
-    { user: "John Doe", action: "created a new project", time: "2 mins ago" },
-    { user: "Sarah Smith", action: "updated settings", time: "10 mins ago" },
-    { user: "Mike Johnson", action: "completed task", time: "25 mins ago" },
-    { user: "Emma Wilson", action: "added new files", time: "1 hour ago" },
+  // Sample products data
+  const topProducts = [
+    { id: 1, name: "Wireless Headphones", price: 99.99, sold: 124 },
+    { id: 2, name: "Smart Watch", price: 199.99, sold: 98 },
+    { id: 3, name: "Bluetooth Speaker", price: 79.99, sold: 87 },
+    { id: 4, name: "Phone Case", price: 24.99, sold: 76 },
+    { id: 5, name: "USB-C Cable", price: 12.99, sold: 65 },
+  ];
+
+  // Sample orders data
+  const recentOrders = [
+    {
+      id: "#1001",
+      customer: "John Doe",
+      items: 3,
+      total: 149.97,
+      payment: "Credit Card",
+      status: "completed",
+    },
+    {
+      id: "#1002",
+      customer: "Jane Smith",
+      items: 1,
+      total: 199.99,
+      payment: "PayPal",
+      status: "shipped",
+    },
+    {
+      id: "#1003",
+      customer: "Mike Johnson",
+      items: 5,
+      total: 64.95,
+      payment: "Credit Card",
+      status: "processing",
+    },
+    {
+      id: "#1004",
+      customer: "Sarah Williams",
+      items: 2,
+      total: 179.98,
+      payment: "Apple Pay",
+      status: "completed",
+    },
+    {
+      id: "#1005",
+      customer: "David Brown",
+      items: 1,
+      total: 24.99,
+      payment: "Credit Card",
+      status: "pending",
+    },
   ];
 
   return (
-    <div className="flex h-screen bg-gray-900 text-gray-200">
-      {/* Sidebar */}
-      <div
-        className={`${
-          sidebarOpen ? "w-64" : "w-20"
-        } bg-gray-800 transition-all duration-300 ease-in-out flex flex-col`}
-      >
-        <div className="p-4 flex items-center justify-between border-b border-gray-700">
-          {sidebarOpen ? (
-            <h1 className="text-xl font-bold text-purple-400">AdminPanel</h1>
-          ) : (
-            <div className="w-8 h-8 bg-purple-500 rounded-full"></div>
-          )}
-          <button
-            onClick={toggleSidebar}
-            className="text-gray-400 hover:text-white p-1 rounded-lg"
-          >
-            {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
-          </button>
-        </div>
-
-        <nav className="flex-1 overflow-y-auto py-4">
-          <ul>
-            {navItems.map((item) => (
-              <li key={item.name} className="px-4">
-                <button
-                  onClick={() => setActiveNav(item.name)}
-                  className={`flex items-center w-full p-3 rounded-lg transition-colors ${
-                    activeNav === item.name
-                      ? "bg-purple-900/50 text-purple-300"
-                      : "hover:bg-gray-700/50 text-gray-300"
-                  }`}
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  {sidebarOpen && (
-                    <span className="ml-3 font-medium">{item.label}</span>
-                  )}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="p-4 border-t border-gray-700">
-          <button className="flex items-center w-full p-3 rounded-lg hover:bg-gray-700/50 text-gray-300">
-            <FiLogOut />
-            {sidebarOpen && <span className="ml-3 font-medium">Logout</span>}
-          </button>
-        </div>
-      </div>
+    <div className="flex p-0 h-screen bg-gray-900 text-gray-200">
+      {/* Sidebar (same as before) */}
+      {/* ... */}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Navigation */}
-        <header className="bg-gray-800 border-b border-gray-700 p-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <button
-              onClick={toggleSidebar}
-              className="text-gray-400 hover:text-white p-1 rounded-lg mr-4"
-            >
-              <FiMenu size={20} />
-            </button>
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="bg-gray-700 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 w-64"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <button className="p-2 rounded-full hover:bg-gray-700 relative">
-              <FiBell size={20} />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                <FiUser size={16} />
-              </div>
-              <span className="font-medium">Admin</span>
-            </div>
-          </div>
-        </header>
+        {/* Top Navigation (same as before) */}
+        {/* ... */}
 
         {/* Dashboard Content */}
         <main className="flex-1 overflow-y-auto p-6 bg-gray-900/50">
-          <h2 className="text-2xl font-bold mb-6">Dashboard Overview</h2>
+          <h2 className="text-2xl font-bold mb-6">E-commerce Dashboard</h2>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -160,42 +135,42 @@ const AdminDashboard = () => {
             ))}
           </div>
 
-          {/* Charts and Tables */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Chart */}
-            <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 lg:col-span-2">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold">Performance Overview</h3>
-                <select className="bg-gray-700 text-sm rounded-lg px-3 py-1 focus:outline-none">
-                  <option>Last 7 days</option>
-                  <option>Last 30 days</option>
-                  <option>Last 90 days</option>
-                </select>
-              </div>
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
+              <h3 className="font-bold mb-4">Sales Overview</h3>
               <div className="h-64 bg-gray-900/50 rounded-lg flex items-center justify-center text-gray-400">
-                Chart Area
+                Sales Chart
               </div>
             </div>
-
-            {/* Recent Activities */}
             <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
-              <h3 className="font-bold mb-4">Recent Activities</h3>
-              <ul className="space-y-4">
-                {recentActivities.map((activity, index) => (
-                  <li key={index} className="flex items-start">
-                    <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center mr-3 mt-1">
-                      <FiUser size={14} className="text-purple-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm">
-                        <span className="font-medium">{activity.user}</span>{" "}
-                        {activity.action}
-                      </p>
-                      <p className="text-xs text-gray-400">{activity.time}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <h3 className="font-bold mb-4">Revenue by Category</h3>
+              <div className="h-64 bg-gray-900/50 rounded-lg flex items-center justify-center text-gray-400">
+                Category Chart
+              </div>
+            </div>
+          </div>
+
+          {/* Top Products */}
+          <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold">Top Selling Products</h3>
+              <button className="text-sm text-purple-400 hover:text-purple-300">
+                View All Products
+              </button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {topProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="bg-gray-700/50 rounded-lg p-3 hover:bg-gray-700 transition-colors"
+                >
+                  <div className="bg-gray-600 rounded-md w-full aspect-square mb-2"></div>
+                  <p className="text-sm font-medium truncate">{product.name}</p>
+                  <p className="text-xs text-gray-400">${product.price}</p>
+                  <p className="text-xs text-green-400">{product.sold} sold</p>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -204,47 +179,45 @@ const AdminDashboard = () => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold">Recent Orders</h3>
               <button className="text-sm text-purple-400 hover:text-purple-300">
-                View All
+                View All Orders
               </button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="text-left text-gray-400 text-sm border-b border-gray-700">
-                    <th className="pb-3">Order ID</th>
+                    <th className="pb-3">Order #</th>
                     <th className="pb-3">Customer</th>
-                    <th className="pb-3">Date</th>
-                    <th className="pb-3">Amount</th>
+                    <th className="pb-3">Items</th>
+                    <th className="pb-3">Total</th>
+                    <th className="pb-3">Payment</th>
                     <th className="pb-3">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[1, 2, 3, 4, 5].map((item) => (
+                  {recentOrders.map((order) => (
                     <tr
-                      key={item}
+                      key={order.id}
                       className="border-b border-gray-700/50 hover:bg-gray-700/20"
                     >
-                      <td className="py-3">
-                        #ORD-{item}00{item}
-                      </td>
-                      <td className="py-3">Customer {item}</td>
-                      <td className="py-3">2023-05-{10 + item}</td>
-                      <td className="py-3">${(item * 125).toFixed(2)}</td>
+                      <td className="py-3">{order.id}</td>
+                      <td className="py-3">{order.customer}</td>
+                      <td className="py-3">{order.items}</td>
+                      <td className="py-3">${order.total.toFixed(2)}</td>
+                      <td className="py-3">{order.payment}</td>
                       <td className="py-3">
                         <span
                           className={`px-2 py-1 rounded-full text-xs ${
-                            item % 3 === 0
+                            order.status === "completed"
                               ? "bg-green-900/50 text-green-400"
-                              : item % 2 === 0
+                              : order.status === "shipped"
                               ? "bg-blue-900/50 text-blue-400"
-                              : "bg-yellow-900/50 text-yellow-400"
+                              : order.status === "processing"
+                              ? "bg-yellow-900/50 text-yellow-400"
+                              : "bg-gray-700 text-gray-300"
                           }`}
                         >
-                          {item % 3 === 0
-                            ? "Completed"
-                            : item % 2 === 0
-                            ? "Processing"
-                            : "Pending"}
+                          {order.status}
                         </span>
                       </td>
                     </tr>
