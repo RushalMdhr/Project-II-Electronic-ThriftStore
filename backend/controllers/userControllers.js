@@ -73,6 +73,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
     }
   }
+  catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 const logout = asyncHandler(async (req, res) => {

@@ -1,14 +1,30 @@
-___________________ Installation ___________________
+______________________________________________ Installation ___________________
+
+        ⚠️⚠️    WARNING !!  ⚠️⚠️ 
+to install the backend lib you just need to install 
+...yourfolders/PROJECT-II/> npm i ...
+without moving inside backend
+
+But to install the frontend lib you must change directory 
+cd ./frontend/. > npm i
+to install the lib 
+        ⚠️⚠️    WARNING !!  ⚠️⚠️ 
+
+________ CREATE PROJECT FRONTEND ________
 npm create vite@latest my-project -- --template react
+
+________ BACKEND ________
 npm i nodemon multer mongoose jsonwebtoken express-formidable express-async-handler express dotenv cors cookie-parser concurrently bcryptjs
+npm i bcrypt
+
+________ FRONTEND ________
 npm i slick-carousel react-slick react-toastify react-router react-router-dom react-redux react-icons apexcharts react-apexcharts moment flowbite axios @reduxjs/toolkit
 
+________ OTHER FRONTEND lib ________
 npm install -D tailwindcss @tailwindcss/vite
-
 npm i lucide-react
-
 npm i sweetalert2
-npm i bcrypt
+
 
 ___________________ .env ___________________
 PORT=5000

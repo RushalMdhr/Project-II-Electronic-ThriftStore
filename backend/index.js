@@ -4,9 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import path from "path";
 import express from "express";
-
 import cors from "cors";
-import dotenv from "dotenv";
 
 import cookieParser from "cookie-parser";
 
@@ -19,7 +17,6 @@ import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 
 //db connection
-dotenv.config();
 connectDB();
 
 //app using
