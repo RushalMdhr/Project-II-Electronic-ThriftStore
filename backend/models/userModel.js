@@ -16,6 +16,16 @@ const userSchema = mongoose.Schema({
         type : String,
         required : true
     },
+    isUser: {
+        type : Boolean,
+        required : true,
+        default : true,
+    },
+    isVendor: {
+        type : Boolean,
+        required : true,
+        default : false,
+    },
 
     isAdmin: {
         type : Boolean,
