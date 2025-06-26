@@ -3,6 +3,7 @@ import asyncHandler from "../middlewares/asyncHandler.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import createToken from "../utils/createToken.js";
+import mongoose from "mongoose";
 
 const SECRET_KEY = "bgtery";
 // salt is random
@@ -120,6 +121,56 @@ const getAllUsers = asyncHandler(async (req, res) => {
       .json({ message: "Error fetching users", error: error.message });
   }
 });
+
+export const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const updateUserById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid user ID" });
+  }
+
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  user.username = req.body.username || user.username;
+  user.email = req.body.email || user.email;
+  user.isAdmin = req.body.isAdmin ?? user.isAdmin;
+  user.isVendor = req.body.isVendor ?? user.isVendor;
+  user.isUser = req.body.isUser ?? user.isUser;
+
+  if (req.body.password) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    user.password = hashedPassword;
+  }
+
+  const updatedUser = await user.save();
+
+  res.json({
+    _id: updatedUser._id,
+    username: updatedUser.username,
+    email: updatedUser.email,
+    isAdmin: updatedUser.isAdmin,
+    isVendor: updatedUser.isVendor,
+    isUser: updatedUser.isUser,
+  });
+});
+
 
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);

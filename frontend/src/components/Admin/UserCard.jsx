@@ -1,9 +1,9 @@
-// components/Admin/UserCard.jsx
 import React from "react";
+import { Link } from "react-router-dom"; // ✅ use this instead of useNavigate
 import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
 import "../../styles/UserCard.css";
 
-const UserCard = ({ user, onDelete }) => {
+const UserCard = ({ user, onDelete, onView }) => {
   const handleDelete = () => {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete ${user.username}?`
@@ -13,14 +13,9 @@ const UserCard = ({ user, onDelete }) => {
     }
   };
 
-  const handleEdit = () => {
-    console.log("Edit user:", user);
-    // You can trigger a modal or navigate to edit page
-  };
-
   const handleView = () => {
     console.log("View user:", user);
-    // You can trigger a modal or navigate to user details page
+    onView(user);
   };
 
   return (
@@ -40,9 +35,13 @@ const UserCard = ({ user, onDelete }) => {
           <button className="action-btn" title="View" onClick={handleView}>
             <FiEye />
           </button>
-          <button className="action-btn" title="Edit" onClick={handleEdit}>
+          <Link
+            to={`/admin/users/${user._id}/edit`}
+            className="action-btn"
+            title="Edit"
+          >
             <FiEdit />
-          </button>
+          </Link>
           <button className="action-btn" title="Delete" onClick={handleDelete}>
             <FiTrash2 />
           </button>
