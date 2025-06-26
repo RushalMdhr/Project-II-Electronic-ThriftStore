@@ -1,5 +1,5 @@
 import CartItem from "../models/cartitemModel.js";
-import asyncHandler from "../middlewares/asyncHandlers.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 // @desc    Add item to cart
 export const addToCart = asyncHandler(async (req, res) => {
