@@ -25,13 +25,6 @@ export const getAdminSummary = async (req, res) => {
     // Add userGrowthData aggregation here:
     const userGrowthData = await User.aggregate([
       {
-        $match: {
-          createdAt: {
-            $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
-          },
-        },
-      },
-      {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
           count: { $sum: 1 },
@@ -39,6 +32,7 @@ export const getAdminSummary = async (req, res) => {
       },
       { $sort: { _id: 1 } },
     ]);
+      
     res.json({
       users,
       vendors,
