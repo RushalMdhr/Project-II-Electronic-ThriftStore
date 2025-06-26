@@ -14,7 +14,8 @@ import UpdateProfile from "./pages/User/UpdateProfile.jsx";
 
 import VendorRegister from "./pages/Vendor/VendorRegister.jsx";
 import VendorRegisterGuard from "./pages/Vendor/VendorRegisterGuard.jsx";
-import Home from "./pages/User/Home.jsx";
+import Home from "./pages/Home/Home.jsx";
+
 import AboutUs from "./pages/User/AboutUs.jsx";
 import ContactUs from "./pages/User/ContactUs.jsx";
 import FAQ from "./pages/User/FAQ.jsx";
@@ -24,6 +25,10 @@ import ProductList from "./components/Product/ProductList.jsx";
 import AdminRoute from "./components/Admin/AdminRoute.jsx";
 import UserList from "./pages/Admin/UserList.jsx";
 import OrderList from "./components/Admin/OrderList.jsx"
+
+import UploadPage from "./pages/Vendor/UploadPage.jsx";
+import UploadPageTest from "./pages/Vendor/UploadPageTest.jsx";
+
 import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
 import UserUpdate from "./pages/Admin/UserUpdate.jsx";
 import Dashboard from "./pages/Vendor/Dashboard.jsx";
@@ -49,7 +54,9 @@ const router = createBrowserRouter(
       {/* Protected routes */}
       <Route path="/" element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
-        <Route path="/upload" element={<Upload />} />
+
+        <Route path="/vendor" element={<VendorRegister />} />
+        <Route path="/upload" element={<UploadPageTest />} />
         <Route path="/admin/productcard" element={<ProductList />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
         <Route path="/dashboard" element={<Dashboard />} />
