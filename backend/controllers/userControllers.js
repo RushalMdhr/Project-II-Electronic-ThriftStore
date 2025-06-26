@@ -63,6 +63,9 @@ const loginUser = asyncHandler(async (req, res) => {
           username: exitingUser.username,
           email: exitingUser.email,
           isAdmin: exitingUser.isAdmin,
+          isVendor: exitingUser.isVendor,
+          shopName: exitingUser.shopName,
+          shopDescription: exitingUser.shopDescription,
         });
         return;
       } else {
@@ -204,4 +207,47 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     throw new Error("user not found");
   }
 });
-export { createUser, loginUser, logout, getAllUsers,deleteUser,updateCurrentUserProfile };
+
+// Create or update vendor shop details and set isVendor to true
+const updateVendorShop = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  const { shopName, shopDescription } = req.body;
+  if (!shopName || !shopDescription) {
+    return res.status(400).json({ message: "Shop name and description are required" });
+  }
+  user.shopName = shopName;
+  user.shopDescription = shopDescription;
+  user.isVendor = true;
+  await user.save();
+  res.status(200).json({
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+    isVendor: user.isVendor,
+    shopName: user.shopName,
+    shopDescription: user.shopDescription,
+  });
+});
+
+const getCurrentUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select("-password");
+  if (user) {
+    res.status(200).json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      isVendor: user.isVendor,
+      shopName: user.shopName,
+      shopDescription: user.shopDescription,
+    });
+  } else {
+    res.status(404);
+    throw new Error("user not found");
+  }
+});
+
+export { createUser, loginUser, logout, getAllUsers,deleteUser,updateCurrentUserProfile, updateVendorShop, getCurrentUserProfile };

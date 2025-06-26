@@ -13,6 +13,7 @@ import Profile from "./pages/User/Profile.jsx";
 import UpdateProfile from "./pages/User/UpdateProfile.jsx";
 
 import VendorRegister from "./pages/Vendor/VendorRegister.jsx";
+import VendorRegisterGuard from "./pages/Vendor/VendorRegisterGuard.jsx";
 import Home from "./pages/User/Home.jsx";
 import AboutUs from "./pages/User/AboutUs.jsx";
 import ContactUs from "./pages/User/ContactUs.jsx";
@@ -25,27 +26,33 @@ import UserList from "./pages/Admin/UserList.jsx";
 import OrderList from "./components/Admin/OrderList.jsx"
 import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
 import UserUpdate from "./pages/Admin/UserUpdate.jsx";
+import Dashboard from "./pages/Vendor/Dashboard.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<App />}>
+    <Route path="/" element={<App />} errorElement={<div className="min-h-screen flex items-center justify-center bg-[#0a1120] text-white"><div className="text-center"><h1 className="text-4xl font-bold mb-4 text-[#1de9b6]">404 - Page Not Found</h1><p className="text-lg">Sorry, the page you are looking for does not exist.</p><a href="/" className="mt-4 inline-block px-6 py-2 bg-[#1de9b6] text-[#0a1120] rounded-lg font-semibold">Go Home</a></div></div>}>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/aboutus" element={<AboutUs />} />
       <Route path="/contactus" element={<ContactUs />} />
 
-      <Route path="/vendor/register" element={<VendorRegister />} />
+      {/* Vendor route guard: if already a vendor, redirect to dashboard */}
+      <Route path="/vendor/register" element={
+        <VendorRegisterGuard>
+          <VendorRegister />
+        </VendorRegisterGuard>
+      } />
       <Route path="/faq" element={<FAQ />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* Protected routes */}
       <Route path="/" element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
-        <Route path="/vendor" element={<VendorRegister />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/admin/productcard" element={<ProductList />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Route>
 
       <Route element={<AdminRoute />}>
