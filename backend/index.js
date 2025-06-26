@@ -15,12 +15,23 @@ import userRoutes from "./routes/userRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 //db connection
 connectDB();
 
+
+
 //app using
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Your frontend origin
+    credentials: true, // Allow cookies to be sent if needed
+  })
+);
+  
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -28,6 +39,7 @@ app.use(cookieParser());
 app.use("/api/users",userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/admin", adminRoutes);
 
 // __________________IMAGE________________________________________
 app.use("/api/upload", uploadRoutes);
