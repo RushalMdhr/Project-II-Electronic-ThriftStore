@@ -8,7 +8,12 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const UploadPageTest = () => {
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState([]);
+  console.log(images);
+  
+
+  // Update file input handler in the form:
+  // onChange={(e) => setImages(Array.from(e.target.files))}
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
   const [price, setPrice] = useState("");
@@ -27,7 +32,7 @@ const UploadPageTest = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     if (
-      !image ||
+      !images ||
       !name ||
       !brand ||
       !price ||
@@ -50,38 +55,27 @@ const UploadPageTest = () => {
     formData.append("quantity", quantity);
     formData.append("condition", condition);
 
-
-    // 1. Upload images and get their paths
-
+    // Upload all images in one request
     let imagePaths = [];
-
-    if (image) {
+    if (images && images.length > 0) {
       const imgFormData = new FormData();
-      for (let i = 0; i < image.length; i++) {
-        imgFormData.append("images", image[i]);
-      }
+      images.forEach((img) => imgFormData.append("images", img));
       try {
-        const data = await uploadProductImage(imgFormData).unwrap();
-        imagePaths = data.paths || [];
+        const response = await uploadProductImage(imgFormData).unwrap();
+        if (response && response.paths) {
+          imagePaths = response.paths;
+          console.log("Image paths:", imagePaths);
+        }
       } catch (err) {
-        alert("Failed to upload images");
+        toast.error("Failed to upload images");
         return;
       }
     }
-    // 2. Prepare product data with image paths
-     formData.append("images", imagePaths);
-    // const productData = {
-    //   name,
-    //   brand,
-    //   price,
-    //   description,
-    //   category,
-    //   quantity,
-    //   condition,
-    //   images: imagePaths,
-    // };
 
-    // 3. Submit product
+    // Add image paths as a comma-separated string
+    formData.append("images", imagePaths);
+    
+
     try {
       const product = await createProduct(formData).unwrap();
       toast.info("WORKING");
@@ -103,7 +97,7 @@ const UploadPageTest = () => {
           type="file"
           accept="image/*"
           multiple
-          onChange={(e) => setImage(e.target.files)}
+          onChange={(e) => setImages((prev) => [...prev, ...Array.from(e.target.files)])}
         />
         <input
           type="text"
