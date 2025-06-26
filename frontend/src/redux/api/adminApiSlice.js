@@ -9,7 +9,10 @@ export const adminApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    getUserGrowthData: builder.query({
+      query: () => "/admin/user-growth",
+    }),
   }),
 });
 
-export const { useGetAdminSummaryQuery } = adminApiSlice;
+export const { useGetAdminSummaryQuery, useGetUserGrowthDataQuery } = adminApiSlice;

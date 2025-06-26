@@ -43,7 +43,7 @@ const AdminDashboard = () => {
                   title="New Users Over Time"
                   data={summary.userGrowthData}
                   dataKey="count"
-                  xAxisKey="date"
+                  xAxisKey="_id" // <--- this matches your aggregation response key
                   lineColor="#10B981"
                 />
               )}

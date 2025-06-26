@@ -34,3 +34,34 @@ export const getAdminSummary = async (req, res) => {
     res.status(500).json({ message: "Admin summary failed", error });
   }
 };
+
+// Controller to get user growth data grouped by day (last 30 days)
+export const getUserGrowth = async (req, res) => {
+    try {
+      // Aggregate users by createdAt date (format YYYY-MM-DD)
+      const userGrowthData = await User.aggregate([
+        {
+          $match: {
+            createdAt: {
+              // Only last 30 days
+              $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+            },
+            count: { $sum: 1 }, // Count users per day
+          },
+        },
+        { $sort: { _id: 1 } }, // Sort by date ascending
+      ]);
+  
+      res.json(userGrowthData);
+    } catch (error) {
+      console.error("Error in getUserGrowth:", error);
+      res.status(500).json({ message: "Server error while getting user growth" });
+    }
+  };
