@@ -6,14 +6,18 @@ const Upload = () => {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [image, setImage] = useState(null); // use null for files
+  // const [image, setImage] = useState(null); // use null for files
+  const [image, setImage] = useState([]); // multiple files
+
   const [quantity, setQuantity] = useState("");
 
   const navigate = useNavigate();
 
   const handleUpload = async () => {
     const formData = new FormData();
-    formData.append("file", image);
+    image.forEach((img) => {
+    formData.append("image", img); // 'images' should match backend (upload.array('images'))
+   });
     formData.append("name", name);
     formData.append("price", price);
     formData.append("description", description);
@@ -21,7 +25,7 @@ const Upload = () => {
     formData.append("quantity", quantity);
 
     try {
-      let result = await fetch("http://localhost:5000/api/users/upload", {
+      let result = await fetch("http://localhost:5000/api/products/add", {
         method: "POST",
         body: formData,
       });
@@ -36,12 +40,12 @@ const Upload = () => {
   return (
     <div>
       <h1>Upload</h1>
-      <input
+     <input
         type="file"
-        name="file"
-        id="file"
-        onChange={(e) => setImage(e.target.files[0])}
+        multiple
+        onChange={(e) => setImage(Array.from(e.target.files))}
       />
+
       <input
         type="text"
         placeholder="Name"

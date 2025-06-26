@@ -1,11 +1,17 @@
 //packages
 
 import dotenv from "dotenv";
-dotenv.config();
+
 import path from "path";
 import express from "express";
 import cors from "cors";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 import cookieParser from "cookie-parser";
 
 //utils
@@ -15,6 +21,8 @@ import userRoutes from "./routes/userRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import cartitemRoutes from "./routes/cartitemRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
 //db connection
 connectDB();
@@ -29,10 +37,13 @@ app.use("/api/users",userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 
+
+app.use("/api/cart", cartitemRoutes);
+app.use("/api/orders", orderRoutes);
+
 // __________________IMAGE________________________________________
 app.use("/api/upload", uploadRoutes);
-const __dirname = path.resolve();
-app.use("/uploads", express.static(path.join(__dirname + "/uploads")));
+app.use("/uploadimage", express.static(path.join(__dirname + "/uploadimage")));
 // __________________IMAGE________________________________________
 
 

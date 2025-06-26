@@ -1,27 +1,29 @@
 import React from "react";
-import {
-  FiEye,
-  FiEdit,
-  FiTrash2,
-  FiShoppingCart,
-  FiHeart,
-} from "react-icons/fi";
+import AddToCart from "../Cart/AddToCart";
+import { FiEye, FiEdit, FiTrash2, FiHeart } from "react-icons/fi";
+import { useSelector } from "react-redux";
 import "../../styles/ProductCard.css";
 
 const ProductCard = ({ product, onDelete, onEdit }) => {
-  if (!product)
-    return <div className="loading-product">Loading product...</div>;
+  // ✅ Get the currently logged-in user from your custom slice `rushal`
+  const user = useSelector((state) => state.auth?.userInfo);
+  const userId = user?._id;
 
-  // Default product image
-  const defaultImage = "https://product.img";
-  const productImage = product.image || defaultImage;
+  if (!product) return <div className="loading-product">Loading product...</div>;
 
-  // Determine stock status - check both inStock flag and quantity
-  const isOutOfStock = product.quantity <= 0 ;
+  const defaultImage = "https://via.placeholder.com/300x300?text=No+Image";
+  const BASE_URL = "http://localhost:5000/uploadimage/";
+  const productImage =
+    Array.isArray(product.image) && product.image.length > 0
+      ? `${BASE_URL}${product.image[0]}`
+      : defaultImage;
+
+  const isOutOfStock = product.quantity <= 0;
 
   return (
     <div className="product-card-wrapper">
       <div className="product-card">
+        {/* Stock Badge */}
         <div className="product-badge">
           {!isOutOfStock ? (
             <span className="in-stock">In Stock ({product.quantity})</span>
@@ -30,16 +32,18 @@ const ProductCard = ({ product, onDelete, onEdit }) => {
           )}
         </div>
 
-        {/* Rest of your component remains the same */}
+        {/* Product Image & Quick Actions */}
         <div className="product-image-container">
           <img
             src={productImage}
             alt={product.name}
             className="product-image"
             onError={(e) => {
+              e.target.onerror = null;
               e.target.src = defaultImage;
             }}
           />
+
           <div className="quick-actions">
             <button className="quick-action-btn" title="Add to Wishlist">
               <FiHeart />
@@ -47,16 +51,23 @@ const ProductCard = ({ product, onDelete, onEdit }) => {
             <button className="quick-action-btn" title="Quick View">
               <FiEye />
             </button>
-            <button
-              className="quick-action-btn"
-              title="Add to Cart"
-              disabled={isOutOfStock}
-            >
-              <FiShoppingCart />
-            </button>
+
+            {/* Add to Cart (only if in stock & user is logged in) */}
+            {!isOutOfStock &&
+              (userId ? (
+                <AddToCart productId={product._id} userId={userId} />
+              ) : (
+                <button
+                  className="quick-action-btn"
+                  onClick={() => alert("Please log in to add to cart")}
+                >
+                  🛒
+                </button>
+              ))}
           </div>
         </div>
 
+        {/* Product Info */}
         <div className="product-info">
           <h3 className="product-title">{product.name}</h3>
           <p className="product-description">{product.description}</p>
@@ -67,9 +78,7 @@ const ProductCard = ({ product, onDelete, onEdit }) => {
               {Array.from({ length: 5 }).map((_, i) => (
                 <span
                   key={i}
-                  className={
-                    i < (product.rating || 0) ? "star-filled" : "star-empty"
-                  }
+                  className={i < (product.rating || 0) ? "star-filled" : "star-empty"}
                 >
                   ★
                 </span>
@@ -78,6 +87,7 @@ const ProductCard = ({ product, onDelete, onEdit }) => {
           </div>
         </div>
 
+        {/* Action Buttons */}
         <div className="product-actions">
           <button className="action-btn" title="View Details">
             <FiEye />
@@ -92,7 +102,7 @@ const ProductCard = ({ product, onDelete, onEdit }) => {
           <button
             className="action-btn"
             title="Delete Product"
-            onClick={() => onDelete(product.id)}
+            onClick={() => onDelete(product._id)}
           >
             <FiTrash2 />
           </button>

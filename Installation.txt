@@ -26,6 +26,7 @@ npm i lucide-react
 npm i sweetalert2
 
 
+
 ___________________ .env ___________________
 PORT=5000
 DATABASE_URI=mongodb://127.0.0.1:27017/test

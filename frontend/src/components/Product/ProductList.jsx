@@ -33,6 +33,8 @@ const ProductList = () => {
 
         const data = await response.json();
         setProducts(data);
+        console.log("Fetched products:", data);
+
       } catch (err) {
         setError(err.message);
         console.error("Fetch error:", err);
@@ -58,8 +60,10 @@ const ProductList = () => {
         console.log(`Product ${productId} deleted successfully`);
         // Update the products state by filtering out the deleted product
         setProducts((prevProducts) =>
-          prevProducts.filter((p) => p.id !== productId)
-        );
+        prevProducts.filter((p) => p._id !== productId) // ✅ fixed
+      );
+
+
       } else {
         // Parse error response and show it
         const errorData = await response.json();
@@ -85,7 +89,7 @@ const ProductList = () => {
     <div className="products-container">
       {products.map((product) => (
         <ProductCard
-          key={product.id}
+          key={product._id}
           product={product}
           onDelete={(id) => handleDelete(id)}
           onEdit={handleEdit}
