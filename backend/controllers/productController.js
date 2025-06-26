@@ -1,9 +1,10 @@
-
 import asyncHandler from "../middlewares/asyncHandler.js";
 import Product from "../models/productModel.js";
 import mongoose from "mongoose";
 
 const createProduct = asyncHandler(async (req, res) => {
+  console.log("i m in createProduct");
+  
   try {
     const { name, description, price, category, quantity, brand } = req.fields;
     switch (true) {
@@ -20,25 +21,31 @@ const createProduct = asyncHandler(async (req, res) => {
       case !quantity:
         return res.json({ error: "quantity is required" });
     }
+    
 
     const product = new Product({ ...req.fields });
     await product.save();
     res.json(product);
   } catch (error) {
-    res.status(500).json({ error: "Server error" , message: error.message });
+    res.status(500).json({ error: "Server error", message: error.message });
   }
 });
 
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find({})
+      .populate("category")
+      .limit(12)
+      .sort({ createdAt: -1 });
+
     const mappedProducts = products.map((product) => ({
       ...product.toObject(),
       id: product._id.toString(),
     }));
     res.json(mappedProducts);
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    console.error(error);
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
@@ -79,11 +86,10 @@ const deleteProductById = asyncHandler(async (req, res) => {
     if (mongoose.connection.readyState !== 1) {
       throw new Error("MongoDB not connected");
     }
-    
+
     if (typeof id !== "string" || id.length === 0) {
       return res.status(400).json({ error: "Invalid ID format" });
     }
-
 
     const result = await Product.findOneAndDelete({ _id: req.params.id });
     if (!result) {
@@ -135,7 +141,6 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 
 const addProductReview = asyncHandler(async (req, res) => {
-  console.log("All GOOD _______________________");
   try {
     const { rating, comment } = req.body;
     const product = await Product.findById(req.params.productId);
@@ -207,4 +212,3 @@ export {
   fetchTopProducts,
   fetchNewProducts,
 };
-
