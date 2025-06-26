@@ -8,6 +8,8 @@ const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data: summary, isLoading, error } = useGetAdminSummaryQuery();
 
+  console.log("User Growth Data:", summary?.userGrowthData);
+
   return (
     <div className="flex h-screen bg-gray-900 text-white">
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -46,7 +48,8 @@ const AdminDashboard = () => {
                   xAxisKey="_id" // <--- this matches your aggregation response key
                   lineColor="#10B981"
                 />
-              )}
+                  )}
+                  
 
               {/* Orders */}
               {summary?.orders && <OrderList orders={summary.orders} />}

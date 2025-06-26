@@ -22,6 +22,23 @@ export const getAdminSummary = async (req, res) => {
       { $sort: { _id: 1 } },
     ]);
 
+    // Add userGrowthData aggregation here:
+    const userGrowthData = await User.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
     res.json({
       users,
       vendors,
@@ -29,39 +46,10 @@ export const getAdminSummary = async (req, res) => {
       revenue,
       orders,
       salesData,
+      userGrowthData, // <-- Include it here
     });
   } catch (error) {
     res.status(500).json({ message: "Admin summary failed", error });
   }
 };
-
-// Controller to get user growth data grouped by day (last 30 days)
-export const getUserGrowth = async (req, res) => {
-    try {
-      // Aggregate users by createdAt date (format YYYY-MM-DD)
-      const userGrowthData = await User.aggregate([
-        {
-          $match: {
-            createdAt: {
-              // Only last 30 days
-              $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
-            },
-          },
-        },
-        {
-          $group: {
-            _id: {
-              $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
-            },
-            count: { $sum: 1 }, // Count users per day
-          },
-        },
-        { $sort: { _id: 1 } }, // Sort by date ascending
-      ]);
   
-      res.json(userGrowthData);
-    } catch (error) {
-      console.error("Error in getUserGrowth:", error);
-      res.status(500).json({ message: "Server error while getting user growth" });
-    }
-  };
