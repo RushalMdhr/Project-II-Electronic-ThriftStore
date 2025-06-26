@@ -31,6 +31,14 @@ const userSchema = mongoose.Schema({
         type : Boolean,
         required : true,
         default : false,
+    },
+    shopName: {
+        type: String,
+        default: null,
+    },
+    shopDescription: {
+        type: String,
+        default: null,
     }
 },{
     timestamps : true //when we create or delete a user it will give the specific time

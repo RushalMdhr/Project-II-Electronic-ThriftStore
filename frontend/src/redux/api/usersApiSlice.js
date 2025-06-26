@@ -68,6 +68,20 @@ export const userApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    // Mutation for making a user a vendor (update shop info)
+    makeVendor: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/vendor/shop`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    getCurrentUser: builder.query({
+      query: () => ({
+        url: `${USERS_URL}/profile`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -80,6 +94,8 @@ export const {
   useDeleteUserMutation,
   useGetUserDetailsQuery,
   useUpdateUserMutation,
+  useMakeVendorMutation,
+  useGetCurrentUserQuery,
 
 
 } = userApiSlice;
