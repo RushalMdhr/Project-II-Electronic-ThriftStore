@@ -24,6 +24,7 @@ ________ OTHER FRONTEND lib ________
 npm install -D tailwindcss @tailwindcss/vite
 npm i lucide-react
 npm i sweetalert2
+npm i recharts
 
 
 ___________________ .env ___________________
