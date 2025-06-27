@@ -27,13 +27,22 @@ const DashboardChart = ({
   const options = {
     chart: {
       type: "line",
-      toolbar: {
-        show: false,
-      },
-      zoom: {
-        enabled: false,
-      },
       background: "transparent",
+      zoom: {
+        enabled: true,
+        type: "x", // zoom horizontally
+        autoScaleYaxis: true,
+      },
+      toolbar: {
+        show: true,
+        tools: {
+          zoom: true,
+          zoomin: true,
+          zoomout: true,
+          pan: true,
+          reset: true,
+        },
+      },
     },
     xaxis: {
       categories: data.map((item) => item[xAxisKey]),
@@ -55,7 +64,7 @@ const DashboardChart = ({
       strokeDashArray: 5,
     },
     stroke: {
-      curve: "smooth", // equivalent to monotone in Recharts
+      curve: "smooth",
       width: 2,
       colors: [lineColor],
     },
