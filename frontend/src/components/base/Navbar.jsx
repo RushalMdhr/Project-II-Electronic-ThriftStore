@@ -27,7 +27,7 @@ const Navbar = () => {
 
   return (
     <div>
-      <nav className="bg-[#0a1120] px-8 py-4 flex items-center justify-between">
+      <nav className="bg-[#0a1120] pl-2 pr-8 py-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <a href="/">
@@ -56,12 +56,20 @@ const Navbar = () => {
             <i className="ri-apps-2-line mr-1"></i> Categories
           </a>
           {userInfo && userInfo.isVendor ? (
-            <a
-              href="/vendor/dashboard"
-              className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
-            >
-              <i className="ri-dashboard-line mr-1"></i> Dashboard
-            </a>
+            <>
+              <a
+                href="/vendor/dashboard"
+                className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
+              >
+                <i className="ri-dashboard-line mr-1"></i> Dashboard
+              </a>
+              <a
+                href="/vendor/upload"
+                className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
+              >
+                <i className="ri-dashboard-line mr-1"></i> Upload
+              </a>
+            </>
           ) : (
             <a
               href="/vendor/register"
