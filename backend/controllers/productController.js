@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 
 const createProduct = asyncHandler(async (req, res) => {
   console.log("i m in createProduct");
-  
+
   try {
     const { name, description, price, category, quantity, brand } = req.fields;
     switch (true) {
@@ -21,9 +21,8 @@ const createProduct = asyncHandler(async (req, res) => {
       case !quantity:
         return res.json({ error: "quantity is required" });
     }
-    
 
-    const product = new Product({ ...req.fields });
+    const product = new Product({ ...req.fields, UploadedBy: req.user._id });
     await product.save();
     res.json(product);
   } catch (error) {
@@ -126,7 +125,9 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
 const getProductById = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId);
+    const product = await Product.findById(req.params.productId)
+      .populate("category", "name")
+      // .populate("user", "username email");
 
     if (product) {
       return res.json(product);
@@ -201,6 +202,20 @@ const fetchNewProducts = asyncHandler(async (req, res) => {
   }
 });
 
+const getMyProducts = asyncHandler(async (req, res) => {
+  try {
+    const id = req.user._id;
+    // const myProducts = await Product.UploadedBy.find({  id})
+    const myProducts = await Product.find({ UploadedBy: id }).populate(
+      "category"
+    );
+    // .populate('category', 'name');
+    res.send(myProducts);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 export {
   createProduct,
   getAllProducts,
@@ -211,4 +226,5 @@ export {
   addProductReview,
   fetchTopProducts,
   fetchNewProducts,
+  getMyProducts,
 };

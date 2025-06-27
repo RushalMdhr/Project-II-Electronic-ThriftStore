@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   useMakeVendorMutation,
@@ -6,6 +6,7 @@ import {
 } from "../../redux/api/usersApiSlice";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/features/auth/authSlice";
+import { toast } from "react-toastify";
 
 export default function VendorRegister() {
   const [formData, setFormData] = useState({
@@ -34,10 +35,11 @@ export default function VendorRegister() {
         const user = await res.json();
         dispatch(setCredentials(user));
       }
-      alert("Vendor shop info updated!");
+      toast.info("Vendor shop info updated!");
+      toast.success("You are now a vendor!");
       navigate("/dashboard");
     } catch (err) {
-      alert("Failed to update vendor info");
+      toast.error("Failed to update vendor info");
     }
   };
 
