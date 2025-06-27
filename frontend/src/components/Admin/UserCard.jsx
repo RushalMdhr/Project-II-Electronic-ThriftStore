@@ -1,7 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom"; // ✅ use this instead of useNavigate
+import { Link } from "react-router-dom";
 import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
-import "../../styles/UserCard.css";
 
 const UserCard = ({ user, onDelete, onView }) => {
   const handleDelete = () => {
@@ -14,36 +13,49 @@ const UserCard = ({ user, onDelete, onView }) => {
   };
 
   const handleView = () => {
-    console.log("View user:", user);
     onView(user);
   };
 
   return (
-    <div className="user-card-wrapper">
-      <div className="user-card">
-        <div className="user-avatar">
+    <div className="w-[65%] mx-auto">
+      <div className="flex items-center justify-between bg-[#0a101e] rounded-xl px-5 py-4 transition-colors duration-300 hover:bg-[#202532] shadow-sm">
+        {/* Avatar */}
+        <div className="flex items-center gap-4">
           <img
             src={user.avatar || "https://i.pravatar.cc/150?img=3"}
             alt={user.username}
+            className="w-12 h-12 rounded-full object-cover"
           />
+          <div>
+            <h3 className="text-gray-100 font-semibold text-lg">
+              {user.username}
+            </h3>
+            <p className="text-gray-400 text-sm">{user.email}</p>
+          </div>
         </div>
-        <div className="user-info">
-          <h3>{user.username}</h3>
-          <p>{user.email}</p>
-        </div>
-        <div className="user-actions">
-          <button className="action-btn" title="View" onClick={handleView}>
-            <FiEye />
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <button
+            className="text-gray-300 hover:text-[#1de9b6] p-2 rounded transition-colors duration-300"
+            title="View"
+            onClick={handleView}
+          >
+            <FiEye size={20} />
           </button>
           <Link
             to={`/admin/users/${user._id}/edit`}
-            className="action-btn"
+            className="text-gray-300 hover:text-[#1de9b6] p-2 rounded transition-colors duration-300"
             title="Edit"
           >
-            <FiEdit />
+            <FiEdit size={20} />
           </Link>
-          <button className="action-btn" title="Delete" onClick={handleDelete}>
-            <FiTrash2 />
+          <button
+            className="text-gray-300 hover:text-red-500 p-2 rounded transition-colors duration-300"
+            title="Delete"
+            onClick={handleDelete}
+          >
+            <FiTrash2 size={20} />
           </button>
         </div>
       </div>
