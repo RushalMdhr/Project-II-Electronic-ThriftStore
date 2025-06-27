@@ -47,12 +47,12 @@ export const productApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    uploadProductImage : builder.mutation({
-        query:(data)=>({
-            url : `${UPLOAD_URL}/`,
-            method : 'POST',
-            body : data
-        })
+    uploadProductImage: builder.mutation({
+      query: (data) => ({
+        url: `${UPLOAD_URL}/`,
+        method: "POST",
+        body: data,
+      }),
     }),
 
     deleteProduct: builder.mutation({
@@ -63,37 +63,42 @@ export const productApiSlice = apiSlice.injectEndpoints({
       providesTags: ["Product"],
     }),
 
-    createReview : builder.mutation({
-        query : (productId, data)=>({
-            url : `${PRODUCT_URL}/${productId}/reviews`,
-            method : 'POST',
-            body : data
-        })
+    createReview: builder.mutation({
+      query: (productId, data) => ({
+        url: `${PRODUCT_URL}/${productId}/reviews`,
+        method: "POST",
+        body: data,
+      }),
     }),
 
-    getTopProduct : builder.query({
-        query : ()=>`${PRODUCT_URL}/top`,
-        keepUnusedDataFor :5,
+    getTopProduct: builder.query({
+      query: () => `${PRODUCT_URL}/top`,
+      keepUnusedDataFor: 5,
     }),
 
-    getNewProducts : builder.query({
-        query : ()=>`${PRODUCT_URL}/new`,
-        keepUnusedDataFor : 5,
-    })
-
+    getNewProducts: builder.query({
+      query: () => `${PRODUCT_URL}/new`,
+      keepUnusedDataFor: 5,
+    }),
+    
+    getMyProducts: builder.query({
+      query: () => `${PRODUCT_URL}/getmyproducts`,
+      providesTags: ["Product"],
+    }),
   }),
 });
 
 export const {
-    useGetProductsQuery,
-    useGetProductByIdQuery,
-    useAllProductsQuery,
-    useGetProductDetailsQuery,
-    useCreateProductMutation,
-    useUpdateProductDetailsMutation,
-    useDeleteProductMutation,
-    useCreateReviewMutation,
-    useGetTopProductQuery,
-    useGetNewProductsQuery,
-    useUploadProductImageMutation
-} = productApiSlice
+  useGetProductsQuery,
+  useGetProductByIdQuery,
+  useAllProductsQuery,
+  useGetProductDetailsQuery,
+  useCreateProductMutation,
+  useUpdateProductDetailsMutation,
+  useDeleteProductMutation,
+  useCreateReviewMutation,
+  useGetTopProductQuery,
+  useGetNewProductsQuery,
+  useUploadProductImageMutation,
+  useGetMyProductsQuery,
+} = productApiSlice;

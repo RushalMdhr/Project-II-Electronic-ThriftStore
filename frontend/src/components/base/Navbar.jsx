@@ -57,7 +57,7 @@ const Navbar = () => {
           </a>
           {userInfo && userInfo.isVendor ? (
             <a
-              href="/dashboard"
+              href="/vendor/dashboard"
               className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
             >
               <i className="ri-dashboard-line mr-1"></i> Dashboard
