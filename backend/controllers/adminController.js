@@ -8,11 +8,19 @@ export const getAdminSummary = async (req, res) => {
     const users = await User.countDocuments();
     const vendors = await User.countDocuments({ isVendor: true });
     const products = await Product.countDocuments();
-    const orders = await Order.find().populate("user", "email");
 
-    const revenue = orders.reduce((acc, order) => acc + order.totalPrice, 0);
+    const orders = await Order.find().populate("user", "email").lean();
+    const revenue = orders.reduce(
+      (acc, order) => acc + (order.totalPrice ?? 0),
+      0
+    );
 
     const salesData = await Order.aggregate([
+      {
+        $match: {
+          createdAt: { $type: "date" }, // ✅ only include valid dates
+        },
+      },
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
@@ -22,8 +30,12 @@ export const getAdminSummary = async (req, res) => {
       { $sort: { _id: 1 } },
     ]);
 
-    // Add userGrowthData aggregation here:
     const userGrowthData = await User.aggregate([
+      {
+        $match: {
+          createdAt: { $type: "date" }, // ✅ only include valid dates
+        },
+      },
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
@@ -32,7 +44,7 @@ export const getAdminSummary = async (req, res) => {
       },
       { $sort: { _id: 1 } },
     ]);
-      
+
     res.json({
       users,
       vendors,
@@ -40,10 +52,13 @@ export const getAdminSummary = async (req, res) => {
       revenue,
       orders,
       salesData,
-      userGrowthData, // <-- Include it here
+      userGrowthData,
     });
   } catch (error) {
-    res.status(500).json({ message: "Admin summary failed", error });
+    console.error("Admin summary error:", error);
+    res.status(500).json({
+      message: "Admin summary failed",
+      error: error.message,
+    });
   }
 };
-  
