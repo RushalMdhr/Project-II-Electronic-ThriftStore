@@ -15,6 +15,7 @@ import userRoutes from "./routes/userRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import cartitemRoutes from "./routes/cartitemRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 
 //db connection
@@ -39,6 +40,7 @@ app.use(cookieParser());
 app.use("/api/users",userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/cart",cartitemRoutes);
 app.use("/api/admin", adminRoutes);
 
 // __________________IMAGE________________________________________

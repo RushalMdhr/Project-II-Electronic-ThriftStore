@@ -24,7 +24,8 @@ import Upload from "./components/Product/Upload.jsx";
 import ProductList from "./components/Product/ProductList.jsx";
 import AdminRoute from "./components/Admin/AdminRoute.jsx";
 import UserList from "./pages/Admin/UserList.jsx";
-import OrderList from "./components/Admin/OrderList.jsx"
+import OrderList from "./components/Admin/OrderList.jsx";
+import CartPage from "./pages/Cart/CartPage.jsx";
 
 // import UploadPage from "./pages/Vendor/UploadPage.jsx";
 import UploadPageTest from "./pages/Vendor/UploadPageTest.jsx";
@@ -35,6 +36,9 @@ import Dashboard from "./pages/Vendor/Dashboard.jsx";
 import VendorProducts from "./pages/Vendor/ProductTools/VendorProducts.jsx";
 import VendorRoutes from "./components/Vendor/VendorRoutes.jsx";
 import ProductOverView from "./pages/Home/ProductTools/ProductOverView.jsx";
+// Import UserProvider
+import { UserProvider } from "./components/UserProvider";
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />} errorElement={<div className="min-h-screen flex items-center justify-center bg-[#0a1120] text-white"><div className="text-center"><h1 className="text-4xl font-bold mb-4 text-[#1de9b6]">404 - Page Not Found</h1><p className="text-lg">Sorry, the page you are looking for does not exist.</p><a href="/" className="mt-4 inline-block px-6 py-2 bg-[#1de9b6] text-[#0a1120] rounded-lg font-semibold">Go Home</a></div></div>}>
@@ -44,6 +48,9 @@ const router = createBrowserRouter(
       <Route path="/aboutus" element={<AboutUs />} />
       <Route path="/contactus" element={<ContactUs />} />
       <Route path="/:productId" element={<ProductOverView />} />
+      <Route path="/cart" element={<CartPage />} />
+
+
 
       /* Vendor route guard: if already a vendor, redirect to dashboard */
       <Route path="/vendor/register" element={
@@ -84,6 +91,9 @@ const router = createBrowserRouter(
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
-    <RouterProvider router={router} />
+    <UserProvider>
+      <RouterProvider router={router} />
+    </UserProvider>
   </Provider>
 );
+

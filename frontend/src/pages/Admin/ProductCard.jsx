@@ -6,9 +6,10 @@ import {
   FiShoppingCart,
   FiHeart,
 } from "react-icons/fi";
+import AddToCart from "../../Cart/AddToCart";
 import "../../styles/ProductCard.css";
 
-const ProductCard = ({ product, onDelete, onEdit }) => {
+const ProductCard = ({ product, onDelete, onEdit, userId }) => {
   if (!product)
     return <div className="loading-product">Loading product...</div>;
 

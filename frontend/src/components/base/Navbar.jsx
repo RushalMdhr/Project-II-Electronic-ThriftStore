@@ -124,6 +124,7 @@ const Navbar = () => {
                 </span>
               </span>
               <span
+                href="cart"
                 title="Cart"
                 className="text-white text-2xl hover:text-[#1de9b6] cursor-pointer transition-colors duration-200 relative"
               >

@@ -1,11 +1,18 @@
-
 import { useAllProductsQuery } from "../../redux/api/productsApiSlice";
-import ProductGridCard from "../../pages/Home/ProductGridCard.jsx";
-const ProductGrid = () => {
-    const {data : products=[],isLoading,isError,refetch} = useAllProductsQuery();
-    console.log(products);
+import ProductGridCard from "../../pages/Home/ProductGridCard";
+import { useUserId } from "../../components/UserProvider";
 
-  if(!products || products.length === 0) {
+const ProductGrid = () => {
+  const userId = useUserId();
+  const {
+    data: products = [],
+    isLoading,
+    isError,
+  } = useAllProductsQuery();
+
+  if (isLoading) return <p className="text-center">Loading products…</p>;
+  if (isError) return <p className="text-center text-red-600">Failed to load products</p>;
+  if (products.length === 0) {
     return (
       <div className="text-center py-16">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">No Products Found</h2>
@@ -22,12 +29,11 @@ const ProductGrid = () => {
             Trending Thrift Finds
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Discover the most popular pre-loved items from our community of
-            sellers
+            Discover the most popular pre-loved items from our community of sellers
           </p>
         </div>
 
-        <ProductGridCard products={products}/>
+        <ProductGridCard products={products} userId={userId} />
 
         <div className="text-center mt-12">
           <button className="px-8 py-3 border-2 border-emerald-600 text-emerald-600 rounded-full hover:bg-emerald-50 transition-colors font-medium">

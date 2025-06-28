@@ -6,9 +6,10 @@ import {
   FiShoppingCart,
   FiHeart,
 } from "react-icons/fi";
+import AddToCart from "../../pages/Cart/AddToCart";
 import "../../styles/ProductCard.css";
 
-const ProductCard = ({ product, onDelete, onEdit }) => {
+const ProductCard = ({ product, onDelete, onEdit, userId }) => {
   if (!product)
     return <div className="loading-product">Loading product...</div>;
 
@@ -47,13 +48,12 @@ const ProductCard = ({ product, onDelete, onEdit }) => {
             <button className="quick-action-btn" title="Quick View">
               <FiEye />
             </button>
-            <button
-              className="quick-action-btn"
-              title="Add to Cart"
-              disabled={isOutOfStock}
-            >
-              <FiShoppingCart />
-            </button>
+            <AddToCart
+              productId={product._id}
+              userId={userId}
+              isDisabled={isOutOfStock}
+            />
+
           </div>
         </div>
 
