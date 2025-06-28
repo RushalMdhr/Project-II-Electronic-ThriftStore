@@ -77,7 +77,7 @@ const OrderList = () => {
       {/* Modal Card for Order Details */}
       <Dialog
         open={!!selectedOrder}
-        onOpenChange={() => setSelectedOrder(null)}
+        onClose={() => setSelectedOrder(null)}
       >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
