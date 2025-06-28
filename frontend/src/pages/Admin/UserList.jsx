@@ -23,20 +23,47 @@ const UserList = () => {
     setSelectedUser(user);
   };
 
-  if (isLoading)
-    return <div className="text-center mt-10">Loading users...</div>;
-  if (isError)
+  if (isLoading) {
     return (
-      <div className="text-center text-red-500 mt-10">
+      <div className="bg-[#0a1120] text-white min-h-screen flex justify-center items-center">
+        Loading users...
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="bg-[#0a1120] text-red-500 min-h-screen flex justify-center items-center">
         Error: {error?.data?.message || error.error}
       </div>
     );
-  if (!users || users.length === 0)
-    return <div className="text-center mt-10">No users found.</div>;
+  }
+
+  if (!users || users.length === 0) {
+    return (
+      <div className="bg-[#0a1120] text-white min-h-screen flex justify-center items-center">
+        No users found.
+      </div>
+    );
+  }
 
   return (
-    <>
-      <div className="flex flex-col gap-4 px-4 py-6">
+    <div className="bg-[#131a2b] min-h-screen px-10 py-6">
+      
+      <div className="flex items-center justify-between mb-6 border-b border-gray-700 pb-4">
+        <div>
+          <h2 className="text-3xl text-[#1de9b6] font-bold">User Management</h2>
+          <p className="text-sm text-gray-400 mt-1">
+            View, edit, and manage all registered users.
+          </p>
+        </div>
+        <div>
+          <span className="text-m bg-[#1de9b6]/10 text-[#1de9b6] px-3 py-1 rounded-full font-medium">
+            Total: {users.length}
+          </span>
+        </div>
+      </div>
+      <div className="flex flex-col gap-6">
         {users.map((user) => (
           <UserCard
             key={user._id}
@@ -98,7 +125,7 @@ const UserList = () => {
           </div>
         </>
       )}
-    </>
+    </div>
   );
 };
 

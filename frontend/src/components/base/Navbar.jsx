@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import "remixicon/fonts/remixicon.css";
 import { useLogoutMutation } from "../../redux/api/usersApiSlice";
 import { logout } from "../../redux/features/auth/authSlice";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -37,53 +38,66 @@ const Navbar = () => {
         </div>
         {/* Nav Links */}
         <div className="flex items-center space-x-8">
-          <a
-            href="/"
+          <Link
+            to="/"
             className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
           >
             <i className="ri-home-4-line mr-1"></i> Home
-          </a>
-          <a
-            href="/admin/productcard"
+          </Link>
+
+          <Link
+            to="/admin/productcard"
             className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
           >
             <i className="ri-box-3-line mr-1"></i> Products
-          </a>
-          <a
-            href="#"
+          </Link>
+
+          <Link
+            to="#"
             className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
           >
             <i className="ri-apps-2-line mr-1"></i> Categories
-          </a>
+          </Link>
+
+          {userInfo?.isAdmin && (
+            <Link
+              to="/admin"
+              className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
+            >
+              <i className="ri-shield-user-line mr-1"></i> Admin Panel
+            </Link>
+          )}
+
           {userInfo && userInfo.isVendor ? (
             <>
-              <a
-                href="/vendor/dashboard"
+              <Link
+                to="/vendor/dashboard"
                 className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
               >
                 <i className="ri-dashboard-line mr-1"></i> Dashboard
-              </a>
-              <a
-                href="/vendor/upload"
+              </Link>
+              <Link
+                to="/vendor/upload"
                 className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
               >
                 <i className="ri-dashboard-line mr-1"></i> Upload
-              </a>
+              </Link>
             </>
           ) : (
-            <a
-              href="/vendor/register"
+            <Link
+              to="/vendor/register"
               className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
             >
               <i className="ri-store-2-line mr-1"></i> Vendors
-            </a>
+            </Link>
           )}
-          <a
-            href="#"
+
+          <Link
+            to="#"
             className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
           >
             <i className="ri-article-line mr-1"></i> Blog
-          </a>
+          </Link>
         </div>
         {/* Search and Icons */}
         <div className="flex items-center space-x-6">
