@@ -15,7 +15,8 @@ import userRoutes from "./routes/userRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
-import adminRoutes from "./routes/adminRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js"; 
+import orderRoutes from "./routes/orderRoutes.js";
 
 //db connection
 connectDB();
@@ -40,6 +41,7 @@ app.use("/api/users",userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/orders", orderRoutes);
 
 // __________________IMAGE________________________________________
 app.use("/api/upload", uploadRoutes);

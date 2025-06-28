@@ -96,7 +96,10 @@ const router = createBrowserRouter(
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="users" element={<UserList />} />
-          <Route path="orderlist" element={<OrderList />} />
+          <Route
+            path="orders"
+            element={<OrderList />}
+          />
           <Route path="users/:id/edit" element={<UserUpdate />} />
         </Route>
       </Route>

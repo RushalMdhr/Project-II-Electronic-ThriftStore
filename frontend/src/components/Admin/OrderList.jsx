@@ -1,16 +1,27 @@
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/Dialog"; // use relative paths
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/Dialog";
 import { Card, CardContent } from "../ui/Card";
 import { Badge } from "../ui/Badge";
 import { format } from "date-fns";
 
-const OrderList = ({ orders }) => {
+import { useGetOrdersQuery } from "../../redux/api/orderApiSlice.js"; // <-- import hook
+const OrderList = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  // Fetch orders from API using RTK Query hook
+  const { data: orders, isLoading, isError, error } = useGetOrdersQuery();
+
+  if (isLoading) {
+    return <p className="text-white p-6">Loading orders...</p>;
+  }
+
+  if (isError) {
+    return (
+      <p className="text-red-500 p-6">
+        Error loading orders: {error?.data?.message || error.error}
+      </p>
+    );
+  }
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow">
@@ -35,11 +46,15 @@ const OrderList = ({ orders }) => {
                   className="border-b border-gray-700 hover:bg-gray-700/20 cursor-pointer"
                   onClick={() => setSelectedOrder(order)}
                 >
-                  <td className="py-2">{order._id.slice(-6)}</td>
+                  <td className="py-2">
+                    {order._id ? order._id.slice(-6) : "N/A"}
+                  </td>
                   <td className="py-2">{order.user?.email || "N/A"}</td>
                   <td className="py-2">Rs. {order.totalPrice}</td>
                   <td className="py-2">
-                    {new Date(order.createdAt).toLocaleDateString()}
+                    {order.createdAt
+                      ? new Date(order.createdAt).toLocaleDateString()
+                      : "N/A"}
                   </td>
                   <td className="py-2">
                     <Badge variant={order.isPaid ? "success" : "destructive"}>
@@ -59,7 +74,7 @@ const OrderList = ({ orders }) => {
         </table>
       </div>
 
-      {/* 📂️ Modal Card for Order Details */}
+      {/* Modal Card for Order Details */}
       <Dialog
         open={!!selectedOrder}
         onOpenChange={() => setSelectedOrder(null)}
@@ -73,7 +88,10 @@ const OrderList = ({ orders }) => {
             <Card className="rounded-lg">
               <CardContent className="space-y-4 p-4">
                 <div className="text-sm text-gray-400">
-                  Placed on: {format(new Date(selectedOrder.createdAt), "PPpp")}
+                  Placed on:{" "}
+                  {selectedOrder.createdAt
+                    ? format(new Date(selectedOrder.createdAt), "PPpp")
+                    : "N/A"}
                 </div>
 
                 <div className="space-y-1">
@@ -84,29 +102,34 @@ const OrderList = ({ orders }) => {
                     <strong>Total:</strong> Rs. {selectedOrder.totalPrice}
                   </div>
                   <div>
-                    <strong>Payment:</strong> {selectedOrder.paymentMethod}
+                    <strong>Payment:</strong>{" "}
+                    {selectedOrder.paymentMethod || "N/A"}
                   </div>
                 </div>
 
                 <div>
                   <h4 className="font-semibold mb-1">Shipping Address:</h4>
                   <p className="text-sm text-gray-400">
-                    {selectedOrder.shippingAddress.address},{" "}
-                    {selectedOrder.shippingAddress.city},{" "}
-                    {selectedOrder.shippingAddress.country} -{" "}
-                    {selectedOrder.shippingAddress.postalCode}
+                    {selectedOrder.shippingAddress?.address || "N/A"},{" "}
+                    {selectedOrder.shippingAddress?.city || "N/A"},{" "}
+                    {selectedOrder.shippingAddress?.country || "N/A"} -{" "}
+                    {selectedOrder.shippingAddress?.postalCode || "N/A"}
                   </p>
                 </div>
 
                 <div>
                   <h4 className="font-semibold mb-1">Items:</h4>
                   <ul className="list-disc pl-5 text-sm text-gray-400 space-y-1">
-                    {selectedOrder.orderItems.map((item, idx) => (
-                      <li key={idx}>
-                        {item.product?.name || "Product"} × {item.quantity} (Rs.{" "}
-                        {item.price})
-                      </li>
-                    ))}
+                    {selectedOrder.orderItems?.length > 0 ? (
+                      selectedOrder.orderItems.map((item, idx) => (
+                        <li key={idx}>
+                          {item.product?.name || "Product"} × {item.quantity}{" "}
+                          (Rs. {item.price})
+                        </li>
+                      ))
+                    ) : (
+                      <li>No items found</li>
+                    )}
                   </ul>
                 </div>
 
