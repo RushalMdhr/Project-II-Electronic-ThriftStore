@@ -1,5 +1,3 @@
-import React from "react";
-
 // Dialog Wrapper with backdrop and animation
 export const Dialog = ({ open, onClose, children }) => {
   if (!open) return null;
