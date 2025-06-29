@@ -1,16 +1,21 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   useListcategoryQuery,
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
 } from "../../redux/api/categoryApiSlice";
+import { useAllProductsQuery } from "../../redux/api/productsApiSlice";
+
+import Chart from "react-apexcharts";
 
 const Category = () => {
   const [name, setName] = useState("");
   const [id, setId] = useState(null);
 
   const { data: categories = [], refetch } = useListcategoryQuery();
+  const { data: products = [] } = useAllProductsQuery();
+
   const [createCategory] = useCreateCategoryMutation();
   const [updateCategory] = useUpdateCategoryMutation();
   const [deleteCategory] = useDeleteCategoryMutation();
@@ -58,6 +63,25 @@ const Category = () => {
       console.error("Delete failed:", error);
     }
   };
+
+  // Memoize to avoid recalculating on every render
+  const categoriesWithCount = useMemo(() => {
+    // Step 1: Build count map from products in one pass
+    const countMap = products.reduce((acc, prod) => {
+      if (!prod.category) return acc;
+      const catId =
+        typeof prod.category === "object" ? prod.category._id : prod.category;
+      acc[catId] = (acc[catId] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Step 2: Map categories and assign counts from map
+    return categories.map((cat) => ({
+      ...cat,
+      productCount: countMap[cat._id] || 0,
+    }));
+  }, [categories, products]);
+  
 
   return (
     <div className="bg-[#131a2b] min-h-screen px-10 py-6">
@@ -116,38 +140,117 @@ const Category = () => {
           </form>
         </div>
 
-        {/* Category List Section */}
-        <div className="bg-[#1e293b] p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-[#1de9b6] mb-4">
-            Existing Categories
-          </h2>
-          <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-            {categories.length > 0 ? (
-              categories.map((cat) => (
-                <div
-                  key={cat._id}
-                  className="flex justify-between items-center bg-[#0f172a] px-4 py-3 rounded-lg transition hover:bg-[#131c31]"
-                >
-                  <span className="capitalize text-white">{cat.name}</span>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleEdit(cat)}
-                      className="text-sm text-[#1de9b6] hover:underline"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(cat._id)}
-                      className="text-sm text-red-400 hover:underline"
-                    >
-                      Delete
-                    </button>
+        {/* Category List + Chart Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Category List */}
+          <div className="bg-[#1e293b] p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-[#1de9b6] mb-4">
+              Existing Categories
+            </h2>
+            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+              {categoriesWithCount.length > 0 ? (
+                categoriesWithCount.map((cat) => (
+                  <div
+                    key={cat._id}
+                    className="flex justify-between items-center bg-[#0f172a] px-4 py-3 rounded-lg transition hover:bg-[#131c31]"
+                  >
+                    <span className="capitalize text-white">
+                      {cat.name} ({cat.productCount})
+                    </span>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleEdit(cat)}
+                        className="text-sm text-[#1de9b6] hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(cat._id)}
+                        className="text-sm text-red-400 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-400">No categories found.</p>
-            )}
+                ))
+              ) : (
+                <p className="text-gray-400">No categories found.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Donut Chart */}
+          <div className="bg-[#1e293b] p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-[#1de9b6] mb-4">
+              Product Distribution
+            </h2>
+            <Chart
+              type="donut"
+              width="100%"
+              height={320}
+              series={categoriesWithCount.map((cat) => cat.productCount)}
+              options={{
+                labels: categoriesWithCount.map((cat) => cat.name),
+                colors: ["#1de9b6", "#f59e0b", "#3b82f6", "#10b981", "#f43f5e"],
+                legend: {
+                  show: true,
+                  position: "right",
+                  labels: {
+                    colors: "#fff",
+                    formatter: function (val, opts) {
+                      const seriesIndex = opts.seriesIndex;
+                      const count = opts.w.config.series[seriesIndex];
+                      const total = opts.w.globals.seriesTotals.reduce(
+                        (a, b) => a + b,
+                        0
+                      );
+                      const percent = ((count / total) * 100).toFixed(1);
+                      return `${val} - ${percent}% (${count})`;
+                    },
+                  },
+                  markers: {
+                    width: 12,
+                    height: 12,
+                    radius: 6,
+                  },
+                  itemMargin: {
+                    horizontal: 10,
+                    vertical: 5,
+                  },
+                },
+                tooltip: {
+                  theme: "dark",
+                  y: { formatter: (val) => `${val} products` },
+                },
+                dataLabels: {
+                  enabled: false,
+                },
+                stroke: {
+                  show: false,
+                },
+                plotOptions: {
+                  pie: {
+                    donut: {
+                      size: "65%",
+                      labels: {
+                        show: true,
+                        total: {
+                          show: true,
+                          label: "Total",
+                          fontSize: "16px",
+                          color: "#fff",
+                          formatter: () =>
+                            categoriesWithCount.reduce(
+                              (sum, cat) => sum + cat.productCount,
+                              0
+                            ),
+                        },
+                      },
+                    },
+                  },
+                },
+              }}
+            />
           </div>
         </div>
       </div>
