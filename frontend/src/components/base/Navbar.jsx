@@ -123,16 +123,18 @@ const Navbar = () => {
                   3
                 </span>
               </span>
-              <span
-                href="cart"
-                title="Cart"
-                className="text-white text-2xl hover:text-[#1de9b6] cursor-pointer transition-colors duration-200 relative"
-              >
-                <i className="ri-shopping-cart-line"></i>
-                <span className="absolute -top-2 -right-2 bg-[#1de9b6] text-xs text-[#0a1120] rounded-full px-1.5 font-bold">
-                  2
+              <a href="/cart">
+                <span
+                    
+                    title="Cart"
+                    className="text-white text-2xl hover:text-[#1de9b6] cursor-pointer transition-colors duration-200 relative"
+                    >
+                    <i className="ri-shopping-cart-line"></i>
+                    <span className="absolute -top-2 -right-2 bg-[#1de9b6] text-xs text-[#0a1120] rounded-full px-1.5 font-bold">
+                      2
+                    </span>
                 </span>
-              </span>
+              </a>
               <a href="/profile">
                 <span
                   title="Profile"

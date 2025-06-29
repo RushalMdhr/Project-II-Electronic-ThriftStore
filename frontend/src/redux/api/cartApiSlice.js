@@ -5,10 +5,10 @@ export const cartApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Add to cart
     addToCart: builder.mutation({
-      query: (data) => ({
-       url: `${CART_URL}/add`,
-        method: "POST",
-        body: data,
+       query: ({ userId, productId, quantity }) => ({
+    url: "/api/cart/add",
+    method: "POST",
+    body: { userId, productId, quantity },
       }),
     }),
 

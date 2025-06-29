@@ -48,13 +48,8 @@ const ProductCard = ({ product, onDelete, onEdit, userId }) => {
             <button className="quick-action-btn" title="Quick View">
               <FiEye />
             </button>
-            <button
-              className="quick-action-btn"
-              title="Add to Cart"
-              disabled={isOutOfStock}
-            >
-              <FiShoppingCart />
-            </button>
+            <AddToCart productId={product._id} userId={userId} disabled={isOutOfStock} />
+           
           </div>
         </div>
 

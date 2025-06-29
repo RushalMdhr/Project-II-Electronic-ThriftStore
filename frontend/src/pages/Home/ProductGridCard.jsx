@@ -1,7 +1,11 @@
 import React from "react";
 import AddToCart from "../pages/Cart/AddToCart";
+import { useUserId } from "../../components/UserProvider";
+
+
 
 const ProductGridCard = ({ products }) => {
+   const userId = useUserId();
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {products.map((product) => {
@@ -27,8 +31,9 @@ const ProductGridCard = ({ products }) => {
               <h3 className="font-semibold text-gray-900">{product.name}</h3>
               <p className="text-sm text-gray-600">Price: Rs. {product.price}</p>
 
-              <AddToCart productId={product._id} disabled={isOutOfStock} />
+              
             </div>
+            <AddToCart productId={product._id} userId={userId} disabled={isOutOfStock} />
           </div>
         );
       })}

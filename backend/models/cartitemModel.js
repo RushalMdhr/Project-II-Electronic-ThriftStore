@@ -18,11 +18,13 @@ const cartItemSchema =  mongoose.Schema({
     min: 1,
     default: 1,
   },
-  addedAt: {
-    type: Date,
-    default: Date.now,
+  price:{
+    type: Number,
+    required: true,
   }
-});
+},
+{timestamps:true}
+);
 
 const CartItem = mongoose.model('CartItem', cartItemSchema);
 

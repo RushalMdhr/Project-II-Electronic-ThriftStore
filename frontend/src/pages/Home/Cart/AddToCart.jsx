@@ -1,6 +1,6 @@
 import React from "react";
-import { useAddToCartMutation } from "../../redux/api/cartApiSlice";
-import { useUserId } from "../../components/UserProvider";
+import { useAddToCartMutation } from "../../../redux/api/cartApiSlice";
+import { useUserId } from "../../../components/UserProvider";
 
 const AddToCart = ({ productId, disabled }) => {
   const userId = useUserId();
@@ -32,7 +32,7 @@ const AddToCart = ({ productId, disabled }) => {
           : "bg-emerald-600 text-white hover:bg-emerald-700"
       }`}
     >
-      {disabled ? "Out of Stock" : isLoading ? "Adding…" : "Add to Cart"}
+{disabled ? "Out of Stock" : isLoading ? "Adding…" : "Add to Cart"}
     </button>
   );
 };

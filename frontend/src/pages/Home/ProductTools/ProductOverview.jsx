@@ -2,11 +2,14 @@ import { useParams } from "react-router";
 import { useGetProductByIdQuery } from "../../../redux/api/productsApiSlice";
 import ProductGrid from "./ProductGrid";
 import { useEffect } from "react";
+import AddToCart from "../Cart/AddToCart"; 
+
 
 const ProductOverView = () => {
   const param = useParams();
   const { data: product = [] } = useGetProductByIdQuery(param.productId);
   console.log(product);
+const isOutOfStock = product.countInStock === 0;
 
   useEffect(() => {
     // This will run every time 'product' changes
@@ -14,6 +17,7 @@ const ProductOverView = () => {
   }, [product]);
 
 return (
+
     <>
         <div className="max-w-lg mx-auto bg-white rounded-xl shadow-lg p-8 flex flex-col items-center space-y-6 mt-8">
             <img
@@ -53,9 +57,8 @@ return (
                 </div>
             </div>
             <div className="flex space-x-4 mt-4">
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
-                    Add to Cart
-                </button>
+                {/* Add to Cart Button */}
+                <AddToCart productId={product._id} disabled={isOutOfStock} />
                 <button className="px-6 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition">
                     Buy Now
                 </button>

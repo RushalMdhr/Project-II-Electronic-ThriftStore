@@ -25,7 +25,7 @@ import ProductList from "./components/Product/ProductList.jsx";
 import AdminRoute from "./components/Admin/AdminRoute.jsx";
 import UserList from "./pages/Admin/UserList.jsx";
 import OrderList from "./components/Admin/OrderList.jsx";
-import CartPage from "./pages/Cart/CartPage.jsx";
+import CartPage from "./pages/Home/Cart/CartPage.jsx";
 
 // import UploadPage from "./pages/Vendor/UploadPage.jsx";
 import UploadPageTest from "./pages/Vendor/UploadPageTest.jsx";
