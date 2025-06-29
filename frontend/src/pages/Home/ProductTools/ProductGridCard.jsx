@@ -1,4 +1,5 @@
 import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Link } from "react-router";
 
 const ProductGridCard = ({ products }) => {
   return (
@@ -10,11 +11,12 @@ const ProductGridCard = ({ products }) => {
             >
               {/* Image Container */}
               <div className="relative aspect-square overflow-hidden">
-                <img
+                <Link to={`/${product._id}`}><img
                   src={product.images? product.images[0] : "/temp/placeholder.svg"}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+                </Link>
 
                 {/* Discount Badge */}
                 <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">

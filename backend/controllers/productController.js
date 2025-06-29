@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 
 const createProduct = asyncHandler(async (req, res) => {
   console.log("i m in createProduct");
-  
+
   try {
     const { name, description, price, category, quantity, brand } = req.fields;
     switch (true) {
@@ -21,9 +21,8 @@ const createProduct = asyncHandler(async (req, res) => {
       case !quantity:
         return res.json({ error: "quantity is required" });
     }
-    
 
-    const product = new Product({ ...req.fields });
+    const product = new Product({ ...req.fields, UploadedBy: req.user._id });
     await product.save();
     res.json(product);
   } catch (error) {
@@ -83,22 +82,11 @@ const updateProductDetails = asyncHandler(async (req, res) => {
 
 const deleteProductById = asyncHandler(async (req, res) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      throw new Error("MongoDB not connected");
-    }
-
-    if (typeof id !== "string" || id.length === 0) {
-      return res.status(400).json({ error: "Invalid ID format" });
-    }
-
-    const result = await Product.findOneAndDelete({ _id: req.params.id });
-    if (!result) {
-      return res.status(404).json({ error: "Document not found" });
-    }
-    return res.status(204).send(result);
-  } catch (err) {
-    console.error("DELETE Operation Failed:", err);
-    return res.status(500).json({ message: "Delete operation failed" });
+    const product = await Product.findByIdAndDelete(req.params.productId);
+    res.json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "server error" });
   }
 });
 
@@ -108,8 +96,17 @@ const fetchProducts = asyncHandler(async (req, res) => {
     const keyword = req.query.keyword
       ? { name: { $regex: req.query.keyword, $options: "i" } }
       : {};
-    const count = await Product.countDocuments({ ...keyword });
-    const products = await Product.find({ ...keyword }).limit(pageSize);
+
+    // Exclude products uploaded by the logged-in vendor
+    let excludeVendor = {};
+    if (req.user && req.user._id) {
+      excludeVendor = { UploadedBy: { $ne: req.user._id } };
+    }
+
+    const filter = { ...keyword, ...excludeVendor };
+
+    const count = await Product.countDocuments(filter);
+    const products = await Product.find(filter).limit(pageSize);
 
     res.json({
       products,
@@ -126,7 +123,9 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
 const getProductById = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId);
+    const product = await Product.findById(req.params.productId)
+      .populate("category", "name")
+      // .populate("user", "username email");
 
     if (product) {
       return res.json(product);
@@ -183,6 +182,7 @@ const addProductReview = asyncHandler(async (req, res) => {
 
 const fetchTopProducts = asyncHandler(async (req, res) => {
   try {
+    
     const products = await Product.find({}).sort({ rating: -1 }).limit(4);
     res.json(products);
   } catch (error) {
@@ -201,6 +201,21 @@ const fetchNewProducts = asyncHandler(async (req, res) => {
   }
 });
 
+const getMyProducts = asyncHandler(async (req, res) => {
+  try {
+    const id = req.user._id;
+    // const myProducts = await Product.UploadedBy.find({  id})
+    const myProducts = await Product.find({ UploadedBy: id }).populate(
+      "category"
+    );
+    // .populate('category', 'name');
+    res.send(myProducts);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 export {
   createProduct,
   getAllProducts,
@@ -211,4 +226,5 @@ export {
   addProductReview,
   fetchTopProducts,
   fetchNewProducts,
+  getMyProducts,
 };
