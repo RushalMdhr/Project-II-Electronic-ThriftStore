@@ -31,11 +31,6 @@ const orderSchema = mongoose.Schema(
         // },
       },
     ],
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
   //   shippingAddress: {
   //     address: { type: String, required: true },
   //     city: { type: String, required: true },
