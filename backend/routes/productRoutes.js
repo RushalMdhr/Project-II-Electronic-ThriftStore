@@ -16,7 +16,7 @@ import {
 import checkId from "../middlewares/checkId.js";
 import { authenticate, authorizeAdmin,authorizeVendor,authorizeAdminOrVendor } from "../middlewares/authMiddleware.js";
 
-const router = express.Router();
+const   router = express.Router();
 
 router.route("/getmyproducts").get(authenticate, authorizeVendor, getMyProducts);
 
