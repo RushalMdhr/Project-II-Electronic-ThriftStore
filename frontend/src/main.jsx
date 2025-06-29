@@ -37,6 +37,7 @@ import VendorRoutes from "./components/Vendor/VendorRoutes.jsx";
 import ProductOverView from "./pages/Home/ProductTools/ProductOverView.jsx";
 import AdminLayout from "./components/Admin/AdminLayout.jsx";
 import ManageOrders from "./pages/Admin/ManageOrders.jsx";
+import Category from "./components/Admin/Category.jsx";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route
@@ -97,11 +98,9 @@ const router = createBrowserRouter(
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="users" element={<UserList />} />
-          <Route
-            path="orders"
-            element={<ManageOrders />}
-          />
+          <Route path="orders" element={<ManageOrders />} />
           <Route path="users/:id/edit" element={<UserUpdate />} />
+          <Route path="categories" element={<Category />} />
         </Route>
       </Route>
     </Route>
