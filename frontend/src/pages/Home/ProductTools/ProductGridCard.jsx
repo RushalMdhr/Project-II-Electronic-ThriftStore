@@ -81,7 +81,7 @@ const ProductGridCard = ({ products }) => {
                 {/* Add to Cart Button */}
                 <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors font-medium">
                   <ShoppingCart className="h-4 w-4" />
-                  <span>Add to Cart</span>
+                  <span>Add to me</span>
                 </button>
               </div>
             </div>

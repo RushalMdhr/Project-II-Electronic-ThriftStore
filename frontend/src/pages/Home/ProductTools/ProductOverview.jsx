@@ -13,6 +13,10 @@ const ProductOverView = () => {
     console.log("Product data updated:", product);
   }, [product]);
 
+    const makeOrder = () => {
+        
+    }
+
 return (
     <>
         <div className="max-w-lg mx-auto bg-white rounded-xl shadow-lg p-8 flex flex-col items-center space-y-6 mt-8">
@@ -56,7 +60,7 @@ return (
                 <button className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
                     Add to Cart
                 </button>
-                <button className="px-6 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition">
+                <button type="button" onClick={makeOrder} className="px-6 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition">
                     Buy Now
                 </button>
             </div>
