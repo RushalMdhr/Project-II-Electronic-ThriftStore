@@ -1,18 +1,27 @@
-import React from "react";
+import { forwardRef } from "react"
+import { cn } from "../../Utils/cn"
 
-const variantStyles = {
-  success: "bg-green-600 text-white",
-  destructive: "bg-red-600 text-white",
-  secondary: "bg-gray-500 text-white",
-  default: "bg-gray-700 text-white",
-};
+const Badge = forwardRef(({ className, variant = "default", ...props }, ref) => {
+  const variants = {
+    default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+    secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+    destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+    outline: "text-foreground",
+  }
 
-export const Badge = ({ variant = "default", className = "", children }) => {
   return (
-    <span
-      className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${variantStyles[variant]} ${className}`}
-    >
-      {children}
-    </span>
-  );
-};
+    <div
+      ref={ref}
+      className={cn(
+        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+        variants[variant],
+        className,
+      )}
+      {...props}
+    />
+  )
+})
+
+Badge.displayName = "Badge"
+
+export { Badge }
