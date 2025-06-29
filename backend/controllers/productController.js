@@ -82,22 +82,11 @@ const updateProductDetails = asyncHandler(async (req, res) => {
 
 const deleteProductById = asyncHandler(async (req, res) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      throw new Error("MongoDB not connected");
-    }
-
-    if (typeof id !== "string" || id.length === 0) {
-      return res.status(400).json({ error: "Invalid ID format" });
-    }
-
-    const result = await Product.findOneAndDelete({ _id: req.params.id });
-    if (!result) {
-      return res.status(404).json({ error: "Document not found" });
-    }
-    return res.status(204).send(result);
-  } catch (err) {
-    console.error("DELETE Operation Failed:", err);
-    return res.status(500).json({ message: "Delete operation failed" });
+    const product = await Product.findByIdAndDelete(req.params.productId);
+    res.json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "server error" });
   }
 });
 
