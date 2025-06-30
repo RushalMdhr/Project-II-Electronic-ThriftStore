@@ -110,7 +110,7 @@ const UploadPageTest = () => {
         if (!createdProduct.ok) {
           toast.error(createdProduct.error);
         }
-        toast.success("Product created successfully!");
+        toast.success(`${createdProduct.name} created successfully!`);
       } else {
         toast.info("Updating product details...");
         console.log("Updating product with ID:", product._id);
@@ -141,7 +141,7 @@ const UploadPageTest = () => {
 
       const deletedProduct = await deleteProduct(product._id).unwrap();
       console.log("Deleted product:", deletedProduct);
-      toast.success("Product deleted successfully!");
+      toast.success(`${deletedProduct?.name} deleted successfully!`);
       navigate("/vendor/products"); // Redirect to products list after deletion
     } catch (error) {
       toast.error("Failed to delete product");
