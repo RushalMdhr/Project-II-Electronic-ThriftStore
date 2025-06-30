@@ -1,6 +1,7 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
 import Product from "../models/productModel.js";
-import mongoose from "mongoose";
+import fs from "fs";
+import path from "path";
 
 const createProduct = asyncHandler(async (req, res) => {
   console.log("i m in createProduct");
@@ -63,8 +64,6 @@ const updateProductDetails = asyncHandler(async (req, res) => {
         return res.json({ error: "price is required" });
       case !category:
         return res.json({ error: "category is required" });
-      case !quantity:
-        return res.json({ error: "quantity is required" });
     }
 
     const product = await Product.findById(
@@ -83,6 +82,20 @@ const updateProductDetails = asyncHandler(async (req, res) => {
 const deleteProductById = asyncHandler(async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.productId);
+    
+    if (product && product.images && product.images.length > 0) {
+      product.images.forEach((imgPath) => {
+        // Adjust the path as per your upload directory
+        const uploadsDir = path.join(process.cwd(), "uploads");
+        const filePath = path.join(
+          uploadsDir,
+          path.basename(imgPath)
+        );
+        fs.unlink(filePath, (err) => {
+          if (err) console.error("Failed to delete image:", filePath, err);
+        });
+      });
+    }
     res.json(product);
   } catch (error) {
     console.error(error);
@@ -114,9 +127,11 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
 const getProductById = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId)
-      .populate("category", "name")
-      // .populate("user", "username email");
+    const product = await Product.findById(req.params.productId).populate(
+      "category",
+      "name"
+    );
+    // .populate("user", "username email");
 
     if (product) {
       return res.json(product);

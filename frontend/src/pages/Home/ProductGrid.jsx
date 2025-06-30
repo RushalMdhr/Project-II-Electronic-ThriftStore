@@ -26,6 +26,7 @@ const ProductGrid = () => {
             sellers
           </p>
         </div>
+        <button onClick={() => refetch()}>Refresh Products</button>
 
         <ProductGridCard products={products}/>
 

@@ -1,10 +1,14 @@
 import { useGetMyProductsQuery } from "../../../redux/api/productsApiSlice"
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const VendorProducts = () => {
-  const { data: myproducts, isLoading, isError } = useGetMyProductsQuery();
+  const { data: myproducts, isLoading, isError,refetch } = useGetMyProductsQuery();
   const navigate = useNavigate();
-
+  const location = useLocation();
+  useEffect(()=>{
+    refetch();
+  },[location.key])
   const handleEdit = (product) => {
     console.log("Editing product:", product);
     
