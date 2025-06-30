@@ -1,19 +1,41 @@
 import asyncHandler from "../middlewares/asyncHandler.js"
 import CartItem from '../models/cartitemModel.js';
 // Add a product to cart
-export const addToCart = asyncHandler(async (req, res) => {
-  const { userId, productId, quantity } = req.body;
-  let cartItem = await CartItem.findOne({ user: userId, product: productId });
+import Product from "../models/productModel.js"; 
 
-  if (cartItem) {
-    cartItem.quantity += quantity || 1;
-    await cartItem.save();
-  } else {
-    cartItem = await CartItem.create({ user: userId, product: productId, quantity });
+export const addToCart = async (req, res) => {
+  try {
+    const { userId, productId, quantity } = req.body;
+
+    const existing = await CartItem.findOne({ user: userId, product: productId });
+
+    if (existing) {
+      existing.quantity += quantity || 1;
+      await existing.save();
+      return res.status(201).json(existing);
+    }
+
+    // 🟡 Fetch price from Product model
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // ✅ Create cart item with price
+    const cartItem = await CartItem.create({
+      user: userId,
+      product: productId,
+      quantity: quantity || 1,
+      price: product.price, 
+    });
+
+    res.status(201).json(cartItem);
+  } catch (error) {
+    console.error("❌ Error in addToCart:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
+};
 
-  res.status(201).json(cartItem);
-});
 
 // Get all cart items for a user
 export const getCartItems = async (req, res) => {
