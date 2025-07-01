@@ -19,7 +19,7 @@ const createProduct = asyncHandler(async (req, res) => {
         return res.json({ error: "category is required" });
     }
 
-    const product = new Product({ ...req.fields, UploadedBy: req.user._id });
+    const product = new Product({ ...req.fields, uploadedBy: req.user._id });
     await product.save();
     res.json(product);
   } catch (error) {
