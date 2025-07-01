@@ -4,8 +4,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLoginMutation } from "../../redux/api/usersApiSlice";
 import { setCredentials } from "../../redux/features/auth/authSlice";
 import { toast } from "react-toastify";
+import { Eye, EyeOff } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+// import Navbar from "../../components/base/Navbar"; // Uncomment if you want the navbar on login
 
 const Login = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
@@ -38,51 +45,87 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-gray-800 p-8 rounded-lg shadow-lg border border-gray-700">
-        <h2 className="text-2xl font-bold text-white text-center mb-6">
-          Login
-        </h2>
-        <form onSubmit={loginHandler} className="space-y-5">
-          <div>
-            <label className="block text-gray-300 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your email"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-300 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-md transition disabled:opacity-50"
-          >
-            {isLoading ? "Logging in..." : "Login"}
-          </button>
-          <p className="text-sm text-gray-400 text-center mt-4">
-            New here?{" "}
-            <Link
-              to={redirect ? `/register?redirect=${redirect}` : "/register"}
-              className="text-green-400 hover:text-green-500"
-            >
-              Register
-            </Link>
-          </p>
-        </form>
+    <div className="min-h-screen bg-gray-900">
+      {/* <Navbar /> */}
+      <div className="pt-20 flex items-center justify-center min-h-screen px-4">
+        <Card className="w-full max-w-md bg-gray-800 border-gray-700">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-white">Welcome Back</CardTitle>
+            <p className="text-gray-400">Sign in to your ThriftTech account</p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={loginHandler} className="space-y-4">
+              <div>
+                <Label htmlFor="email" className="text-white">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-emerald-400"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="password" className="text-white">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-emerald-400 pr-10"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="flex items-center">
+                  <input type="checkbox" className="mr-2" />
+                  <span className="text-sm text-gray-400">Remember me</span>
+                </label>
+                <Link to="/forgot-password" className="text-sm text-emerald-400 hover:text-emerald-300">
+                  Forgot password?
+                </Link>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-emerald-500 hover:bg-emerald-600"
+                disabled={isLoading}
+              >
+                {isLoading ? "Logging in..." : "Sign In"}
+              </Button>
+
+              <div className="text-center">
+                <span className="text-gray-400">Don't have an account? </span>
+                <Link
+                  to={redirect ? `/register?redirect=${redirect}` : "/register"}
+                  className="text-emerald-400 hover:text-emerald-300"
+                >
+                  Sign up
+                </Link>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

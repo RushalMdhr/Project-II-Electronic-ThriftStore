@@ -4,8 +4,6 @@ import fs from "fs";
 import path from "path";
 
 const createProduct = asyncHandler(async (req, res) => {
-  console.log("i m in createProduct");
-
   try {
     const { name, description, price, category, quantity, brand } = req.fields;
     switch (true) {
@@ -19,8 +17,6 @@ const createProduct = asyncHandler(async (req, res) => {
         return res.json({ error: "price is required" });
       case !category:
         return res.json({ error: "category is required" });
-      case !quantity:
-        return res.json({ error: "quantity is required" });
     }
 
     const product = new Product({ ...req.fields, UploadedBy: req.user._id });

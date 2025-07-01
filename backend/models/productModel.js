@@ -34,8 +34,8 @@ const ProductSchema = mongoose.Schema({
     // numReviews: { type: Number, required: true, default: 0 },
     price: { type: Number, required: true, default: 0 },
     discountedPrice: { type: Number, required: true, default: 0 },
-    countInStock: { type: Number, required: true, default: 0 },
-    UploadedBy: {
+    countInStock: { type: Number, required: true, default: 1 },
+    uploadedBy: {
         type: ObjectId,
         ref: "User",
         required: true
