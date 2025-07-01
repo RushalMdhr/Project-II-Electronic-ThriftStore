@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
+import { Badge } from "../ui/Badge"; // Adjust path as needed
 
-const statusColors = {
-  active: "bg-green-500 text-white",
-  inactive: "bg-yellow-400 text-black",
-  banned: "bg-red-600 text-white",
+const statusVariants = {
+  active: "default",
+  inactive: "secondary",
+  banned: "destructive",
 };
 
 const UserCard = ({ user, onDelete, onView }) => {
@@ -39,14 +40,13 @@ const UserCard = ({ user, onDelete, onView }) => {
           </div>
         </div>
 
-        {/* Status badge */}
-        <span
-          className={`inline-block px-4 py-1 rounded-full text-xs font-semibold whitespace-nowrap self-center ${
-            statusColors[user.status] || "bg-gray-400 text-white"
-          }`}
+        {/* Status badge using reusable Badge */}
+        <Badge
+          variant={statusVariants[user.status] || "outline"}
+          className="self-center"
         >
           {capitalize(user.status)}
-        </span>
+        </Badge>
 
         {/* Actions */}
         <div className="flex gap-4 justify-end flex-wrap min-w-[150px]">

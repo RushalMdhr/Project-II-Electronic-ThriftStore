@@ -58,22 +58,23 @@ const loginUser = asyncHandler(async (req, res) => {
       return res.status(403).json({ message: "Account is banned by admin." });
     }
 
-    // Check if user has been inactive for 30+ days
-    const INACTIVITY_LIMIT_DAYS = 30;
+    const INACTIVITY_LIMIT_MINUTES = 1440; // 24 hours
+
     const lastLogin = exitingUser.lastLogin || exitingUser.createdAt;
     const inactivityThreshold = new Date(
-      Date.now() - INACTIVITY_LIMIT_DAYS * 24 * 60 * 60 * 1000
+      Date.now() - INACTIVITY_LIMIT_MINUTES * 60 * 1000
     );
 
     if (lastLogin < inactivityThreshold && exitingUser.status === "active") {
       exitingUser.status = "inactive";
       await exitingUser.save();
-      return res
-        .status(403)
-        .json({
-          message: "Account set to inactive due to 30+ days of inactivity.",
-        });
+      return res.status(403).json({
+        message: `Account set to inactive due to ${
+          INACTIVITY_LIMIT_MINUTES / 60
+        } hours of inactivity. Log in again to reactivate.`,
+      });
     }
+    
 
     const isPasswordValid = await bcrypt.compare(
       password,
