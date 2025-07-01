@@ -2,6 +2,7 @@ import React from "react";
 import { useAddToCartMutation } from "../../../redux/api/cartApiSlice";
 import { useUserId } from "../../../components/UserProvider";
 
+// added a button
 const AddToCart = ({ productId, disabled }) => {
   const userId = useUserId();
   const [addToCart, { isLoading }] = useAddToCartMutation();

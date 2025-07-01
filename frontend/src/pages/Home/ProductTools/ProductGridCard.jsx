@@ -3,6 +3,7 @@ import { Heart, Star } from "lucide-react";
 import { Link } from "react-router-dom"; 
 import AddToCart from "../Cart/AddToCart"; 
 
+//  added button
 const ProductGridCard = ({ products }) => {
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">

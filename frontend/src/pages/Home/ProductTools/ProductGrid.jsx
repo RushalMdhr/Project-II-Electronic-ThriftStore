@@ -1,7 +1,7 @@
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { useAllProductsQuery } from "../../../redux/api/productsApiSlice";
 import ProductGridCard from "./ProductGridCard";
-
+//
 const ProductGrid = () => {
     const {data : products=[],isLoading,isError,refetch} = useAllProductsQuery();
     console.log(products);
