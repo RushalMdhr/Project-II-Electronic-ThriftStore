@@ -1,10 +1,9 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
 import Product from "../models/productModel.js";
-import mongoose from "mongoose";
+import fs from "fs";
+import path from "path";
 
 const createProduct = asyncHandler(async (req, res) => {
-  console.log("i m in createProduct");
-  
   try {
     const { name, description, price, category, quantity, brand } = req.fields;
     switch (true) {
@@ -18,12 +17,8 @@ const createProduct = asyncHandler(async (req, res) => {
         return res.json({ error: "price is required" });
       case !category:
         return res.json({ error: "category is required" });
-      case !quantity:
-        return res.json({ error: "quantity is required" });
     }
-    
-
-    const product = new Product({ ...req.fields });
+    const product = new Product({ ...req.fields, UploadedBy: req.user._id });
     await product.save();
     res.json(product);
   } catch (error) {
@@ -64,8 +59,6 @@ const updateProductDetails = asyncHandler(async (req, res) => {
         return res.json({ error: "price is required" });
       case !category:
         return res.json({ error: "category is required" });
-      case !quantity:
-        return res.json({ error: "quantity is required" });
     }
 
     const product = await Product.findById(
@@ -83,22 +76,25 @@ const updateProductDetails = asyncHandler(async (req, res) => {
 
 const deleteProductById = asyncHandler(async (req, res) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      throw new Error("MongoDB not connected");
+    const product = await Product.findByIdAndDelete(req.params.productId);
+    
+    if (product && product.images && product.images.length > 0) {
+      product.images.forEach((imgPath) => {
+        // Adjust the path as per your upload directory
+        const uploadsDir = path.join(process.cwd(), "uploads");
+        const filePath = path.join(
+          uploadsDir,
+          path.basename(imgPath)
+        );
+        fs.unlink(filePath, (err) => {
+          if (err) console.error("Failed to delete image:", filePath, err);
+        });
+      });
     }
-
-    if (typeof id !== "string" || id.length === 0) {
-      return res.status(400).json({ error: "Invalid ID format" });
-    }
-
-    const result = await Product.findOneAndDelete({ _id: req.params.id });
-    if (!result) {
-      return res.status(404).json({ error: "Document not found" });
-    }
-    return res.status(204).send(result);
-  } catch (err) {
-    console.error("DELETE Operation Failed:", err);
-    return res.status(500).json({ message: "Delete operation failed" });
+    res.json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "server error" });
   }
 });
 
@@ -126,7 +122,11 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
 const getProductById = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId);
+    const product = await Product.findById(req.params.productId).populate(
+      "category",
+      "name"
+    );
+    // .populate("user", "username email");
 
     if (product) {
       return res.json(product);
@@ -201,6 +201,20 @@ const fetchNewProducts = asyncHandler(async (req, res) => {
   }
 });
 
+const getMyProducts = asyncHandler(async (req, res) => {
+  try {
+    const id = req.user._id;
+    // const myProducts = await Product.UploadedBy.find({  id})
+    const myProducts = await Product.find({ UploadedBy: id }).populate(
+      "category"
+    );
+    // .populate('category', 'name');
+    res.send(myProducts);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 export {
   createProduct,
   getAllProducts,
@@ -211,4 +225,5 @@ export {
   addProductReview,
   fetchTopProducts,
   fetchNewProducts,
+  getMyProducts,
 };

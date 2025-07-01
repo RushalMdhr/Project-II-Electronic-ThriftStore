@@ -11,18 +11,21 @@ import {
   addProductReview,
   fetchTopProducts,
   fetchNewProducts,
+  getMyProducts
 } from "../controllers/productController.js";
 import checkId from "../middlewares/checkId.js";
-import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
+import { authenticate, authorizeAdmin,authorizeVendor,authorizeAdminOrVendor } from "../middlewares/authMiddleware.js";
 
-const router = express.Router();
+const   router = express.Router();
+
+router.route("/getmyproducts").get(authenticate, authorizeVendor, getMyProducts);
 
 router.route("/allproducts").get(getAllProducts);
 
 router
   .route("/")
   .get(fetchProducts)
-  .post(authenticate, authorizeAdmin, formidable(), createProduct);
+  .post(authenticate, authorizeAdminOrVendor, formidable(), createProduct);
 
 router.get("/top", fetchTopProducts);
 router.get("/new", fetchNewProducts);
@@ -30,12 +33,12 @@ router.get("/new", fetchNewProducts);
 router
   .route("/:productId")
   .get(getProductById)
-  .put(authenticate, authorizeAdmin, formidable(), updateProductDetails)
-  .delete(authenticate, authorizeAdmin, deleteProductById);
+  .put(authenticate, authorizeAdminOrVendor, formidable(), updateProductDetails)
+  .delete(authenticate, authorizeAdminOrVendor, deleteProductById);
 
-router
-  .route("/:productId/reviews")
-  .post(authenticate, authorizeAdmin, checkId, addProductReview);
+// router
+//   .route("/:productId/reviews")
+//   .post(authenticate, authorizeAdmin, checkId, addProductReview);
 
 
 export default router;

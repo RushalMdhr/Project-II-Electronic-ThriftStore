@@ -1,17 +1,20 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import "remixicon/fonts/remixicon.css";
 import { useLogoutMutation } from "../../redux/api/usersApiSlice";
 import { logout } from "../../redux/features/auth/authSlice";
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import "remixicon/fonts/remixicon.css";
 
 const Navbar = () => {
   const { userInfo } = useSelector((state) => state.auth);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [logoutApiCall] = useLogoutMutation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const logoutHandler = async (e) => {
     try {
@@ -25,133 +28,257 @@ const Navbar = () => {
     }
   };
 
+  // Spacer div to create space for the fixed navbar
   return (
-    <div>
-      <nav className="bg-[#0a1120] px-8 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center space-x-2">
-          <a href="/">
-            <span className="text-3xl font-bold text-[#1de9b6]">Thrift</span>
-            <span className="text-3xl font-bold text-white">Tech</span>
-          </a>
-        </div>
-        {/* Nav Links */}
-        <div className="flex items-center space-x-8">
-          <a
-            href="/"
-            className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
-          >
-            <i className="ri-home-4-line mr-1"></i> Home
-          </a>
-          <a
-            href="/admin/productcard"
-            className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
-          >
-            <i className="ri-box-3-line mr-1"></i> Products
-          </a>
-          <a
-            href="#"
-            className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
-          >
-            <i className="ri-apps-2-line mr-1"></i> Categories
-          </a>
-          {userInfo && userInfo.isVendor ? (
-            <a
-              href="/dashboard"
-              className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
-            >
-              <i className="ri-dashboard-line mr-1"></i> Dashboard
-            </a>
-          ) : (
-            <a
-              href="/vendor/register"
-              className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
-            >
-              <i className="ri-store-2-line mr-1"></i> Vendors
-            </a>
-          )}
-          <a
-            href="#"
-            className="flex items-center text-white text-lg font-semibold hover:text-[#1de9b6] transition"
-          >
-            <i className="ri-article-line mr-1"></i> Blog
-          </a>
-        </div>
-        {/* Search and Icons */}
-        <div className="flex items-center space-x-6">
-          {/* Search */}
-          <div className="flex items-center bg-[#131a2b] px-3 py-1 rounded-lg">
-            <span className="text-[#1de9b6] text-xl mr-2">
-              <i className="ri-search-line"></i>
-            </span>
-            <input
-              type="text"
-              placeholder="Search"
-              className="bg-transparent outline-none text-white placeholder:text-gray-400 w-24"
-            />
-          </div>
-          {/* Icons */}
-          <span
-            title="Toggle Theme"
-            className="text-white text-2xl hover:text-[#1de9b6] cursor-pointer transition-colors duration-200"
-          >
-            <i className="ri-sun-line"></i>
-          </span>
+    <>
+      <div className="h-16 w-full" />
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex-shrink-0 flex items-center mr-8">
+              <Link to="/" className="flex items-center space-x-2">
+                <div className="text-2xl font-bold text-emerald-400">
+                  Thrift
+                </div>
+                <div className="text-2xl font-bold text-white">Tech</div>
+              </Link>
+            </div>
 
-          {userInfo ? (
-            <>
-              <span
-                title="Wishlist"
-                className="text-white text-2xl hover:text-[#1de9b6] cursor-pointer transition-colors duration-200"
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              <Link
+                to="/"
+                className="text-gray-300 hover:text-white transition-colors"
               >
-                <i className="ri-heart-line"></i>
-              </span>
-              <span
-                title="Notifications"
-                className="text-white text-2xl hover:text-[#1de9b6] cursor-pointer transition-colors duration-200 relative"
+                Home
+              </Link>
+              <Link
+                to="/products"
+                className="text-gray-300 hover:text-white transition-colors"
               >
-                <i className="ri-notification-3-line"></i>
-                <span className="absolute -top-2 -right-2 bg-[#1de9b6] text-xs text-[#0a1120] rounded-full px-1.5 font-bold">
-                  3
-                </span>
-              </span>
-              <span
-                title="Cart"
-                className="text-white text-2xl hover:text-[#1de9b6] cursor-pointer transition-colors duration-200 relative"
+                Products
+              </Link>
+              <Link
+                to="/admin/categories"
+                className="text-gray-300 hover:text-white transition-colors"
               >
-                <i className="ri-shopping-cart-line"></i>
-                <span className="absolute -top-2 -right-2 bg-[#1de9b6] text-xs text-[#0a1120] rounded-full px-1.5 font-bold">
-                  2
-                </span>
-              </span>
-              <a href="/profile">
-                <span
-                  title="Profile"
-                  className="text-white text-2xl hover:text-[#1de9b6] cursor-pointer transition-colors duration-200"
+                Categories
+              </Link>
+              {userInfo?.isAdmin && (
+                <Link
+                  to="/admin"
+                  className="text-gray-300 hover:text-white transition-colors"
                 >
-                  <i className="ri-user-line">{userInfo.username}</i>
-                </span>
-              </a>
-              <button onClick={logoutHandler}>
-                <span
-                  title="Login"
-                  className="text-white text-2xl hover:text-[#1de9b6] cursor-pointer transition-colors duration-200"
+                  Admin Panel
+                </Link>
+              )}
+              {userInfo && userInfo.isVendor ? (
+                <>
+                  <Link
+                    to="/vendor/dashboard"
+                    className="text-gray-300 hover:text-white transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/vendor/upload"
+                    className="text-gray-300 hover:text-white transition-colors"
+                  >
+                    Upload
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  to="/vendor/register"
+                  className="text-gray-300 hover:text-white transition-colors"
                 >
-                  <i className="ri-login-box-line"></i>
+                  Vendors
+                </Link>
+              )}
+              <Link
+                to="#"
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Blog
+              </Link>
+            </div>
+
+            {/* Search Bar */}
+            <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
+              <div className="relative w-full">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <i className="ri-search-line"></i>
                 </span>
-              </button>
-            </>
-          ) : (
-            <a
-              href="login"
-              className="text-white text-lg font-bold ml-2 hover:text-[#1de9b6] transition flex items-center"
-            >
-              <i className="ri-login-circle-line mr-1"></i> Login
-            </a>
+                <Input
+                  type="text"
+                  placeholder="Search for products..."
+                  className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-400"
+                />
+              </div>
+            </div>
+
+            {/* Right Side Icons */}
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-gray-300 hover:text-white"
+              >
+                <i className="ri-heart-line text-xl"></i>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-gray-300 hover:text-white"
+              >
+                <i className="ri-shopping-cart-line text-xl"></i>
+              </Button>
+              {userInfo ? (
+                <>
+                  <Link to="/profile">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-gray-300 hover:text-white"
+                    >
+                      <i className="ri-user-line text-xl"></i>
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-300 hover:text-white"
+                    onClick={logoutHandler}
+                    title="Logout"
+                  >
+                    <i className="ri-logout-box-line text-xl"></i>
+                  </Button>
+                </>
+              ) : (
+                <Link to="/login">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-300 hover:text-white"
+                  >
+                    <i className="ri-login-circle-line text-xl"></i>
+                  </Button>
+                </Link>
+              )}
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden text-gray-300 hover:text-white"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                <i
+                  className={`ri-${
+                    isMenuOpen ? "close-line" : "menu-line"
+                  } text-xl`}
+                ></i>
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className="md:hidden py-4 border-t border-gray-800">
+              <div className="flex flex-col space-y-4">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    <i className="ri-search-line"></i>
+                  </span>
+                  <Input
+                    type="text"
+                    placeholder="Search for products..."
+                    className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400"
+                  />
+                </div>
+                <Link
+                  to="/"
+                  className="text-gray-300 hover:text-white transition-colors py-2"
+                >
+                  Home
+                </Link>
+                <Link
+                  to="/admin/productcard"
+                  className="text-gray-300 hover:text-white transition-colors py-2"
+                >
+                  Products
+                </Link>
+                <Link
+                  to="/admin/categories"
+                  className="text-gray-300 hover:text-white transition-colors py-2"
+                >
+                  Categories
+                </Link>
+                {userInfo?.isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="text-gray-300 hover:text-white transition-colors py-2"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
+                {userInfo && userInfo.isVendor ? (
+                  <>
+                    <Link
+                      to="/vendor/dashboard"
+                      className="text-gray-300 hover:text-white transition-colors py-2"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/vendor/upload"
+                      className="text-gray-300 hover:text-white transition-colors py-2"
+                    >
+                      Upload
+                    </Link>
+                  </>
+                ) : (
+                  <Link
+                    to="/vendor/register"
+                    className="text-gray-300 hover:text-white transition-colors py-2"
+                  >
+                    Vendors
+                  </Link>
+                )}
+                <Link
+                  to="#"
+                  className="text-gray-300 hover:text-white transition-colors py-2"
+                >
+                  Blog
+                </Link>
+                {userInfo ? (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-300 hover:text-white"
+                    onClick={logoutHandler}
+                    title="Logout"
+                  >
+                    <i className="ri-logout-box-line text-xl"></i>
+                  </Button>
+                ) : (
+                  <Link to="/login">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-gray-300 hover:text-white"
+                    >
+                      <i className="ri-login-circle-line text-xl"></i>
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </nav>
-    </div>
+    </>
   );
 };
 
