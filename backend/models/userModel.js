@@ -1,48 +1,59 @@
 import mongoose from "mongoose";
 
-const userSchema = mongoose.Schema({
-    username : {
-        type : String,
-        required : true
+const userSchema = mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
     },
 
-    email : {
-        type : String,
-        required : true,
-        unique : true
+    email: {
+      type: String,
+      required: true,
+      unique: true,
     },
 
-    password : {
-        type : String,
-        required : true
+    password: {
+      type: String,
+      required: true,
     },
     isUser: {
-        type : Boolean,
-        required : true,
-        default : true,
+      type: Boolean,
+      required: true,
+      default: true,
     },
     isVendor: {
-        type : Boolean,
-        required : true,
-        default : false,
+      type: Boolean,
+      required: true,
+      default: false,
     },
 
     isAdmin: {
-        type : Boolean,
-        required : true,
-        default : false,
+      type: Boolean,
+      required: true,
+      default: false,
     },
     shopName: {
-        type: String,
-        default: null,
+      type: String,
+      default: null,
     },
     shopDescription: {
-        type: String,
-        default: null,
-    }
-},{
-    timestamps : true //when we create or delete a user it will give the specific time
-});
+      type: String,
+      default: null,
+    },
+    status: {
+      type: String,
+      enum: ["active", "inactive", "banned"],
+      default: "active",
+    },
+    lastLogin: {
+      type: Date,
+      default: Date.now,
+    },  },
+  {
+    timestamps: true, //when we create or delete a user it will give the specific time
+  }
+);
 
 const User = mongoose.model('User',userSchema);
 

@@ -18,6 +18,8 @@ const UserUpdate = () => {
     isUser: false,
     isVendor: false,
     isAdmin: false,
+    status: "active",
+    password: "",
   });
 
   useEffect(() => {
@@ -28,6 +30,8 @@ const UserUpdate = () => {
         isUser: user.isUser || false,
         isVendor: user.isVendor || false,
         isAdmin: user.isAdmin || false,
+        status: user.status || "active",
+        password: "",
       });
     }
   }, [user]);
@@ -56,65 +60,119 @@ const UserUpdate = () => {
       </div>
     );
 
+  // Color classes for status
+  const statusColors = {
+    active: "bg-green-500",
+    inactive: "bg-yellow-400",
+    banned: "bg-red-600",
+  };
+
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center px-4">
-      <div className="w-full sm:w-[60%] bg-gray-800 p-10 rounded-xl shadow-lg border border-gray-700">
-        <h2 className="text-3xl font-bold mb-8 text-center pb-5">Update User</h2>
+    <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center px-4 py-10">
+      <div className="w-full sm:w-[600px] bg-gray-800 p-10 rounded-xl shadow-lg border border-gray-700">
+        <h2 className="text-3xl font-bold mb-8 text-center pb-5">
+          Update User
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Username */}
           <input
             type="text"
             value={formData.username}
             onChange={(e) =>
               setFormData({ ...formData, username: e.target.value })
             }
-            className="w-full bg-gray-700 text-white placeholder-gray-400 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-gray-700 text-white placeholder-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
             placeholder="Username"
           />
+
+          {/* Email */}
           <input
             type="email"
             value={formData.email}
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
-            className="w-full bg-gray-700 text-white placeholder-gray-400 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-gray-700 text-white placeholder-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
             placeholder="Email"
           />
+
+          {/* Status segmented control */}
+          <div className="w-full">
+            <label className="block mb-2 text-sm font-semibold text-gray-300">
+              Status
+            </label>
+            <div className="inline-flex rounded-lg bg-gray-800 shadow-sm overflow-hidden select-none">
+              {["active", "inactive", "banned"].map((statusOption) => (
+                <button
+                  key={statusOption}
+                  type="button"
+                  onClick={() =>
+                    setFormData({ ...formData, status: statusOption })
+                  }
+                  className={`px-5 py-2 text-sm font-medium transition
+                    ${
+                      formData.status === statusOption
+                        ? `${statusColors[statusOption]} text-white`
+                        : "text-gray-400 hover:bg-gray-700 hover:text-white"
+                    }
+                    focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                >
+                  {statusOption.charAt(0).toUpperCase() + statusOption.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Role toggles */}
           <div className="flex justify-between items-center gap-6">
             {[
               { key: "isUser", label: "User" },
               { key: "isVendor", label: "Vendor" },
               { key: "isAdmin", label: "Admin" },
             ].map(({ key, label }) => (
-              <div key={key} className="flex items-center gap-2">
-                <label className="flex items-center cursor-pointer">
-                  <div className="relative">
-                    <input
-                      type="checkbox"
-                      checked={formData[key]}
-                      onChange={(e) =>
-                        setFormData({ ...formData, [key]: e.target.checked })
-                      }
-                      className="sr-only"
-                    />
-                    <div
-                      className={`w-11 h-6 rounded-full shadow-inner transition duration-200 ${
-                        formData[key] ? "bg-green-500" : "bg-gray-600"
-                      }`}
-                    ></div>
-                    <div
-                      className={`dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition duration-200 ${
-                        formData[key] ? "translate-x-5" : ""
-                      }`}
-                    ></div>
-                  </div>
-                  <span className="ml-2 text-sm">{label}</span>
-                </label>
-              </div>
+              <label
+                key={key}
+                className="relative inline-flex items-center cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={formData[key]}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [key]: e.target.checked })
+                  }
+                  className="sr-only"
+                />
+                <div
+                  className={`w-11 h-6 rounded-full shadow-inner transition duration-200
+                    ${formData[key] ? "bg-green-500" : "bg-gray-600"}`}
+                ></div>
+                <div
+                  className={`dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition duration-200
+                    ${formData[key] ? "translate-x-5" : ""}`}
+                ></div>
+                <span className="ml-3 text-sm font-medium text-gray-300">
+                  {label}
+                </span>
+              </label>
             ))}
           </div>
+
+          {/* Password - optional */}
+          <input
+            type="password"
+            value={formData.password || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
+            placeholder="New password (leave blank to keep current)"
+            className="w-full bg-gray-700 text-white placeholder-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+          />
+
+          {/* Submit button */}
           <button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-md transition"
+            className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold py-3 rounded-lg shadow-md transition duration-300"
+            disabled={isUpdating}
           >
             {isUpdating ? "Updating..." : "Update User"}
           </button>

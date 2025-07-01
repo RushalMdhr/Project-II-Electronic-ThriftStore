@@ -49,38 +49,66 @@ const loginUser = asyncHandler(async (req, res) => {
   try {
     const exitingUser = await User.findOne({ email });
 
-    if (exitingUser) {
-      const isPasswordValid = await bcrypt.compare(
-        password,
-        exitingUser.password
-      );
-
-      if (isPasswordValid) {
-        createToken(res, exitingUser._id);
-
-        res.status(201).json({
-          _id: exitingUser._id,
-          username: exitingUser.username,
-          email: exitingUser.email,
-          isAdmin: exitingUser.isAdmin,
-          isVendor: exitingUser.isVendor,
-          shopName: exitingUser.shopName,
-          shopDescription: exitingUser.shopDescription,
-        });
-        return;
-      } else {
-        res.status(401).json({ message: "Incorrect password" });
-        return;
-      }
-    }else{
-      res.status(404).json({ message : "User not found "})
-
+    if (!exitingUser) {
+      return res.status(404).json({ message: "User not found" });
     }
-  }
-  catch (error) {
+
+    // Block banned users
+    if (exitingUser.status === "banned") {
+      return res.status(403).json({ message: "Account is banned by admin." });
+    }
+
+    // Check if user has been inactive for 30+ days
+    const INACTIVITY_LIMIT_DAYS = 30;
+    const lastLogin = exitingUser.lastLogin || exitingUser.createdAt;
+    const inactivityThreshold = new Date(
+      Date.now() - INACTIVITY_LIMIT_DAYS * 24 * 60 * 60 * 1000
+    );
+
+    if (lastLogin < inactivityThreshold && exitingUser.status === "active") {
+      exitingUser.status = "inactive";
+      await exitingUser.save();
+      return res
+        .status(403)
+        .json({
+          message: "Account set to inactive due to 30+ days of inactivity.",
+        });
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      exitingUser.password
+    );
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Incorrect password" });
+    }
+
+    // Auto-reactivate user on successful login
+    exitingUser.lastLogin = new Date();
+    if (exitingUser.status === "inactive") {
+      exitingUser.status = "active";
+    }
+    await exitingUser.save();
+
+    createToken(res, exitingUser._id);
+
+    res.status(200).json({
+      _id: exitingUser._id,
+      username: exitingUser.username,
+      email: exitingUser.email,
+      isAdmin: exitingUser.isAdmin,
+      isVendor: exitingUser.isVendor,
+      shopName: exitingUser.shopName,
+      shopDescription: exitingUser.shopDescription,
+      status: exitingUser.status,
+    });
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 const logout = asyncHandler(async (req, res) => {
   res.cookie("jwt", "", {
@@ -156,6 +184,16 @@ export const updateUserById = asyncHandler(async (req, res) => {
   user.isVendor = req.body.isVendor ?? user.isVendor;
   user.isUser = req.body.isUser ?? user.isUser;
 
+  // Only allow admin to change status to "banned" or back to "active"
+  if (req.body.status && ["banned", "active"].includes(req.body.status)) {
+    if (!req.user || !req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Only admin can ban or unban users" });
+    }
+    user.status = req.body.status;
+  }
+
   if (req.body.password) {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -171,8 +209,10 @@ export const updateUserById = asyncHandler(async (req, res) => {
     isAdmin: updatedUser.isAdmin,
     isVendor: updatedUser.isVendor,
     isUser: updatedUser.isUser,
+    status: updatedUser.status,
   });
 });
+
 
 
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
