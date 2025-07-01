@@ -26,31 +26,65 @@ import AdminRoute from "./components/Admin/AdminRoute.jsx";
 import UserList from "./pages/Admin/UserList.jsx";
 import OrderList from "./components/Admin/OrderList.jsx"
 
-import UploadPage from "./pages/Vendor/UploadPage.jsx";
+// import UploadPage from "./pages/Vendor/UploadPage.jsx";
 import UploadPageTest from "./pages/Vendor/UploadPageTest.jsx";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
 import UserUpdate from "./pages/Admin/UserUpdate.jsx";
 import Dashboard from "./pages/Vendor/Dashboard.jsx";
-
+import VendorProducts from "./pages/Vendor/ProductTools/VendorProducts.jsx";
+import VendorRoutes from "./components/Vendor/VendorRoutes.jsx";
+import ProductOverView from "./pages/Home/ProductTools/ProductOverView.jsx";
+import AdminLayout from "./components/Admin/AdminLayout.jsx";
+import ManageOrders from "./pages/Admin/ManageOrders.jsx";
+import Category from "./components/Admin/Category.jsx";
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<App />} errorElement={<div className="min-h-screen flex items-center justify-center bg-[#0a1120] text-white"><div className="text-center"><h1 className="text-4xl font-bold mb-4 text-[#1de9b6]">404 - Page Not Found</h1><p className="text-lg">Sorry, the page you are looking for does not exist.</p><a href="/" className="mt-4 inline-block px-6 py-2 bg-[#1de9b6] text-[#0a1120] rounded-lg font-semibold">Go Home</a></div></div>}>
+    <Route
+      path="/"
+      element={<App />}
+      errorElement={
+        <div className="min-h-screen flex items-center justify-center bg-[#0a1120] text-white">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-4 text-[#1de9b6]">
+              404 - Page Not Found
+            </h1>
+            <p className="text-lg">
+              Sorry, the page you are looking for does not exist.
+            </p>
+            <a
+              href="/"
+              className="mt-4 inline-block px-6 py-2 bg-[#1de9b6] text-[#0a1120] rounded-lg font-semibold"
+            >
+              Go Home
+            </a>
+          </div>
+        </div>
+      }
+    >
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/aboutus" element={<AboutUs />} />
       <Route path="/contactus" element={<ContactUs />} />
-
-      {/* Vendor route guard: if already a vendor, redirect to dashboard */}
-      <Route path="/vendor/register" element={
-        <VendorRegisterGuard>
-          <VendorRegister />
-        </VendorRegisterGuard>
-      } />
+      <Route path="/:productId" element={<ProductOverView />} />
+      /* Vendor route guard: if already a vendor, redirect to dashboard */
+      <Route
+        path="/vendor/register"
+        element={
+          <VendorRegisterGuard>
+            <VendorRegister />
+          </VendorRegisterGuard>
+        }
+      />
       <Route path="/faq" element={<FAQ />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-
+      {/* Vendor-only protected routes */}
+      <Route path="/vendor" element={<VendorRoutes />}>
+        <Route path="products" element={<VendorProducts />} />
+        <Route path="upload" element={<UploadPageTest />} />
+        <Route path="dashboard" element={<Dashboard />} />
+      </Route>
       {/* Protected routes */}
       <Route path="/" element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
@@ -59,14 +93,15 @@ const router = createBrowserRouter(
         <Route path="/upload" element={<UploadPageTest />} />
         <Route path="/admin/productcard" element={<ProductList />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
-        <Route path="/dashboard" element={<Dashboard />} />
       </Route>
-
       <Route element={<AdminRoute />}>
-        <Route path="/admin/usercard" element={<UserList />} />
-        <Route path="/admin/orderlist" element={<OrderList />} />
-        <Route path="/admin/" element={<AdminDashboard />} />
-        <Route path="/admin/users/:id/edit" element={<UserUpdate />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<UserList />} />
+          <Route path="orders" element={<ManageOrders />} />
+          <Route path="users/:id/edit" element={<UserUpdate />} />
+          <Route path="categories" element={<Category />} />
+        </Route>
       </Route>
     </Route>
   )

@@ -1,18 +1,32 @@
+import { useAllProductsQuery } from "../../../redux/api/productsApiSlice";
+import ProductGridCard from "./ProductGridCard";
+import { useEffect } from "react";
 
-import { useAllProductsQuery } from "../../redux/api/productsApiSlice";
-import ProductGridCard from "../../pages/Home/ProductGridCard.jsx";
 const ProductGrid = () => {
-    const {data : products=[],isLoading,isError,refetch} = useAllProductsQuery();
-    console.log(products);
+  const {
+    data: products = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useAllProductsQuery();
+  console.log(products);
 
-  if(!products || products.length === 0) {
+  useEffect(()=>{
+    refetch();
+  },[products])
+
+  if (!products || products.length === 0) {
     return (
       <div className="text-center py-16">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">No Products Found</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          No Products Found
+        </h2>
         <p className="text-gray-600">Check back later for new thrift finds!</p>
       </div>
     );
   }
+
+
 
   return (
     <section className="py-16 bg-white">
@@ -26,9 +40,8 @@ const ProductGrid = () => {
             sellers
           </p>
         </div>
-        <button onClick={() => refetch()}>Refresh Products</button>
 
-        <ProductGridCard products={products}/>
+        <ProductGridCard products={products} />
 
         <div className="text-center mt-12">
           <button className="px-8 py-3 border-2 border-emerald-600 text-emerald-600 rounded-full hover:bg-emerald-50 transition-colors font-medium">

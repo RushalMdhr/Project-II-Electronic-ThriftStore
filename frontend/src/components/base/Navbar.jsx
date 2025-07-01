@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import "remixicon/fonts/remixicon.css";
 
+
 const Navbar = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -44,6 +45,7 @@ const Navbar = () => {
                 <div className="text-2xl font-bold text-white">Tech</div>
               </Link>
             </div>
+
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
