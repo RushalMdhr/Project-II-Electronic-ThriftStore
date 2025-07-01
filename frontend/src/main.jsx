@@ -67,8 +67,8 @@ const router = createBrowserRouter(
       <Route path="/register" element={<Register />} />
       <Route path="/aboutus" element={<AboutUs />} />
       <Route path="/contactus" element={<ContactUs />} />
-      <Route path="/:productId" element={<ProductOverView />} />
-      /* Vendor route guard: if already a vendor, redirect to dashboard */
+      <Route path="/overview/:productId" element={<ProductOverView />} />
+      {/* Vendor route guard: if already a vendor, redirect to dashboard */}
       <Route
         path="/vendor/register"
         element={

@@ -2,6 +2,7 @@ import { useParams } from "react-router";
 import { useGetProductByIdQuery } from "../../../redux/api/productsApiSlice";
 import ProductGrid from "./ProductGrid";
 import { useEffect } from "react";
+import ScrollToTop from "../../../components/ScrollToTop";
 
 const ProductOverView = () => {
   const param = useParams();
@@ -16,6 +17,7 @@ const ProductOverView = () => {
     const makeOrder = () => {
         
     }
+if(product.error) return(<><h1>404</h1></>)
 
 return (
     <>
