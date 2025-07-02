@@ -43,7 +43,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/cart",cartitemRoutes);
 app.use("/api/admin", adminRoutes);
 
-// __________________IMAGE________________________________________
+// __________________IMAGE______________  __________________________
 app.use("/api/upload", uploadRoutes);
 const __dirname = path.resolve();
 app.use("/uploads", express.static(path.join(__dirname + "/uploads")));
