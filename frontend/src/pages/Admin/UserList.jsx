@@ -76,78 +76,78 @@ const UserList = () => {
       </div>
 
       {/* Modal */}
-        {selectedUser && (
-          <>
-            <div
-          className="fixed inset-0 backdrop-blur-sm z-40"
-          onClick={() => setSelectedUser(null)}
+      {selectedUser && (
+        <>
+          <div
+            className="fixed inset-0 backdrop-blur-sm z-40"
+            onClick={() => setSelectedUser(null)}
             ></div>
 
             <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-          <div className="bg-slate-800 rounded-xl p-6 w-80 relative pointer-events-auto shadow-[0_0_15px_4px_rgba(59,130,246,0.7)]">
-            <button
-              className="absolute top-2 right-3 text-gray-100 text-2xl hover:text-red-500"
-              onClick={() => setSelectedUser(null)}
-              aria-label="Close modal"
-            >
-              &times;
-            </button>
-            <div className="flex flex-col items-center">
-              <img
-            src={selectedUser.avatar || "https://i.pravatar.cc/150?img=3"}
-            alt={selectedUser.username}
-            className="w-28 h-28 rounded-full object-cover mb-4"
-              />
-              <h2 className="text-xl text-gray-50 font-semibold mb-1">
-            {selectedUser.username}
-              </h2>
-              <p className="text-gray-400 mb-3">{selectedUser.email}</p>
+              <div className="bg-slate-800 rounded-xl p-6 w-80 relative pointer-events-auto shadow-[0_0_15px_4px_rgba(59,130,246,0.7)]">
+          <button
+            className="absolute top-2 right-3 text-gray-100 text-2xl hover:text-red-500"
+            onClick={() => setSelectedUser(null)}
+            aria-label="Close modal"
+          >
+            &times;
+          </button>
+          <div className="flex flex-col items-center">
+            <img
+              src={selectedUser.avatar || "https://i.pravatar.cc/150?img=3"}
+              alt={selectedUser.username}
+              className="w-28 h-28 rounded-full object-cover mb-4"
+            />
+            <h2 className="text-xl text-gray-50 font-semibold mb-1">
+              {selectedUser.username}
+            </h2>
+            <p className="text-gray-400 mb-3">{selectedUser.email}</p>
 
-              {/* ✅ Status Badge */}
-                <Badge
-                  variant={
-                    selectedUser.status === "active"
-                      ? "default"
-                      : selectedUser.status === "inactive"
-                      ? "secondary"
-                      : selectedUser.status === "banned"
-                      ? "destructive"
-                      : "outline"
-                  }
-                  className="mb-3"
-                >
-                  {selectedUser.status?.toUpperCase()}
-                </Badge>
-                {/* Joined Date */}
-                <div className="text-xs text-gray-400 mb-2">
-                  Joined:{" "}
-                  {selectedUser.createdAt
-                  ? new Date(selectedUser.createdAt).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    })
-                  : "Unknown"}
-                </div>
-                {/* User ID */}
-                <div className="text-xs text-gray-500 mb-4">
-                  ID: {selectedUser._id}
-                </div>
-                {/* ✅ Role Badges */}
-                <div className="flex gap-2 flex-wrap justify-center">
-                  {selectedUser.isUser && <Badge variant="outline">User</Badge>}
-                  {selectedUser.isVendor && (
-                    <Badge className="bg-green-600 text-white">Vendor</Badge>
-                  )}
-                  {selectedUser.isAdmin && (
-                    <Badge className="bg-red-600 text-white">Admin</Badge>
-                  )}
-                </div>
-              </div>
+            {/* ✅ Status Badge */}
+            <Badge
+              variant={
+                selectedUser.status === "active"
+            ? "default"
+            : selectedUser.status === "inactive"
+            ? "secondary"
+            : selectedUser.status === "banned"
+            ? "destructive"
+            : "outline"
+              }
+              className="mb-3"
+            >
+              {selectedUser.status?.toUpperCase()}
+            </Badge>
+            {/* Joined Date */}
+            <div className="text-xs text-gray-400 mb-2">
+              Joined:{" "}
+              {selectedUser.createdAt
+                ? new Date(selectedUser.createdAt).toLocaleDateString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })
+                : "Unknown"}
+            </div>
+            {/* User ID */}
+            <div className="text-xs text-gray-500 mb-4">
+              ID: {selectedUser._id}
+            </div>
+            {/* ✅ Role Badges */}
+            <div className="flex gap-2 flex-wrap justify-center">
+              {selectedUser.isUser && <Badge variant="outline">User</Badge>}
+              {selectedUser.isVendor && (
+                <Badge className="bg-green-600 text-white">Vendor</Badge>
+              )}
+              {selectedUser.isAdmin && (
+                <Badge className="bg-red-600 text-white hover:bg-red-600 hover:text-white">Admin</Badge>
+              )}
             </div>
           </div>
-        </>
-      )}
+              </div>
+            </div>
+          </>
+        )}
     </div>
   );
 };
