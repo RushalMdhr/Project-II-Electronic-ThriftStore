@@ -21,7 +21,7 @@ export const addToCart = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // ✅ Create cart item with price
+    // ✅ Create cart item
     const cartItem = await CartItem.create({
       user: userId,
       product: productId,
