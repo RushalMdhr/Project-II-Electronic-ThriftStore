@@ -24,7 +24,7 @@ frontend/src
 -Components/UserProvider
 -Components/ScrollToTop
 
-### managed the add to cart in productOverview and product grid cart
-### main.jsx managed
-### app.jsx bit changed for scroll
+managed the add to cart in productOverview and product grid cart
+main.jsx managed
+app.jsx bit changed for scroll
 -rushal
