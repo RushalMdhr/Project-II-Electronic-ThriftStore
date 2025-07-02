@@ -1,4 +1,4 @@
-// src/components/UserProvider.jsx
+// fetch user
 import React, { createContext, useContext } from "react";
 import { useSelector } from "react-redux";
 
@@ -13,8 +13,10 @@ export const UserProvider = ({ children }) => {
 
 export const useUserId = () => {
   const context = useContext(UserContext);
+  console.log("context");
   if (context === undefined) {
     throw new Error("useUserId must be used within UserProvider");
   }
   return context;
+  
 };
