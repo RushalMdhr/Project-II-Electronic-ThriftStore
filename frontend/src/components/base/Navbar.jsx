@@ -99,10 +99,10 @@ const Navbar = () => {
                 </Link>
               )}
               <Link
-                to="#"
+                to="/cart"
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                Blog
+                Cart
               </Link>
             </div>
 
