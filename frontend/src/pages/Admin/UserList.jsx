@@ -4,6 +4,7 @@ import {
   useDeleteUserMutation,
 } from "../../redux/api/usersApiSlice.js";
 import UserCard from "../../components/Admin/UserCard";
+import { Badge } from "../../components/ui/Badge"; // ⬅️ Badge import added
 
 const UserList = () => {
   const { data: users, isLoading, isError, error } = useGetUsersQuery();
@@ -49,7 +50,6 @@ const UserList = () => {
 
   return (
     <div className="bg-[#131a2b] min-h-screen px-10 py-6">
-      
       <div className="flex items-center justify-between mb-6 border-b border-gray-700 pb-4">
         <div>
           <h2 className="text-3xl text-[#1de9b6] font-bold">User Management</h2>
@@ -63,6 +63,7 @@ const UserList = () => {
           </span>
         </div>
       </div>
+
       <div className="flex flex-col gap-6">
         {users.map((user) => (
           <UserCard
@@ -74,9 +75,9 @@ const UserList = () => {
         ))}
       </div>
 
+      {/* Modal */}
       {selectedUser && (
         <>
-          {/* Blur background */}
           <div
             className="fixed inset-0 backdrop-blur-sm z-40"
             onClick={() => setSelectedUser(null)}
@@ -97,27 +98,35 @@ const UserList = () => {
                   alt={selectedUser.username}
                   className="w-28 h-28 rounded-full object-cover mb-4"
                 />
-                <h2 className="text-xl text-gray-50 font-semibold mb-2">
+                <h2 className="text-xl text-gray-50 font-semibold mb-1">
                   {selectedUser.username}
                 </h2>
-                <p className="text-gray-400 mb-4">{selectedUser.email}</p>
+                <p className="text-gray-400 mb-3">{selectedUser.email}</p>
 
-                {/* Roles badges */}
-                <div className="flex gap-2">
-                  {selectedUser.isUser && (
-                    <span className="px-3 py-1 rounded-full bg-blue-200 text-blue-800 text-sm font-medium">
-                      User
-                    </span>
-                  )}
+                {/* ✅ Status Badge */}
+                <Badge
+                  variant={
+                    selectedUser.status === "active"
+                      ? "default"
+                      : selectedUser.status === "inactive"
+                      ? "secondary"
+                      : selectedUser.status === "banned"
+                      ? "destructive"
+                      : "outline"
+                  }
+                  className="mb-3"
+                >
+                  {selectedUser.status?.toUpperCase()}
+                </Badge>
+
+                {/* ✅ Role Badges */}
+                <div className="flex gap-2 flex-wrap justify-center">
+                  {selectedUser.isUser && <Badge variant="outline">User</Badge>}
                   {selectedUser.isVendor && (
-                    <span className="px-3 py-1 rounded-full bg-green-200 text-green-800 text-sm font-medium">
-                      Vendor
-                    </span>
+                    <Badge className="bg-green-600 text-white">Vendor</Badge>
                   )}
                   {selectedUser.isAdmin && (
-                    <span className="px-3 py-1 rounded-full bg-red-200 text-red-800 text-sm font-medium">
-                      Admin
-                    </span>
+                    <Badge className="bg-red-600 text-white">Admin</Badge>
                   )}
                 </div>
               </div>
