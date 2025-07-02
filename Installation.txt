@@ -12,6 +12,7 @@ to install the lib
 
 ________ CREATE PROJECT FRONTEND ________
 npm create vite@latest my-project -- --template react
+npm i "@radix-ui/react-select
 
 ________ BACKEND ________
 npm i nodemon multer mongoose jsonwebtoken express-formidable express-async-handler express dotenv cors cookie-parser concurrently bcryptjs
