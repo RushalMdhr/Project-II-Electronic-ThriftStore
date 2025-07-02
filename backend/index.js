@@ -17,6 +17,8 @@ import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js"; 
 import orderRoutes from "./routes/orderRoutes.js";
+import cartitemRoutes from "./routes/cartitemRoutes.js";
+
 
 //db connection
 connectDB();
@@ -42,6 +44,8 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/cart",cartitemRoutes);
+
 
 // __________________IMAGE________________________________________
 app.use("/api/upload", uploadRoutes);

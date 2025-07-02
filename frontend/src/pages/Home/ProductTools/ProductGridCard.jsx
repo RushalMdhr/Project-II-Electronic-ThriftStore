@@ -1,5 +1,6 @@
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { Link } from "react-router";
+import AddToCart from "../../User/Cart/AddToCart";
 
 const ProductGridCard = ({ products }) => {
   return (
@@ -11,7 +12,7 @@ const ProductGridCard = ({ products }) => {
             >
               {/* Image Container */}
               <div className="relative aspect-square overflow-hidden">
-                <Link to={`/${product._id}`}><img
+                <Link to={`overview/${product._id}`}><img
                   src={product.images? product.images[0] : "/temp/placeholder.svg"}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -79,10 +80,12 @@ const ProductGridCard = ({ products }) => {
                 </div>
 
                 {/* Add to Cart Button */}
-                <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors font-medium">
+                <AddToCart productId={product._id} disabled={!product.countInStock} />
                   <ShoppingCart className="h-4 w-4" />
+
+                {/* <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors font-medium">
                   <span>Add to me</span>
-                </button>
+                </button> */}
               </div>
             </div>
           ))}

@@ -2,7 +2,7 @@ import { useParams } from "react-router";
 import { useGetProductByIdQuery } from "../../../redux/api/productsApiSlice";
 import ProductGrid from "./ProductGrid";
 import { useEffect } from "react";
-import ScrollToTop from "../../../components/ScrollToTop";
+import AddToCart from "../../User/Cart/AddToCart";
 
 const ProductOverView = () => {
   const param = useParams();
@@ -59,9 +59,10 @@ return (
                 </div>
             </div>
             <div className="flex space-x-4 mt-4">
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+                <AddToCart productId={product._id} disabled={!product.countInStock} />
+                {/* <button className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
                     Add to Cart
-                </button>
+                </button> */}
                 <button type="button" onClick={makeOrder} className="px-6 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition">
                     Buy Now
                 </button>
