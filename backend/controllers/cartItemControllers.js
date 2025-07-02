@@ -75,7 +75,7 @@ export const updateCartItem = asyncHandler(async (req, res) => {
   res.json(cartItem);
 });
 
-// Delete cart item
+// Delete cart items
 export const deleteCartItem = asyncHandler(async (req, res) => {
   const item = await CartItem.findByIdAndDelete(req.params.id);
   if (!item) return res.status(404).json({ error: "Item not found" });
