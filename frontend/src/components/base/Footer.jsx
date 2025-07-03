@@ -47,16 +47,7 @@ export default function Footer() {
                   Categories
                 </Link>
               </li>
-              <li>
-                <Link href="/vendors" className="text-gray-400 hover:text-white transition-colors">
-                  Vendors
-                </Link>
-              </li>
-              <li>
-                <Link href="/upload" className="text-gray-400 hover:text-white transition-colors">
-                  Sell
-                </Link>
-              </li>
+              
             </ul>
           </div>
 
@@ -64,29 +55,21 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-4">Support</h3>
             <ul className="space-y-2">
+              
               <li>
-                <Link href="/help" className="text-gray-400 hover:text-white transition-colors">
-                  Help Center
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
+                <Link to ="/contactus" className="text-gray-400 hover:text-white transition-colors">
                   Contact Us
                 </Link>
               </li>
+              
               <li>
-                <Link href="/shipping" className="text-gray-400 hover:text-white transition-colors">
-                  Shipping Info
+                <Link to ="/faq" className="text-gray-400 hover:text-white transition-colors">
+                  FAQ
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="text-gray-400 hover:text-white transition-colors">
-                  Returns
-                </Link>
-              </li>
-              <li>
-                <Link href="/warranty" className="text-gray-400 hover:text-white transition-colors">
-                  Warranty
+                <Link to ="/aboutus" className="text-gray-400 hover:text-white transition-colors">
+                  About Us
                 </Link>
               </li>
             </ul>
