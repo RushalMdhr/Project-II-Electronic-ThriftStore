@@ -3,7 +3,7 @@ import { getAllCategories, createCategory, updateCategory,deleteCategory } from 
 import { authenticate } from '../middlewares/authMiddleware.js';
 const router = express.Router();
 
-router.route("/").get(authenticate, getAllCategories).post(authenticate, createCategory);
+router.route("/").get( getAllCategories).post(authenticate, createCategory);
 
 router.route("/:id").put(authenticate, updateCategory).delete(authenticate, deleteCategory);
 
