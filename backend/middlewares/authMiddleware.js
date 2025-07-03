@@ -1,23 +1,36 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import asyncHandler from "./asyncHandler.js";
-import { request } from "express";
 
+// Authenticate user from JWT token stored in cookies
 const authenticate = asyncHandler(async (req, res, next) => {
-  let token;
-
-  //read jwt from the 'jwt' cookies
-
-  token = req.cookies.jwt;
+  const token = req.cookies.jwt;
 
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.userId).select("-password");
+      const user = await User.findById(decoded.userId).select("-password");
+
+      if (!user) {
+        res.status(401);
+        throw new Error("User not found.");
+      }
+
+      // ✅ Banned user check
+      if (user.status === "banned") {
+        res.clearCookie("jwt"); // important
+        res
+          .status(403)
+          .json({ message: "Access denied. Your account has been banned." });
+        return;
+      }
+      
+
+      req.user = user;
       next();
     } catch (error) {
       res.status(401);
-      throw new Error("not auuthorized, token failed");
+      throw new Error("Not authorized, token failed.");
     }
   } else {
     res.status(401);
@@ -25,23 +38,25 @@ const authenticate = asyncHandler(async (req, res, next) => {
   }
 });
 
-//check for the admin
+// Check if user is an admin
 const authorizeAdmin = (req, res, next) => {
   if (req.user && req.user.isAdmin) {
     next();
   } else {
-    res.status(401).send("Not authorized as an admin");
+    res.status(403).send("Not authorized as an admin");
   }
 };
 
+// Check if user is a vendor
 const authorizeVendor = (req, res, next) => {
   if (req.user && req.user.isVendor) {
     next();
   } else {
-    res.status(401).send("Not authorized as a vendor");
+    res.status(403).send("Not authorized as a vendor");
   }
 };
 
+// Check if user is admin or vendor
 const authorizeAdminOrVendor = (req, res, next) => {
   if (req.user && (req.user.isAdmin || req.user.isVendor)) {
     next();
@@ -50,4 +65,9 @@ const authorizeAdminOrVendor = (req, res, next) => {
   }
 };
 
-export { authenticate, authorizeAdmin, authorizeVendor, authorizeAdminOrVendor };
+export {
+  authenticate,
+  authorizeAdmin,
+  authorizeVendor,
+  authorizeAdminOrVendor,
+};
