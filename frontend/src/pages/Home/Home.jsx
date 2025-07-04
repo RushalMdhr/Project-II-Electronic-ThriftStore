@@ -12,11 +12,11 @@ const Home = () => {
       {/* {userInfo.isVendor? (<h1 className='px-100 py-10'>Vendor</h1>) : (<h1 className='px-100 py-10'>Not A Vendor</h1>)} */}
       {/* {!userInfo &&
         (<>
-        <HeroSection />
-      <ShopByCategories/>
+        
         </>)
       } */}
-      
+      <HeroSection />
+      <ShopByCategories/>
       <ProductGrid/>
       {/* Add more components or content here as needed */}
     </div>
