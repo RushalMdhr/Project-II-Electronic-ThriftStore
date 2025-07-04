@@ -6,7 +6,8 @@ import Product from "../models/productModel.js";
 // @route   POST /api/orders
 // @access  Private
 const createOrder = asyncHandler(async (req, res) => {
-  const { orderItems } = req.body;
+  const orderItems = req.body;
+  console.log(orderItems);
 
   if (!orderItems || orderItems.length === 0) {
     res.status(400);
@@ -29,6 +30,7 @@ console.log(itemsPrice)
   // const order = new Order({
   //   user: req.user._id,
   //   orderItems,
+
   // });
 
   // const createdOrder = await order.save();

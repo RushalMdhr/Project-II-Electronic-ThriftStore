@@ -1,21 +1,31 @@
 import { useParams } from "react-router";
 import { useGetProductByIdQuery } from "../../../redux/api/productsApiSlice";
+import { useCreateOrderMutation } from "../../../redux/api/orderApiSlice";
 import ProductGrid from "./ProductGrid";
 import { useEffect } from "react";
 import AddToCart from "../../User/Cart/AddToCart";
 
+
 const ProductOverView = () => {
   const param = useParams();
   const { data: product = [] } = useGetProductByIdQuery(param.productId);
-  console.log(product);
+    console.log(product);
+    const [createOrder] = useCreateOrderMutation();
 
   useEffect(() => {
     // This will run every time 'product' changes
     console.log("Product data updated:", product);
   }, [product]);
 
-    const makeOrder = () => {
+    const makeOrder = async() => {
         
+        const data = {
+            orderItems: [{
+                product: param.productId,
+                quantity : 1,
+           }],
+        };
+        await createOrder(data);
     }
 if(product.error) return(<><h1>404</h1></>)
 

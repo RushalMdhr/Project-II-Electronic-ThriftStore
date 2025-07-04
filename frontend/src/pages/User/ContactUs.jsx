@@ -4,6 +4,8 @@ import Swal from 'sweetalert2'
 const ContactUs = () => { 
         
     const onSubmit = async (event) => {
+        
+        
         event.preventDefault();
         const formData = new FormData(event.target);
 
@@ -31,25 +33,43 @@ const ContactUs = () => {
     };
 
 return (
-<section className='contact-form'>
+  <section className="cform">
     <form onSubmit={onSubmit}>
-        <h2> Contact Form</h2>
-        <div className='input-box'>
-            <label> Full Name</label>
-            <input type='text' name='name'className='field'placeholder='Enter your name' required/>
-        </div>
-        <div className='input-box'>
-            <label> Email</label>
-            <input type='email' name='email' className='field'placeholder='Enter your email' required/>
-        </div>
-        <div className='input-box'>
-            <label> Your Message</label>
-            <textarea name="message" id="" className="field mess"placeholder="Enter your message" required></textarea>
-        </div>
-        <button type="submit">Send Message</button>
+      <h2> Contact Form</h2>
+      <div className="input-box">
+        <label> Full Name</label>
+        <input
+          type="text"
+          name="name"
+          className="field"
+          placeholder="Enter your name"
+          required
+        />
+      </div>
+      <div className="input-box">
+        <label> Email</label>
+        <input
+          type="email"
+          name="email"
+          className="field"
+          placeholder="Enter your email"
+          required
+        />
+      </div>
+      <div className="input-box">
+        <label> Your Message</label>
+        <textarea
+          name="message"
+          id=""
+          className="field mess"
+          placeholder="Enter your message"
+          required
+        ></textarea>
+      </div>
+      <button type="submit">Send Message</button>
     </form>
-</section>
- )
+  </section>
+);
  }
  export default ContactUs
 

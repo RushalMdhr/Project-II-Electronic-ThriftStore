@@ -45,7 +45,7 @@ import UserList from "./pages/Admin/UserList.jsx";
 // ____________ kriti __________________________
 import { UserProvider } from "./components/UserProvider";
 import CartPage from "./pages/User/Cart/CartPage.jsx";
-
+import Checkout from "./pages/User/Checkout.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -104,6 +104,7 @@ const router = createBrowserRouter(
       <Route path="/" element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path ="/checkout" element={<Checkout />} />
         <Route path="/vendor" element={<VendorRegister />} />
         {/* <Route path="/upload" element={<UploadPageTest />} /> */}
         <Route path="/admin/productcard" element={<ProductList />} />
