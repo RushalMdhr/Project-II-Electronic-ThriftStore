@@ -11,7 +11,7 @@ export default function HeroSection() {
           backgroundImage: "url('/hero-cover.jpg')",
         }}
       >
-        <div className="absolute inset-0 bg-gray-900/70"></div>
+        <div className="absolute inset-0 bg-gray-900/40"></div>
       </div>
 
       {/* Content */}

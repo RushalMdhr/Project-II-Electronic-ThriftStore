@@ -8,27 +8,19 @@ const orderSchema = mongoose.Schema(
       required: true,
       ref: "User",
     },
-    orderItems: [
+    orderItems: [ 
       {
         product: {
           type: ObjectId,
           ref: "Product",
           required: true,
+        }, 
+        quantity: {
+          type: Number,
+          required: true,
+          min: 1,
+          // max : instock
         },
-        // vendor: {
-        //   type: ObjectId,
-        //   ref: "Vendor",
-        //   required: true,
-        // }, 
-        // quantity: {
-        //   type: Number,
-        //   required: true,
-        //   min: 1,
-        // },
-        // price: {
-        //   type: Number,
-        //   required: true,
-        // },
       },
     ],
   //   shippingAddress: {

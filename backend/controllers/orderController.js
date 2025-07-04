@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
+import Product from "../models/productModel.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -11,20 +12,30 @@ const createOrder = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("No order items");
   }
+  // Calculate total price by fetching each product's price and multiplying by quantity
+const itemsPrice = (
+  await Promise.all(
+    orderItems.map(async (item) => {
+      const productDoc = await Product.findById(item.product);
+      if (!productDoc) throw new Error("Product not found");
+      return productDoc.price * item.quantity;
+    })
+  )
+).reduce((acc, price) => acc + price, 0);
 
-  const order = new Order({
-    user: req.user._id,
-    orderItems,
-    shippingAddress,
-    paymentMethod,
-    totalPrice,
-  });
+console.log('Total items price:', itemsPrice);
+console.log(itemsPrice)
+  // console.log(itemsPrice);
+  // const order = new Order({
+  //   user: req.user._id,
+  //   orderItems,
+  // });
 
-  const createdOrder = await order.save();
+  // const createdOrder = await order.save();
 
-  console.log("Order created:", createdOrder._id); // DEBUG
+  // console.log("Order created:", createdOrder._id); // DEBUG
 
-  res.status(201).json(createdOrder);
+  // res.status(201).json(createdOrder);
 });
 
 // @desc    Get logged in user's orders
