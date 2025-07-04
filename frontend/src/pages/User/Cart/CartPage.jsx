@@ -5,13 +5,18 @@ import {
   useDeleteCartItemMutation,
 } from "../../../redux/api/cartApiSlice";
 import { useUserId } from "../../../components/UserProvider";
-import { Link, useNavigate } from "react-router-dom"; // ✅ Add useNavigate
+import { Link, useNavigate } from "react-router-dom";
 
 const CartPage = () => {
   const userId = useUserId();
-  const navigate = useNavigate(); // ✅ Use navigate for "Go Back"
+  const navigate = useNavigate();
 
-  const { data: cartItemsData = [], isLoading, isError, refetch } = useGetCartItemsQuery(userId, {
+  const {
+    data: cartItemsData = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useGetCartItemsQuery(userId, {
     skip: !userId,
   });
 
@@ -21,6 +26,7 @@ const CartPage = () => {
 
   useEffect(() => {
     setCartItems(cartItemsData);
+    refetch();
   }, [cartItemsData]);
 
   const totalPrice = cartItems.reduce(
@@ -40,7 +46,9 @@ const CartPage = () => {
   };
 
   const handleDelete = async (itemId) => {
-    const confirmed = window.confirm("Are you sure you want to remove this item?");
+    const confirmed = window.confirm(
+      "Are you sure you want to remove this item?"
+    );
     if (!confirmed) return;
 
     try {
@@ -52,7 +60,9 @@ const CartPage = () => {
   };
 
   const handleClearCart = async () => {
-    const confirmed = window.confirm("Are you sure you want to clear your entire cart?");
+    const confirmed = window.confirm(
+      "Are you sure you want to clear your entire cart?"
+    );
     if (!confirmed) return;
 
     try {
@@ -65,16 +75,22 @@ const CartPage = () => {
     }
   };
 
-  if (!userId) return <p className="p-4 text-center">Please log in to view your cart.</p>;
+  const handleCheckout = () => {
+    console.log("Proceeding to checkout with cartItems:", cartItemsData);
+    navigate("/checkout", { state: { cartItemsData } });
+  };
+
+  if (!userId)
+    return <p className="p-4 text-center">Please log in to view your cart.</p>;
   if (isLoading) return <p className="p-4 text-center">Loading cart...</p>;
   if (isError) return <p className="p-4 text-center">Error loading cart.</p>;
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      {/* ✅ Go Back Button */}
+      {/* Go Back Button */}
       <div className="mb-4">
         <button
-          onClick={() => navigate("/")} // or "/products" if you have a product listing page
+          onClick={() => navigate("/")}
           className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded shadow"
         >
           ← Back to Products
@@ -98,10 +114,15 @@ const CartPage = () => {
 
           {cartItems.map((item) => {
             const price = item.product.discountedPrice || item.product.price;
-            const originalPrice = item.product.discountedPrice ? item.product.price : null;
+            const originalPrice = item.product.discountedPrice
+              ? item.product.price
+              : null;
 
             return (
-              <div key={item._id} className="flex items-center justify-between border-b py-4">
+              <div
+                key={item._id}
+                className="flex items-center justify-between border-b py-4"
+              >
                 <Link to={`/product/${item.product._id}`}>
                   <img
                     src={item.product.images?.[0] || "/placeholder.png"}
@@ -123,14 +144,18 @@ const CartPage = () => {
                   <div className="flex items-center space-x-2 mt-2">
                     <button
                       className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                      onClick={() => handleQuantityChange(item._id, "decrement")}
+                      onClick={() =>
+                        handleQuantityChange(item._id, "decrement")
+                      }
                     >
                       -
                     </button>
                     <span>{item.quantity}</span>
                     <button
                       className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                      onClick={() => handleQuantityChange(item._id, "increment")}
+                      onClick={() =>
+                        handleQuantityChange(item._id, "increment")
+                      }
                     >
                       +
                     </button>
@@ -147,9 +172,16 @@ const CartPage = () => {
           })}
 
           <div className="text-right mt-6">
-            <h3 className="text-xl font-bold">
-              Total: $ {totalPrice}
-            </h3>
+            <h3 className="text-xl font-bold">Total: Rs. {totalPrice}</h3>
+          </div>
+
+          <div className="text-right mt-6">
+            <button
+              onClick={handleCheckout}
+              className="bg-green-500 w-full py-2 text-white rounded hover:bg-green-600 transition"
+            >
+              Checkout
+            </button>
           </div>
         </>
       )}

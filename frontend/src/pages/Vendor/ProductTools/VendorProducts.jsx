@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 const VendorProducts = () => {
-  const { data: myproducts, isLoading, isError,refetch } = useGetMyProductsQuery();
+  const { data: myproducts, isLoading, isError, refetch } = useGetMyProductsQuery();
+  console.log(myproducts)
   const navigate = useNavigate();
   const location = useLocation();
   useEffect(()=>{
