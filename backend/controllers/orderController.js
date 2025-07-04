@@ -5,26 +5,27 @@ import Order from "../models/orderModel.js";
 // @route   POST /api/orders
 // @access  Private
 const createOrder = asyncHandler(async (req, res) => {
-  const { orderItems } = req.body;
+  const orderItems = req.body;
+  console.log(orderItems);
 
-  if (!orderItems || orderItems.length === 0) {
-    res.status(400);
-    throw new Error("No order items");
-  }
+  // if (!orderItems || orderItems.length === 0) {
+  //   res.status(400);
+  //   throw new Error("No order items");
+  // }
 
-  const order = new Order({
-    user: req.user._id,
-    orderItems,
-    shippingAddress,
-    paymentMethod,
-    totalPrice,
-  });
+  // const order = new Order({
+  //   user: req.user._id,
+  //   orderItems,
+  //   shippingAddress,
+  //   paymentMethod,
+  //   totalPrice,
+  // });
 
-  const createdOrder = await order.save();
+  // const createdOrder = await order.save();
 
-  console.log("Order created:", createdOrder._id); // DEBUG
+  // console.log("Order created:", createdOrder._id); // DEBUG
 
-  res.status(201).json(createdOrder);
+  // res.status(201).json(createdOrder);
 });
 
 // @desc    Get logged in user's orders
