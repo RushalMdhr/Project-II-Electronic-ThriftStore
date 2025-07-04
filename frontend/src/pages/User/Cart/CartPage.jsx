@@ -6,7 +6,7 @@ import {
 } from "../../../redux/api/cartApiSlice";
 import { useUserId } from "../../../components/UserProvider";
 import { Link, useNavigate } from "react-router-dom";
-
+// cart
 const CartPage = () => {
   const userId = useUserId();
   const navigate = useNavigate();
