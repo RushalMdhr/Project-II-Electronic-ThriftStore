@@ -37,7 +37,7 @@ export default function VendorRegister() {
       }
       toast.info("Vendor shop info updated!");
       toast.success("You are now a vendor!");
-      navigate("/dashboard");
+      navigate("/vendor/dashboard");
     } catch (err) {
       toast.error("Failed to update vendor info");
     }

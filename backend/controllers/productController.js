@@ -78,7 +78,7 @@ const updateProductDetails = asyncHandler(async (req, res) => {
 const deleteProductById = asyncHandler(async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.productId);
-    
+
     if (product && product.images && product.images.length > 0) {
       product.images.forEach((imgPath) => {
         // Adjust the path as per your upload directory
@@ -101,25 +101,50 @@ const deleteProductById = asyncHandler(async (req, res) => {
 
 const fetchProducts = asyncHandler(async (req, res) => {
   try {
-    const pageSize = 6;
+    const pageSize = 4;
+    const page = Number(req.query.page) || 1;
+
+    // Search keyword
     const keyword = req.query.keyword
       ? { name: { $regex: req.query.keyword, $options: "i" } }
       : {};
-    const count = await Product.countDocuments({ ...keyword });
-    const products = await Product.find({ ...keyword }).limit(pageSize);
+
+    // Vendor filtering
+    const dbFilter = {}
+    if (req.user) {
+      dbFilter = {
+        ...keyword,
+        "uploadedBy": { $ne: req.user._id } // exclude x === req.body.x
+      };
+    }
+    else {
+      const dbFilter = {
+        ...keyword
+      };
+    }
+
+
+
+    const count = await Product.countDocuments(dbFilter);
+    const products = await Product.find(dbFilter)
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
 
     res.json({
+      count,
       products,
-      page: 1,
+      page,
       pages: Math.ceil(count / pageSize),
-      hasMore: false,
+      hasMore: page < Math.ceil(count / pageSize),
     });
+
   } catch (error) {
     console.error(error);
     res.status(500);
-    throw new Error("internal server error");
+    throw new Error("Internal Server Error");
   }
 });
+
 
 const getProductById = asyncHandler(async (req, res) => {
   try {

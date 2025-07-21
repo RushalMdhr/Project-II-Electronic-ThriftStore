@@ -25,7 +25,7 @@ router.route("/allproducts").get(getAllProducts);
 router
   .route("/")
   .get(fetchProducts)
-  .post(authenticate, authorizeAdminOrVendor, formidable(), createProduct);
+  .post(authenticate, authorizeVendor, formidable(), createProduct);
 
 router.get("/top", fetchTopProducts);
 router.get("/new", fetchNewProducts);

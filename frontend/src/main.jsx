@@ -46,6 +46,7 @@ import UserList from "./pages/Admin/UserList.jsx";
 import { UserProvider } from "./components/UserProvider";
 import CartPage from "./pages/User/Cart/CartPage.jsx";
 import Checkout from "./pages/User/Checkout.jsx";
+import Products from "./pages/Home/ProductTools/Products.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -76,6 +77,7 @@ const router = createBrowserRouter(
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/aboutus" element={<AboutUs />} />
+      <Route path="/products" element={<Products />} />
       <Route path="/contactus" element={<ContactUs />} />
       <Route path="/overview/:productId" element={<ProductOverView />} />
       <Route path="/faq" element={<FAQ />} />
