@@ -16,6 +16,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [logoutApiCall] = useLogoutMutation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   const logoutHandler = async (e) => {
     try {
@@ -26,6 +27,17 @@ const Navbar = () => {
     } catch (error) {
       toast.error("Logout failed");
       toast.error(error?.data?.message || error.message || "Logout failed");
+    }
+  };
+
+  // Search submit handler
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (search.trim()) {
+      const Search = encodeURIComponent(search.trim());
+      navigate(`/products?keyword=${Search}`, { state: { Search } });
+    } else {
+      navigate("/products");
     }
   };
 
@@ -98,27 +110,30 @@ const Navbar = () => {
                   Vendors
                 </Link>
               )}
-              <Link
-                to="/cart"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Cart
-              </Link>
+
             </div>
 
             {/* Search Bar */}
-            <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
+            <form
+              className="hidden md:flex items-center flex-1 max-w-md mx-8"
+              onSubmit={handleSearch}
+            >
               <div className="relative w-full">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <i className="ri-search-line"></i>
+                  <button type="submit" className="focus:outline-none">
+                    <i className="ri-search-line"></i>
+                  </button>
                 </span>
                 <Input
                   type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") handleSearch(e); }}
                   placeholder="Search for products..."
                   className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-400"
                 />
               </div>
-            </div>
+            </form>
 
             {/* Right Side Icons */}
             <div className="flex items-center space-x-4">
@@ -129,13 +144,19 @@ const Navbar = () => {
               >
                 <i className="ri-heart-line text-xl"></i>
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-300 hover:text-white"
+              <Link
+                to="/cart"
+                className="text-gray-300 hover:text-white transition-colors"
               >
-                <i className="ri-shopping-cart-line text-xl"></i>
-              </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-300 hover:text-white"
+                >
+                  <i className="ri-shopping-cart-line text-xl"></i>
+                </Button>
+              </Link>
               {userInfo ? (
                 <>
                   <Link to="/profile">
@@ -177,9 +198,8 @@ const Navbar = () => {
                 aria-label="Toggle menu"
               >
                 <i
-                  className={`ri-${
-                    isMenuOpen ? "close-line" : "menu-line"
-                  } text-xl`}
+                  className={`ri-${isMenuOpen ? "close-line" : "menu-line"
+                    } text-xl`}
                 ></i>
               </Button>
             </div>
@@ -189,16 +209,21 @@ const Navbar = () => {
           {isMenuOpen && (
             <div className="md:hidden py-4 border-t border-gray-800">
               <div className="flex flex-col space-y-4">
-                <div className="relative">
+                <form onSubmit={handleSearch} className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    <i className="ri-search-line"></i>
+                    <button type="submit" className="focus:outline-none">
+                      <i className="ri-search-line"></i>
+                    </button>
                   </span>
                   <Input
                     type="text"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") handleSearch(e); }}
                     placeholder="Search for products..."
                     className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400"
                   />
-                </div>
+                </form>
                 <Link
                   to="/"
                   className="text-gray-300 hover:text-white transition-colors py-2"

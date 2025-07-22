@@ -78,7 +78,7 @@ const updateProductDetails = asyncHandler(async (req, res) => {
 const deleteProductById = asyncHandler(async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.productId);
-    
+
     if (product && product.images && product.images.length > 0) {
       product.images.forEach((imgPath) => {
         // Adjust the path as per your upload directory
@@ -101,25 +101,46 @@ const deleteProductById = asyncHandler(async (req, res) => {
 
 const fetchProducts = asyncHandler(async (req, res) => {
   try {
-    const pageSize = 6;
-    const keyword = req.query.keyword
-      ? { name: { $regex: req.query.keyword, $options: "i" } }
-      : {};
-    const count = await Product.countDocuments({ ...keyword });
-    const products = await Product.find({ ...keyword }).limit(pageSize);
+    const pageSize = 4;
+    const page = Number(req.query.page) || 1;
+
+    // Search keyword
+    let dbFilter = {};
+
+
+    // Only add search if keyword is present and not empty
+    if (req.query.keyword != "null" && req.query.keyword.trim().length > 0) {
+      dbFilter.name = { $regex: req.query.keyword, $options: "i" };
+    }
+
+    // Exclude own products only if logged in as vendor
+    if (req.user && req.user.isVendor) {
+      dbFilter.uploadedBy = { $ne: req.user._id };
+    }
+
+    console.log("dbfilter : ", dbFilter)
+
+    const count = await Product.countDocuments(dbFilter);
+    const products = await Product.find(dbFilter)
+      .sort({ createdAt: -1 })
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
 
     res.json({
+      count,
       products,
-      page: 1,
+      page,
       pages: Math.ceil(count / pageSize),
-      hasMore: false,
+      hasMore: page < Math.ceil(count / pageSize),
     });
+
   } catch (error) {
     console.error(error);
     res.status(500);
-    throw new Error("internal server error");
+    throw new Error("Internal Server Error");
   }
 });
+
 
 const getProductById = asyncHandler(async (req, res) => {
   try {
@@ -184,7 +205,7 @@ const addProductReview = asyncHandler(async (req, res) => {
 
 const fetchTopProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await Product.find({}).sort({ rating: -1 }).limit(4);
+    const products = await Product.find({}).sort({ updatedAt: -1 }).limit(4);
     res.json(products);
   } catch (error) {
     console.error(error);
