@@ -24,7 +24,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
           .json({ message: "Access denied. Your account has been banned." });
         return;
       }
-      
+
 
       req.user = user;
       next();
@@ -37,6 +37,23 @@ const authenticate = asyncHandler(async (req, res, next) => {
     throw new Error("Not authorized, no token.");
   }
 });
+
+//Just check if user is authenticated
+const isAuthenticated = asyncHandler(async (req, res, next) => {
+
+  const token = req.cookies.jwt;
+  if (token) {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId).select("-password");
+
+    req.user = user; 
+    console.log(req.user)
+    next();
+  }
+  else {
+    next();
+  }
+})
 
 // Check if user is an admin
 const authorizeAdmin = (req, res, next) => {
@@ -70,4 +87,5 @@ export {
   authorizeAdmin,
   authorizeVendor,
   authorizeAdminOrVendor,
+  isAuthenticated,
 };

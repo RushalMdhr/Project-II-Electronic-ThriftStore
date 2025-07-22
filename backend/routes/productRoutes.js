@@ -14,7 +14,7 @@ import {
   getMyProducts
 } from "../controllers/productController.js";
 import checkId from "../middlewares/checkId.js";
-import { authenticate, authorizeAdmin,authorizeVendor,authorizeAdminOrVendor } from "../middlewares/authMiddleware.js";
+import { authenticate, authorizeAdmin,authorizeVendor,authorizeAdminOrVendor,isAuthenticated} from "../middlewares/authMiddleware.js";
 
 const   router = express.Router();
 
@@ -24,7 +24,7 @@ router.route("/allproducts").get(getAllProducts);
 
 router
   .route("/")
-  .get(fetchProducts)
+  .get(isAuthenticated ,fetchProducts)
   .post(authenticate, authorizeVendor, formidable(), createProduct);
 
 router.get("/top", fetchTopProducts);

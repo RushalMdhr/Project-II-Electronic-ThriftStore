@@ -105,28 +105,24 @@ const fetchProducts = asyncHandler(async (req, res) => {
     const page = Number(req.query.page) || 1;
 
     // Search keyword
-    const keyword = req.query.keyword
-      ? { name: { $regex: req.query.keyword, $options: "i" } }
-      : {};
+    let dbFilter = {};
 
-    // Vendor filtering
-    const dbFilter = {}
-    if (req.user) {
-      dbFilter = {
-        ...keyword,
-        "uploadedBy": { $ne: req.user._id } // exclude x === req.body.x
-      };
-    }
-    else {
-      const dbFilter = {
-        ...keyword
-      };
+
+    // Only add search if keyword is present and not empty
+    if (req.query.keyword != "null" && req.query.keyword.trim().length > 0) {
+      dbFilter.name = { $regex: req.query.keyword, $options: "i" };
     }
 
+    // Exclude own products only if logged in as vendor
+    if (req.user && req.user.isVendor) {
+      dbFilter.uploadedBy = { $ne: req.user._id };
+    }
 
+    console.log("dbfilter : ", dbFilter)
 
     const count = await Product.countDocuments(dbFilter);
     const products = await Product.find(dbFilter)
+      .sort({ createdAt: -1 })
       .limit(pageSize)
       .skip(pageSize * (page - 1));
 
@@ -209,7 +205,7 @@ const addProductReview = asyncHandler(async (req, res) => {
 
 const fetchTopProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await Product.find({}).sort({ rating: -1 }).limit(4);
+    const products = await Product.find({}).sort({ updatedAt: -1 }).limit(4);
     res.json(products);
   } catch (error) {
     console.error(error);
