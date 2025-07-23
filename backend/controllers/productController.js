@@ -114,11 +114,9 @@ const fetchProducts = asyncHandler(async (req, res) => {
     }
 
     // Exclude own products only if logged in as vendor
-    if (req.user && req.user.isVendor) {
+    if (req.user!==null && req.user.isVendor) {
       dbFilter.uploadedBy = { $ne: req.user._id };
     }
-
-    console.log("dbfilter : ", dbFilter)
 
     const count = await Product.countDocuments(dbFilter);
     const products = await Product.find(dbFilter)
@@ -126,8 +124,14 @@ const fetchProducts = asyncHandler(async (req, res) => {
       .limit(pageSize)
       .skip(pageSize * (page - 1));
 
+    // const transformedProducts = products.map(p=>({
+    //   ...p.toObject(),
+    //   views : p.views ? p.views.length : 0,
+    // }));
+    
     res.json({
       count,
+      // transformedProducts,
       products,
       page,
       pages: Math.ceil(count / pageSize),
@@ -237,6 +241,39 @@ const getMyProducts = asyncHandler(async (req, res) => {
   }
 });
 
+const increaseViewCount = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user && req.user._id ? req.user._id.toString() : null;
+    if (!userId) {
+      return ;
+    }
+    
+    const product = await Product.findById(req.params.productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    
+
+    // Check if userId already exists in views array
+    const alreadyViewed = product.views.some(
+      (id) => id.toString() === userId
+    );
+
+    if (alreadyViewed) {
+      return res.json({ message: "View count already updated", views: product.views.length });
+    }
+
+    product.views.push(userId);
+    await product.save();
+
+    res.json({ message: "View count updated", views: product.views.length });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
 export {
   createProduct,
   getAllProducts,
@@ -248,4 +285,5 @@ export {
   fetchTopProducts,
   fetchNewProducts,
   getMyProducts,
+  increaseViewCount,
 };

@@ -39,21 +39,24 @@ const authenticate = asyncHandler(async (req, res, next) => {
 });
 
 //Just check if user is authenticated
+// Optional authentication middleware: attaches user if token is valid, otherwise continues without error
 const isAuthenticated = asyncHandler(async (req, res, next) => {
-
-  const token = req.cookies.jwt;
-  if (token) {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select("-password");
-
-    req.user = user; 
-    console.log(req.user)
+  // if (req.cookies.jwt) {
+    const token = req.cookies.jwt;
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId).select("-password");
+        req.user = user || null;
+      } catch (error) {
+        req.user = null;
+      }
+    } else {
+      req.user = null;
+    }
     next();
-  }
-  else {
-    next();
-  }
-})
+  // }
+});
 
 // Check if user is an admin
 const authorizeAdmin = (req, res, next) => {
