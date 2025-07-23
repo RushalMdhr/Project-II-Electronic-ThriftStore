@@ -12,12 +12,12 @@ const Products = () => {
   console.log(searched)
 
   const {
-    data: productPage = {},
+    data: productPage = [],
     isLoading,
     isError,
     refetch,
-  } = useGetProductsQuery({ page: currentPage , keyword: searched });
-
+  } = useGetProductsQuery({ page: currentPage, keyword: searched });
+  console.log("respond", productPage)
   useEffect(() => {
     refetch();
   }, [currentPage, refetch]);

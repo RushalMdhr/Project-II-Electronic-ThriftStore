@@ -78,6 +78,9 @@ const ProductGridCard = ({ products }) => {
                     </span>
                   </div>
                 </div>
+                <div>
+                  <i class="ri-eye-line">  {product.views?.length}</i>
+                </div>
 
                 {/* Add to Cart Button */}
                 <AddToCart productId={product._id} disabled={!product.countInStock} />
