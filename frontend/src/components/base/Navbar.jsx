@@ -89,29 +89,31 @@ const Navbar = () => {
                   Admin Panel
                 </Link>
               )}
-              {userInfo && userInfo.isVendor ? (
-                <>
+              {userInfo && !userInfo.isAdmin ? (
+                userInfo.isVendor ? (
+                  <>
+                    <Link
+                      to="/vendor/dashboard"
+                      className="text-gray-300 hover:text-white transition-colors"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/vendor/upload"
+                      className="text-gray-300 hover:text-white transition-colors"
+                    >
+                      Upload
+                    </Link>
+                  </>
+                ) : (
                   <Link
-                    to="/vendor/dashboard"
+                    to="/vendor/register"
                     className="text-gray-300 hover:text-white transition-colors"
                   >
-                    Dashboard
+                    Vendors
                   </Link>
-                  <Link
-                    to="/vendor/upload"
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
-                    Upload
-                  </Link>
-                </>
-              ) : (
-                <Link
-                  to="/vendor/register"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Vendors
-                </Link>
-              )}
+                )
+              ) : null}
             </div>
 
             {/* Search Bar */}
