@@ -40,6 +40,9 @@ const Navbar = () => {
       navigate("/products");
     }
   };
+  console.log("userInfo from Redux/localStorage", userInfo);
+  console.log("typeof userInfo.isVendor:", typeof userInfo?.isVendor);
+
 
   // Spacer div to create space for the fixed navbar
   return (
@@ -58,7 +61,6 @@ const Navbar = () => {
               </Link>
             </div>
 
-
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               <Link
@@ -74,7 +76,7 @@ const Navbar = () => {
                 Products
               </Link>
               <Link
-                to="/admin/categories"
+                to={userInfo?.isAdmin ? "/admin/categories" : "/categories"}
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 Categories
@@ -110,7 +112,6 @@ const Navbar = () => {
                   Vendors
                 </Link>
               )}
-
             </div>
 
             {/* Search Bar */}
@@ -127,8 +128,10 @@ const Navbar = () => {
                 <Input
                   type="text"
                   value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") handleSearch(e); }}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSearch(e);
+                  }}
                   placeholder="Search for products..."
                   className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-400"
                 />
@@ -148,7 +151,6 @@ const Navbar = () => {
                 to="/cart"
                 className="text-gray-300 hover:text-white transition-colors"
               >
-
                 <Button
                   variant="ghost"
                   size="icon"
@@ -198,8 +200,9 @@ const Navbar = () => {
                 aria-label="Toggle menu"
               >
                 <i
-                  className={`ri-${isMenuOpen ? "close-line" : "menu-line"
-                    } text-xl`}
+                  className={`ri-${
+                    isMenuOpen ? "close-line" : "menu-line"
+                  } text-xl`}
                 ></i>
               </Button>
             </div>
@@ -218,8 +221,10 @@ const Navbar = () => {
                   <Input
                     type="text"
                     value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter") handleSearch(e); }}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSearch(e);
+                    }}
                     placeholder="Search for products..."
                     className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400"
                   />
