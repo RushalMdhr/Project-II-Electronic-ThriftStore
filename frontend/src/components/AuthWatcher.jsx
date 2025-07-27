@@ -1,12 +1,32 @@
 import { useEffect } from "react";
-import { useGetUserDetailsQuery } from "../redux/api/usersApiSlice";
+import { useGetCurrentUserQuery } from "../redux/api/usersApiSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setCredentials, logout } from "../redux/features/auth/authSlice";
 
 const AuthWatcher = () => {
-  const userInfo = localStorage.getItem("userInfo");
+  const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
 
-  const { refetch } = useGetUserDetailsQuery(undefined, {
-    skip: !userInfo, // Only run if logged in
+  // getCurrentUser query automatically fetches logged-in user's profile
+  const {
+    data: user,
+    refetch,
+    error,
+    isSuccess,
+  } = useGetCurrentUserQuery(undefined, {
+    skip: !userInfo, // skip if no user logged in
   });
+
+  useEffect(() => {
+    if (isSuccess && user) {
+      dispatch(setCredentials(user));
+    }
+
+    if (error) {
+      // handle logout if user banned or token invalid
+      dispatch(logout());
+    }
+  }, [user, isSuccess, error, dispatch]);
 
   useEffect(() => {
     const handleTabChange = () => {
@@ -24,7 +44,6 @@ const AuthWatcher = () => {
     document.addEventListener("visibilitychange", handleTabChange);
     window.addEventListener("focus", handleFocus);
 
-    // Cleanup
     return () => {
       document.removeEventListener("visibilitychange", handleTabChange);
       window.removeEventListener("focus", handleFocus);
