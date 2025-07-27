@@ -40,12 +40,19 @@ const Navbar = () => {
       navigate("/products");
     }
   };
+  console.log("userInfo from Redux/localStorage", userInfo);
+  console.log("typeof userInfo.isVendor:", typeof userInfo?.isVendor);
+
 
   // Spacer div to create space for the fixed navbar
   return (
     <>
       <div className="h-16 w-full" />
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b ${
+          userInfo?.isAdmin ? "bg-gray-900/80" : "bg-teal-900/90"
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -57,7 +64,6 @@ const Navbar = () => {
                 <div className="text-2xl font-bold text-white">Tech</div>
               </Link>
             </div>
-
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
@@ -74,7 +80,7 @@ const Navbar = () => {
                 Products
               </Link>
               <Link
-                to="/admin/categories"
+                to={userInfo?.isAdmin ? "/admin/categories" : "/categories"}
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 Categories
@@ -87,30 +93,31 @@ const Navbar = () => {
                   Admin Panel
                 </Link>
               )}
-              {userInfo && userInfo.isVendor ? (
-                <>
+              {userInfo && !userInfo.isAdmin ? (
+                userInfo.isVendor ? (
+                  <>
+                    <Link
+                      to="/vendor/dashboard"
+                      className="text-gray-300 hover:text-white transition-colors"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/vendor/upload"
+                      className="text-gray-300 hover:text-white transition-colors"
+                    >
+                      Upload
+                    </Link>
+                  </>
+                ) : (
                   <Link
-                    to="/vendor/dashboard"
+                    to="/vendor/register"
                     className="text-gray-300 hover:text-white transition-colors"
                   >
-                    Dashboard
+                    Vendors
                   </Link>
-                  <Link
-                    to="/vendor/upload"
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
-                    Upload
-                  </Link>
-                </>
-              ) : (
-                <Link
-                  to="/vendor/register"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Vendors
-                </Link>
-              )}
-
+                )
+              ) : null}
             </div>
 
             {/* Search Bar */}
@@ -127,8 +134,10 @@ const Navbar = () => {
                 <Input
                   type="text"
                   value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") handleSearch(e); }}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSearch(e);
+                  }}
                   placeholder="Search for products..."
                   className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-400"
                 />
@@ -148,7 +157,6 @@ const Navbar = () => {
                 to="/cart"
                 className="text-gray-300 hover:text-white transition-colors"
               >
-
                 <Button
                   variant="ghost"
                   size="icon"
@@ -198,8 +206,9 @@ const Navbar = () => {
                 aria-label="Toggle menu"
               >
                 <i
-                  className={`ri-${isMenuOpen ? "close-line" : "menu-line"
-                    } text-xl`}
+                  className={`ri-${
+                    isMenuOpen ? "close-line" : "menu-line"
+                  } text-xl`}
                 ></i>
               </Button>
             </div>
@@ -218,8 +227,10 @@ const Navbar = () => {
                   <Input
                     type="text"
                     value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter") handleSearch(e); }}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSearch(e);
+                    }}
                     placeholder="Search for products..."
                     className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400"
                   />
