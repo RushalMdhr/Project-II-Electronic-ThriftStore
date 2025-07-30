@@ -165,10 +165,9 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
 const getProductById = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId).populate(
-      "category",
-      "name"
-    );
+    const product = await Product.findById(req.params.productId)
+      .populate("category", "name")
+      .populate("uploadedBy", "name");
     // .populate("user", "username email");
 
     if (product) {
