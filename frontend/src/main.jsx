@@ -47,6 +47,8 @@ import { UserProvider } from "./components/UserProvider";
 import CartPage from "./pages/User/Cart/CartPage.jsx";
 import Checkout from "./pages/User/Checkout.jsx";
 import Products from "./pages/Home/ProductTools/Products.jsx";
+import ProductCard from "./TestComponents/ProductGridCardTest.jsx";
+import MyOrders from "./pages/User/Orders/MyOrders.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -82,6 +84,8 @@ const router = createBrowserRouter(
       <Route path="/overview/:productId" element={<ProductOverView />} />
       <Route path="/faq" element={<FAQ />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/tester" element={<ProductCard />} />
+      <Route path="/myorders" element={<MyOrders />} />
 
 {/* ________________________________ VENDOR ________________________________________*/}
 
@@ -123,7 +127,6 @@ const router = createBrowserRouter(
           <Route path="categories" element={<Category />} />
         </Route>
       </Route>
-
     </Route>
   )
 );

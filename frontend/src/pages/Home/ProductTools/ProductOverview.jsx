@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import { useGetProductByIdQuery, useIncreaseViewCountMutation } from "../../../redux/api/productsApiSlice";
+import { useGetProductByIdQuery, useGetProductsQuery, useIncreaseViewCountMutation } from "../../../redux/api/productsApiSlice";
 import { useCreateOrderMutation } from "../../../redux/api/orderApiSlice";
 import ProductGrid from "./ProductGrid";
 import { useEffect } from "react";
@@ -10,7 +10,7 @@ import { useState } from "react";
 const ProductOverView = () => {
     const param = useParams();
     const { data: product = [] } = useGetProductByIdQuery(param.productId);
-    console.log(product);
+    const { data: productpage = [], isLoading, isError } = useGetProductsQuery({ productId: param.productId });
     const [createOrder] = useCreateOrderMutation();
     const [view, setview] = useState(false);
     const [increaseViewCount] = useIncreaseViewCountMutation();
@@ -39,11 +39,14 @@ const ProductOverView = () => {
     return (
         <>
             <div className="max-w-lg mx-auto bg-white rounded-xl shadow-lg p-8 flex flex-col items-center space-y-6 mt-8">
-                <img
-                    className="w-56 h-56 object-cover rounded-lg border-2 border-gray-200 shadow"
-                    src={product.images ? product.images[0] : "/temp/placeholder.svg"}
-                    alt={product.name}
-                />
+                {product.images?.map(image => (
+                    <img
+                        className="w-56 h-56 object-cover rounded-lg border-2 border-gray-200 shadow"
+                        src={image}
+                        alt={product.name}
+                    />
+                ))}
+
                 <h1 className="text-3xl font-extrabold text-gray-800">{product.name}</h1>
                 <div className="w-full flex flex-col space-y-2 text-gray-700">
                     <div className="flex justify-between">
@@ -86,7 +89,7 @@ const ProductOverView = () => {
                 </div>
             </div>
             <div className="mt-12">
-                <ProductGrid />
+                <ProductGrid products={productpage.products} />
             </div>
         </>
     );

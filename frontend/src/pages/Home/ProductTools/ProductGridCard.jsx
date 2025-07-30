@@ -13,7 +13,7 @@ const ProductGridCard = ({ products }) => {
               {/* Image Container */}
               <div className="relative aspect-square overflow-hidden">
                 <Link to={`/overview/${product._id}`}><img
-                  src={product.images? product.images[0] : "/temp/placeholder.svg"}
+                  src={product.images? product.images[0] : "/temp/placeholder.svg"} 
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
