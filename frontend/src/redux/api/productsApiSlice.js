@@ -4,9 +4,9 @@ import { PRODUCT_URL, UPLOAD_URL } from "../constants";
 export const productApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getProducts: builder.query({
-      query: ({ page,keyword }) => ({
+      query: ({ page,keyword,productId }) => ({
         url: `${PRODUCT_URL}`,
-        params: { page,keyword },
+        params: { page,keyword,productId},
       }),
       keepUnusedDataFor: 5,
       providesTags: ["Product"],
@@ -85,6 +85,13 @@ export const productApiSlice = apiSlice.injectEndpoints({
       query: () => `${PRODUCT_URL}/getmyproducts`,
       providesTags: ["Product"],
     }),
+
+    increaseViewCount : builder.mutation({
+      query : (productId)=>({
+        url : `${PRODUCT_URL}/${productId}/views`,
+        method : "PUT",
+      })
+    })
   }),
 });
 
@@ -101,4 +108,5 @@ export const {
   useGetNewProductsQuery,
   useUploadProductImageMutation,
   useGetMyProductsQuery,
+  useIncreaseViewCountMutation
 } = productApiSlice;

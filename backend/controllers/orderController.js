@@ -6,7 +6,8 @@ import Product from "../models/productModel.js";
 // @route   POST /api/orders
 // @access  Private
 const createOrder = asyncHandler(async (req, res) => {
-  const orderItems = req.body;
+  console.log("hello world from buy")
+  const { orderItems } = req.body;
   console.log(orderItems);
 
   if (!orderItems || orderItems.length === 0) {
@@ -14,18 +15,24 @@ const createOrder = asyncHandler(async (req, res) => {
     throw new Error("No order items");
   }
   // Calculate total price by fetching each product's price and multiplying by quantity
-const itemsPrice = (
-  await Promise.all(
-    orderItems.map(async (item) => {
-      const productDoc = await Product.findById(item.product);
-      if (!productDoc) throw new Error("Product not found");
-      return productDoc.price * item.quantity;
-    })
-  )
-).reduce((acc, price) => acc + price, 0);
+  const itemsPrice = (
+    await Promise.all(
+      orderItems.map(async (item) => {
+        console.log("mappin")
+        const productDoc = await Product.findById(item.product);
+        if (!productDoc) throw new Error("Product not found");
+        return productDoc.price * item.quantity;
+      })
+    )
+  ).reduce((acc, price) => acc + price, 0);
 
-console.log('Total items price:', itemsPrice);
-console.log(itemsPrice)
+  console.log('Total items price:', itemsPrice,);
+  console.log(itemsPrice)
+
+  const newOrder = new Order({ user: req.user._id, orderItems, total_price: itemsPrice })
+  console.log("creating order : ", newOrder);
+  newOrder.save();
+
   // console.log(itemsPrice);
   // const order = new Order({
   //   user: req.user._id,
@@ -38,18 +45,21 @@ console.log(itemsPrice)
   // console.log("Order created:", createdOrder._id); // DEBUG
 
   // res.status(201).json(createdOrder);
+
 });
 
 // @desc    Get logged in user's orders
 // @route   GET /api/orders/myorders
 // @access  Private
 const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ user: req.user._id }).populate(
-    "user",
-    "email"
-  );
+  const orders = await Order.find({ user: req.user._id })
+    .populate({
+      path: 'orderItems.product',
+      model: 'Product',
+    });
 
   console.log(`Found ${orders.length} orders for user ${req.user._id}`); // DEBUG
+  console.log(orders.orderItems);
 
   res.json(orders);
 });

@@ -7,14 +7,14 @@ import {
   updateOrderToPaid,
   updateOrderToDelivered,
 } from "../controllers/orderController.js";
-import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
+import { authenticate, authorizeAdmin, authorizeVendor } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 router
   .route("/")
   .post(authenticate, createOrder)
-  .get(authenticate, authorizeAdmin, getOrders);
+  .get(authenticate, authorizeVendor, getOrders);
 router.route("/myorders").get(authenticate, getMyOrders);
 router.route("/:id").get(authenticate, getOrderById);
 router.route("/:id/pay").put(authenticate, updateOrderToPaid);

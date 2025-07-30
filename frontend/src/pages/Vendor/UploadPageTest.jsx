@@ -97,10 +97,12 @@ const UploadPageTest = () => {
         return;
       }
     }
-
     // Add image paths as a comma-separated string
-    formData.append("images", imagePaths);
-
+    // console.log(JSON.stringify(imagePaths))
+    // formData.append("images", JSON.stringify(imagePaths));
+    formData.append("images", JSON.stringify(imagePaths));
+    // console.log("Form data being sent:",  formData);
+    
     try {
       let createdProduct;
       if (!product || !product._id) {

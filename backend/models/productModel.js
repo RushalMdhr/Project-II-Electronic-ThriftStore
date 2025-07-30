@@ -40,11 +40,15 @@ const ProductSchema = mongoose.Schema({
         ref: "User",
         required: true
     },
+    views : [{ type: String }],
+    reported : [{ type: String }]
 },
     { timestamps: true });
 
 const Product = mongoose.model('Product', ProductSchema);
 export default Product;
+//today i want something different in product so that many people can see the best item in the shop
+//it may not be like but can be view
 
 
 // ONE TO ONE

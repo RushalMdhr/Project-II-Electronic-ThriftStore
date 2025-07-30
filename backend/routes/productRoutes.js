@@ -11,12 +11,15 @@ import {
   addProductReview,
   fetchTopProducts,
   fetchNewProducts,
-  getMyProducts
+  getMyProducts,
+  increaseViewCount
 } from "../controllers/productController.js";
 import checkId from "../middlewares/checkId.js";
-import { authenticate, authorizeAdmin,authorizeVendor,authorizeAdminOrVendor,isAuthenticated} from "../middlewares/authMiddleware.js";
+import { authenticate, authorizeAdmin, authorizeVendor, authorizeAdminOrVendor, isAuthenticated } from "../middlewares/authMiddleware.js";
 
-const   router = express.Router();
+const router = express.Router();
+
+router.route("/:productId/views").put(isAuthenticated, increaseViewCount);
 
 router.route("/getmyproducts").get(authenticate, authorizeVendor, getMyProducts);
 
@@ -24,7 +27,7 @@ router.route("/allproducts").get(getAllProducts);
 
 router
   .route("/")
-  .get(isAuthenticated ,fetchProducts)
+  .get(isAuthenticated, fetchProducts)
   .post(authenticate, authorizeVendor, formidable(), createProduct);
 
 router.get("/top", fetchTopProducts);
@@ -35,6 +38,7 @@ router
   .get(getProductById)
   .put(authenticate, authorizeAdminOrVendor, formidable(), updateProductDetails)
   .delete(authenticate, authorizeAdminOrVendor, deleteProductById);
+
 
 // router
 //   .route("/:productId/reviews")

@@ -19,6 +19,7 @@ const CartPage = () => {
   } = useGetCartItemsQuery(userId, {
     skip: !userId,
   });
+  console.log("cartitems like : ",cartItemsData);
 
   const [updateCartItem] = useUpdateCartItemMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
