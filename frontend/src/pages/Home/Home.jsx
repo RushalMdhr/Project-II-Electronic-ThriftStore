@@ -1,24 +1,26 @@
-import HeroSection from './HeroSection.jsx';
-import ShopByCategories from '../User/ShopByCategories.jsx';
-import { useSelector } from 'react-redux';
-import ProductGrid from './ProductTools/ProductGrid.jsx';
-import { useGetTopProductQuery } from '../../redux/api/productsApiSlice.js';
-import { useEffect } from 'react';
+import HeroSection from "./HeroSection.jsx";
+import ShopByCategories from "../User/ShopByCategories.jsx";
+import { useSelector } from "react-redux";
+import ProductGrid from "./ProductTools/ProductGrid.jsx";
+import { useGetTopProductQuery } from "../../redux/api/productsApiSlice.js";
+import { useEffect } from "react";
 
 const Home = () => {
   const { userInfo } = useSelector((state) => state.auth);
   console.log(userInfo);
 
-  const { data: topProducts,
+  const {
+    data: topProducts,
     isLoading,
     isError,
-    refetch, } = useGetTopProductQuery();
+    refetch,
+  } = useGetTopProductQuery();
 
-    console.log(topProducts);
+  console.log(topProducts);
 
-    useEffect(()=>{
-      refetch();
-    },[topProducts])
+  useEffect(() => {
+    refetch();
+  }, []);
 
   return (
     <div>
@@ -47,8 +49,7 @@ const Home = () => {
       </div>
       {/* Add more components or content here as needed */}
     </div>
-  )
-}
+  );
+};
 
 export default Home;
-
