@@ -1,9 +1,7 @@
-import { useAllProductsQuery } from "../../../redux/api/productsApiSlice";
 import ProductGridCard from "./ProductGridCard";
-import { useEffect } from "react";
+import ProductGridCardAdmin from "./ProductGridCardAdmin";
 
-const ProductGrid = ({products}) => {
-
+const ProductGrid = ({ products, isAdmin = false }) => {
   if (!products || products.length === 0) {
     return (
       <div className="text-center py-16">
@@ -15,12 +13,14 @@ const ProductGrid = ({products}) => {
     );
   }
 
-
-
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ProductGridCard products={products} />
+        {isAdmin ? (
+          <ProductGridCardAdmin products={products} />
+        ) : (
+          <ProductGridCard products={products} />
+        )}
       </div>
     </section>
   );

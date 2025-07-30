@@ -41,6 +41,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
   try {
     const products = await Product.find({})
       .populate("category")
+      .populate("uploadedBy", "name") // populate vendor name here
       .limit(12)
       .sort({ createdAt: -1 });
 
@@ -135,6 +136,7 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
     const count = await Product.countDocuments(dbFilter);
     const products = await Product.find(dbFilter)
+      .populate("uploadedBy", "name") // <-- Populate vendor name here
       .sort({ createdAt: -1 })
       .limit(pageSize)
       .skip(pageSize * (page - 1));

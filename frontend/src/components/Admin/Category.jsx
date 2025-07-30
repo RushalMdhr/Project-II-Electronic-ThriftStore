@@ -13,8 +13,18 @@ const Category = () => {
   const [name, setName] = useState("");
   const [id, setId] = useState(null);
 
-  const { data: categories = [], refetch } = useListcategoryQuery();
-  const { data: products = [] } = useAllProductsQuery();
+  const {
+    data: categories = [],
+    isLoading: loadingCategories,
+    error: errorCategories,
+    refetch,
+  } = useListcategoryQuery();
+
+  const {
+    data: products = [],
+    isLoading: loadingProducts,
+    error: errorProducts,
+  } = useAllProductsQuery();
 
   const [createCategory] = useCreateCategoryMutation();
   const [updateCategory] = useUpdateCategoryMutation();
@@ -66,6 +76,11 @@ const Category = () => {
 
   // Memoize to avoid recalculating on every render
   const categoriesWithCount = useMemo(() => {
+    // Defensive check: make sure products is an array
+    if (!Array.isArray(products)) {
+      return categories.map((cat) => ({ ...cat, productCount: 0 }));
+    }
+
     // Step 1: Build count map from products in one pass
     const countMap = products.reduce((acc, prod) => {
       if (!prod.category) return acc;
@@ -81,7 +96,23 @@ const Category = () => {
       productCount: countMap[cat._id] || 0,
     }));
   }, [categories, products]);
-  
+
+  // Loading and error handling
+  if (loadingCategories || loadingProducts) {
+    return (
+      <div className="text-center p-10 text-[#1de9b6]">
+        Loading categories and products...
+      </div>
+    );
+  }
+
+  if (errorCategories || errorProducts) {
+    return (
+      <div className="text-center p-10 text-red-500">
+        Error loading categories or products.
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#131a2b] min-h-screen px-10 py-6">
@@ -119,6 +150,7 @@ const Category = () => {
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter category name"
               className="w-full px-4 py-2 rounded-md bg-[#0f172a] text-white border border-gray-700 focus:ring-2 focus:ring-[#1de9b6] focus:outline-none"
+              required
             />
             <div className="flex gap-3">
               <button
