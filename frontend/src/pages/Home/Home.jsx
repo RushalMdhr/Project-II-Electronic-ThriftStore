@@ -1,24 +1,48 @@
-import HeroSection from './HeroSection.jsx';
-import ShopByCategories from '../User/ShopByCategories.jsx';
-import { useSelector } from 'react-redux';
-import ProductGrid from './ProductTools/ProductGrid.jsx';
-import { useGetTopProductQuery } from '../../redux/api/productsApiSlice.js';
-import { useEffect } from 'react';
+import HeroSectionUser from "./HeroSectionUser.jsx";
+import ShopByCategories from "../User/ShopByCategories.jsx";
+import { useSelector } from "react-redux";
+import ProductGrid from "./ProductTools/ProductGrid.jsx";
+import { useGetTopProductQuery } from "../../redux/api/productsApiSlice.js";
+import { useEffect } from "react";
+import HeroSectionAdmin from "./HeroSectionAdmin.jsx";
+import HeroSectionVendor from "./HeroSectionVendor.jsx";
+import HeroSection from "./HeroSection.jsx";
+import { User } from "lucide-react";
 
 const Home = () => {
   const { userInfo } = useSelector((state) => state.auth);
   console.log(userInfo);
 
-  const { data: topProducts,
+  const {
+    data: topProducts,
     isLoading,
     isError,
-    refetch, } = useGetTopProductQuery();
+    refetch,
+  } = useGetTopProductQuery();
 
-    console.log(topProducts);
+  console.log(topProducts);
+console.log(userInfo);
+  useEffect(() => {
+    refetch();
+  }, []);
 
-    useEffect(()=>{
-      refetch();
-    },[topProducts])
+ const renderHeroSection = () => {
+  if (userInfo) {
+    if (userInfo.isAdmin) {
+      return <HeroSectionAdmin />;
+    }
+    if (userInfo.isVendor) {
+      return <HeroSectionVendor />;
+    }
+    if (userInfo.isUser) {
+      return <HeroSectionUser />;
+    }
+  }
+
+  // Guest fallback (not logged in)
+  return <HeroSection />;
+};
+
 
   return (
     <div>
@@ -28,13 +52,13 @@ const Home = () => {
         
         </>)
       } */}
-      <HeroSection />
+      {renderHeroSection()}
       <ShopByCategories />
       <div className="text-center mb-12">
-        <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 text-white">
+        <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
           Trending Thrift Finds
         </h2>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto text-white">
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
           Discover the most popular pre-loved items from our community of
           sellers
         </p>
@@ -47,8 +71,7 @@ const Home = () => {
       </div>
       {/* Add more components or content here as needed */}
     </div>
-  )
-}
+  );
+};
 
 export default Home;
-

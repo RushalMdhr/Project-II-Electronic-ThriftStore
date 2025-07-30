@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import ProductGrid from './ProductGrid';
 import { useGetProductsQuery } from '../../../redux/api/productsApiSlice';
 import { useLocation, useSearchParams } from 'react-router';
+import { useSelector } from "react-redux";
 import { toast } from 'react-toastify';
 
 const Products = () => {
@@ -33,11 +34,14 @@ const Products = () => {
       setSearchParams({ page: pageNum });
     }
   };
-
+const { userInfo } = useSelector((state) => state.auth);
   return (
     <div>
       Count : {productPage.count || 0}
-      <ProductGrid products={productPage.products || []} />
+      <ProductGrid
+        products={productPage.products || []}
+        isAdmin={userInfo?.isAdmin}
+      />
       <button
         className="border-block bg-gray-500 rounded-2xl px-4 py-5 m-3"
         onClick={() => GoBack(currentPage - 1)}
