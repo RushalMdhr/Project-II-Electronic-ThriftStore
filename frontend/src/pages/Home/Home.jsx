@@ -6,7 +6,8 @@ import { useGetTopProductQuery } from "../../redux/api/productsApiSlice.js";
 import { useEffect } from "react";
 import HeroSectionAdmin from "./HeroSectionAdmin.jsx";
 import HeroSectionVendor from "./HeroSectionVendor.jsx";
-import HeroSection from "./HeroSectionUser.jsx";
+import HeroSection from "./HeroSection.jsx";
+import { User } from "lucide-react";
 
 const Home = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -20,27 +21,27 @@ const Home = () => {
   } = useGetTopProductQuery();
 
   console.log(topProducts);
-
+console.log(userInfo);
   useEffect(() => {
     refetch();
   }, []);
 
-  const renderHeroSection = () => {
-    if (!userInfo) {
-      // Not logged in — show default user Hero
-      return <HeroSection />;
+ const renderHeroSection = () => {
+  if (userInfo) {
+    if (userInfo.isAdmin) {
+      return <HeroSectionAdmin />;
     }
+    if (userInfo.isVendor) {
+      return <HeroSectionVendor />;
+    }
+    if (userInfo.isUser) {
+      return <HeroSectionUser />;
+    }
+  }
 
-    // Logged in — switch based on role
-    switch (userInfo.role) {
-      case "admin":
-        return <HeroSectionAdmin />;
-      case "vendor":
-        return <HeroSectionVendor />;
-      default:
-        return <HeroSectionUser />;
-    }
-  };
+  // Guest fallback (not logged in)
+  return <HeroSection />;
+};
 
 
   return (
