@@ -12,10 +12,10 @@ export const categoryApiSlice = apiSlice.injectEndpoints({
     }),
 
     updateCategory: builder.mutation({
-      query: ({id, name}) => ({
+      query: ({ id, name }) => ({
         url: `${CATEGORY_URL}/${id}`,
         method: "PUT",
-        body: {name},
+        body: { name },
       }),
     }),
     deleteCategory: builder.mutation({
@@ -24,16 +24,20 @@ export const categoryApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
-    
+
     listcategory: builder.query({
       query: () => `${CATEGORY_URL}`,
     }),
+    getTopCategories: builder.query({
+      query: () => `${CATEGORY_URL}/topcategories`,
+    })
   }),
 });
 
 export const {
-    useCreateCategoryMutation,
-    useUpdateCategoryMutation,
-    useDeleteCategoryMutation,
-    useListcategoryQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+  useListcategoryQuery,
+  useGetTopCategoriesQuery
 } = categoryApiSlice
