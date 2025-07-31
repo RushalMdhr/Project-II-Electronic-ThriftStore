@@ -7,6 +7,10 @@ const categorySchema = mongoose.Schema({
         required:true,
         maxlength:32,
         unique:true
+    },
+    used : {
+        type:Number,
+        default:0
     }
 })
 
