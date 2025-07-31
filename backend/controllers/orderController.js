@@ -31,7 +31,8 @@ const createOrder = asyncHandler(async (req, res) => {
 
   const newOrder = new Order({ user: req.user._id, orderItems, total_price: itemsPrice })
   console.log("creating order : ", newOrder);
-  newOrder.save();
+  const orderCreated = await newOrder.save();
+  console.log("orderCreated : ",orderCreated)
 
   // console.log(itemsPrice);
   // const order = new Order({
