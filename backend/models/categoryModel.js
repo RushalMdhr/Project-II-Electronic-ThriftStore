@@ -15,7 +15,8 @@ const categorySchema = mongoose.Schema(
     },
     image: {
       type: String,
-      default: "https://via.placeholder.com/150",
+      default:
+        "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=150&q=80",
     },
   },
   { timestamps: true }

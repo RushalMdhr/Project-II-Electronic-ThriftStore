@@ -36,7 +36,6 @@ import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
 import UserUpdate from "./pages/Admin/UserUpdate.jsx";
 import AdminLayout from "./components/Admin/AdminLayout.jsx";
 import ManageOrders from "./pages/Admin/ManageOrders.jsx";
-import Category from "./components/Admin/Category.jsx";
 import AdminRoute from "./components/Admin/AdminRoute.jsx";
 import Unauthorized from "./pages/User/Unauthorized.jsx";
 import ProductList from "./components/Product/ProductList.jsx";
@@ -49,6 +48,7 @@ import Checkout from "./pages/User/Checkout.jsx";
 import Products from "./pages/Home/ProductTools/Products.jsx";
 import ProductCard from "./TestComponents/ProductGridCardTest.jsx";
 import MyOrders from "./pages/User/Orders/MyOrders.jsx";
+import CategoryManagement from "./components/Admin/CategoryManagement.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -124,7 +124,7 @@ const router = createBrowserRouter(
           <Route path="users" element={<UserList />} />
           <Route path="orders" element={<ManageOrders />} />
           <Route path="users/:id/edit" element={<UserUpdate />} />
-          <Route path="categories" element={<Category />} />
+          <Route path="categories" element={<CategoryManagement />} />
         </Route>
       </Route>
     </Route>
