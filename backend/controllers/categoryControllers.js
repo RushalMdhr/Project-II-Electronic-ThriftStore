@@ -68,4 +68,15 @@ export const deleteCategory = async (req, res) => {
   }
 };
 
-export { getAllCategories,createCategory };
+const getTopCategories = asyncHandler(async(req,res)=>{
+  try {
+    const topCategories = await Category.find().sort({ used: -1 }).limit(4);
+    console.log(topCategories);
+    res.send(topCategories);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+    
+  }
+})
+
+export { getAllCategories,createCategory,getTopCategories };
