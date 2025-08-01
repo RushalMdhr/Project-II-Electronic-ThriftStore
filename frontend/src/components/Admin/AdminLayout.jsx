@@ -81,6 +81,18 @@ const AdminLayout = () => {
             <i className="ri-box-3-line text-2xl"></i>
             {!collapsed && <span>Manage Products</span>}
           </Link>
+          
+          <Link
+            to="/admin/categories"
+            className={`flex items-center px-3 py-3 transition
+    hover:bg-[#1de9b6] hover:text-[#0a1120] rounded-sm
+    ${collapsed ? "justify-center w-12 h-12" : "space-x-3 rounded-lg"}
+  `}
+            title="Manage Categories"
+          >
+            <i className="ri-folders-line text-2xl"></i>
+            {!collapsed && <span>Manage Categories</span>}
+          </Link>
         </nav>
       </aside>
 

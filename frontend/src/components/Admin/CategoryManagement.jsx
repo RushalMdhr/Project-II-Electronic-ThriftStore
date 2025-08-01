@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import {
   useListcategoryQuery,
   useCreateCategoryMutation,
@@ -24,7 +24,7 @@ const CategoryManagement = () => {
   const handleEdit = (category) => {
     setName(category.name);
     setId(category._id);
-    setImage(null); // Clear file input, image preview not implemented here
+    setImage(null);
   };
 
   const handleDelete = async (categoryId) => {
@@ -33,9 +33,7 @@ const CategoryManagement = () => {
         await deleteCategory(categoryId).unwrap();
         toast.success("Category deleted successfully");
         refetch();
-        if (id === categoryId) {
-          handleCancel();
-        }
+        if (id === categoryId) handleCancel();
       } catch (err) {
         console.error(err);
         toast.error("Error deleting category");
@@ -45,7 +43,6 @@ const CategoryManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!name.trim()) return toast.error("Category name is required");
 
     const formData = new FormData();
@@ -54,7 +51,7 @@ const CategoryManagement = () => {
 
     try {
       if (id) {
-        await updateCategory({ id, formData }).unwrap();
+        await updateCategory({ id, data: formData }).unwrap();
         toast.success("Category updated");
       } else {
         await createCategory(formData).unwrap();
@@ -77,25 +74,14 @@ const CategoryManagement = () => {
     setImage(null);
   };
 
-  // Calculate product counts per category efficiently
-  const categoriesWithCount = useMemo(() => {
-    if (!Array.isArray(products)) {
-      return categories.map((cat) => ({ ...cat, productCount: 0 }));
-    }
+  const categoriesWithCount = categories.map((cat) => ({
+    ...cat,
+    productCount: cat.used || 0,
+  }));
 
-    const countMap = products.reduce((acc, prod) => {
-      if (!prod.category) return acc;
-      const catId =
-        typeof prod.category === "object" ? prod.category._id : prod.category;
-      acc[catId] = (acc[catId] || 0) + 1;
-      return acc;
-    }, {});
-
-    return categories.map((cat) => ({
-      ...cat,
-      productCount: countMap[cat._id] || 0,
-    }));
-  }, [categories, products]);
+  const chartSeries = categoriesWithCount.map((cat) => cat.productCount);
+  const chartLabels = categoriesWithCount.map((cat) => cat.name);
+  const totalProducts = chartSeries.reduce((a, b) => a + b, 0);
 
   return (
     <div className="p-6 max-w-5xl mx-auto bg-[#131a2b] min-h-screen text-white">
@@ -103,6 +89,7 @@ const CategoryManagement = () => {
         Manage Categories
       </h1>
 
+      {/* Form */}
       <form
         onSubmit={handleSubmit}
         className="bg-[#0f172a] p-6 rounded-lg mb-10 max-w-md"
@@ -135,7 +122,6 @@ const CategoryManagement = () => {
           >
             {id ? "Update" : "Add"} Category
           </button>
-
           {id && (
             <button
               type="button"
@@ -204,73 +190,71 @@ const CategoryManagement = () => {
           <h2 className="text-xl font-semibold mb-4 text-[#1de9b6]">
             Product Distribution
           </h2>
-          <Chart
-            type="donut"
-            width="100%"
-            height={320}
-            series={categoriesWithCount.map((cat) => cat.productCount)}
-            options={{
-              labels: categoriesWithCount.map((cat) => cat.name),
-              colors: ["#1de9b6", "#f59e0b", "#3b82f6", "#10b981", "#f43f5e"],
-              legend: {
-                show: true,
-                position: "right",
-                labels: {
-                  colors: "#fff",
-                  formatter: function (val, opts) {
-                    const seriesIndex = opts.seriesIndex;
-                    const count = opts.w.config.series[seriesIndex];
-                    const total = opts.w.globals.seriesTotals.reduce(
-                      (a, b) => a + b,
-                      0
-                    );
-                    const percent = ((count / total) * 100).toFixed(1);
-                    return `${val} - ${percent}% (${count})`;
+          {chartSeries.length > 0 ? (
+            <Chart
+              type="donut"
+              width="100%"
+              height={320}
+              series={chartSeries}
+              options={{
+                labels: chartLabels,
+                colors: ["#1de9b6", "#f59e0b", "#3b82f6", "#10b981", "#f43f5e"],
+                legend: {
+                  show: true,
+                  position: "right",
+                  labels: {
+                    colors: "#fff",
+                    formatter: (val, opts) => {
+                      const index = opts.seriesIndex;
+                      const count = chartSeries[index];
+                      const percent = ((count / totalProducts) * 100).toFixed(
+                        1
+                      );
+                      return `${val} - ${percent}% (${count})`;
+                    },
+                  },
+                  markers: {
+                    width: 12,
+                    height: 12,
+                    radius: 6,
+                  },
+                  itemMargin: {
+                    horizontal: 10,
+                    vertical: 5,
                   },
                 },
-                markers: {
-                  width: 12,
-                  height: 12,
-                  radius: 6,
+                tooltip: {
+                  theme: "dark",
+                  y: { formatter: (val) => `${val} products` },
                 },
-                itemMargin: {
-                  horizontal: 10,
-                  vertical: 5,
+                dataLabels: {
+                  enabled: false,
                 },
-              },
-              tooltip: {
-                theme: "dark",
-                y: { formatter: (val) => `${val} products` },
-              },
-              dataLabels: {
-                enabled: false,
-              },
-              stroke: {
-                show: false,
-              },
-              plotOptions: {
-                pie: {
-                  donut: {
-                    size: "65%",
-                    labels: {
-                      show: true,
-                      total: {
+                stroke: {
+                  show: false,
+                },
+                plotOptions: {
+                  pie: {
+                    donut: {
+                      size: "65%",
+                      labels: {
                         show: true,
-                        label: "Total",
-                        fontSize: "16px",
-                        color: "#fff",
-                        formatter: () =>
-                          categoriesWithCount.reduce(
-                            (sum, cat) => sum + cat.productCount,
-                            0
-                          ),
+                        total: {
+                          show: true,
+                          label: "Total",
+                          fontSize: "16px",
+                          color: "#fff",
+                          formatter: () => totalProducts,
+                        },
                       },
                     },
                   },
                 },
-              },
-            }}
-          />
+              }}
+            />
+          ) : (
+            <p className="text-gray-400">No product data available.</p>
+          )}
         </div>
       </div>
     </div>
