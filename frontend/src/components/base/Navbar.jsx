@@ -146,13 +146,7 @@ const Navbar = () => {
 
             {/* Right Side Icons */}
             <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-300 hover:text-white"
-              >
-                <i className="ri-heart-line text-xl"></i>
-              </Button>
+              
               <Link
                 to="/cart"
                 className="text-gray-300 hover:text-white transition-colors"
@@ -173,7 +167,7 @@ const Navbar = () => {
                       size="icon"
                       className="text-gray-300 hover:text-white"
                     >
-                      <i className="ri-user-line text-xl"></i>
+                      <i className="ri-user-line text-xl">{userInfo.username}</i>
                     </Button>
                   </Link>
                   <Button
