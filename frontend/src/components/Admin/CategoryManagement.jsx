@@ -27,6 +27,12 @@ const CategoryManagement = () => {
     setImage(null);
   };
 
+  const handleCancel = () => {
+    setName("");
+    setId(null);
+    setImage(null);
+  };
+
   const handleDelete = async (categoryId) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
       try {
@@ -58,9 +64,7 @@ const CategoryManagement = () => {
         toast.success("Category created");
       }
 
-      setName("");
-      setImage(null);
-      setId(null);
+      handleCancel();
       refetch();
     } catch (err) {
       console.error(err);
@@ -68,12 +72,7 @@ const CategoryManagement = () => {
     }
   };
 
-  const handleCancel = () => {
-    setName("");
-    setId(null);
-    setImage(null);
-  };
-
+  // Prepare chart data
   const categoriesWithCount = categories.map((cat) => ({
     ...cat,
     productCount: cat.used || 0,
@@ -84,58 +83,85 @@ const CategoryManagement = () => {
   const totalProducts = chartSeries.reduce((a, b) => a + b, 0);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto bg-[#131a2b] min-h-screen text-white">
-      <h1 className="text-3xl font-bold mb-8 text-[#1de9b6]">
-        Manage Categories
-      </h1>
-
-      {/* Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-[#0f172a] p-6 rounded-lg mb-10 max-w-md"
-      >
-        <div className="mb-4">
-          <label className="block mb-1">Category Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-2 rounded-md bg-[#1e293b] text-white border border-gray-700 focus:ring-2 focus:ring-[#1de9b6]"
-            required
-          />
+    <div className="bg-[#131a2b] min-h-screen px-10 py-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6 border-b border-gray-700 pb-4">
+        <div>
+          <h2 className="text-3xl text-[#1de9b6] font-bold">
+            Manage Categories
+          </h2>
+          <p className="text-sm text-gray-400 mt-1">
+            View, edit, and manage all product categories.
+          </p>
         </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">Image (optional)</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
-            className="w-full px-4 py-2 rounded-md bg-[#0f172a] text-white border border-gray-700 focus:ring-2 focus:ring-[#1de9b6]"
-          />
+        <div>
+          <span className="text-md bg-[#1de9b6]/10 text-[#1de9b6] px-3 py-1 rounded-full font-medium">
+            Total: {categories.length}
+          </span>
         </div>
+      </div>
 
-        <div className="flex gap-4">
-          <button
-            type="submit"
-            className="bg-[#1de9b6] text-black px-6 py-2 rounded hover:bg-[#13c7a6] transition"
-          >
-            {id ? "Update" : "Add"} Category
-          </button>
-          {id && (
+      {/* Form and Image side by side */}
+      <div className="flex gap-8 max-w-10xl mb-10">
+        {/* Your unchanged form */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-[#0f172a] p-6 rounded-lg max-w-3xl w-full"
+        >
+          <div className="mb-4">
+            <label className="block mb-1">Category Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-2 rounded-md bg-[#1e293b] text-white border border-gray-700 focus:ring-2 focus:ring-[#1de9b6]"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-1">Image (optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files[0])}
+              className="w-full px-4 py-2 rounded-md bg-[#0f172a] text-white border border-gray-700 focus:ring-2 focus:ring-[#1de9b6]"
+            />
+          </div>
+
+          <div className="flex gap-4">
             <button
-              type="button"
-              onClick={handleCancel}
-              className="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-500 transition"
+              type="submit"
+              className="bg-[#1de9b6] text-black px-6 py-2 rounded hover:bg-[#13c7a6] transition"
             >
-              Cancel
+              {id ? "Update" : "Add"} Category
             </button>
-          )}
-        </div>
-      </form>
+            {id && (
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-500 transition"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
 
+        {/* Image to fill the empty space */}
+        <div className="flex items-center justify-center w-117 rounded-lg overflow-hidden shadow-lg bg-[#0f172a]">
+          <img
+            src="
+https://taylorwells.com.au/wp-content/uploads/2020/05/ING_19061_177314-1200x675.jpg"
+            alt="Category Management Illustration"
+            className="object-cover w-full h-64"
+          />
+        </div>
+      </div>
+
+      {/* Two-column layout: Category List + Donut Chart */}
       <div className="grid md:grid-cols-2 gap-8">
-        {/* Category List */}
+        {/* Category List Section */}
         <div className="bg-[#1e293b] p-6 rounded-lg max-h-[500px] overflow-y-auto">
           <h2 className="text-xl font-semibold mb-4 text-[#1de9b6]">
             Existing Categories
@@ -185,7 +211,7 @@ const CategoryManagement = () => {
           )}
         </div>
 
-        {/* Donut Chart */}
+        {/* Donut Chart Section */}
         <div className="bg-[#1e293b] p-6 rounded-lg max-h-[500px]">
           <h2 className="text-xl font-semibold mb-4 text-[#1de9b6]">
             Product Distribution
@@ -225,7 +251,9 @@ const CategoryManagement = () => {
                 },
                 tooltip: {
                   theme: "dark",
-                  y: { formatter: (val) => `${val} products` },
+                  y: {
+                    formatter: (val) => `${val} products`,
+                  },
                 },
                 dataLabels: {
                   enabled: false,
