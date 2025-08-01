@@ -1,51 +1,24 @@
-import path from "path";
+// routes/uploadRoutes.js
 import express from "express";
-import multer from "multer";
+import { uploadMultiple } from "../middlewares/multer.js"; // <-- use the modular version
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-
-  filename: (req, file, cb) => {
-    const extname = path.extname(file.originalname);
-    cb(null, `${path.basename(file.originalname, extname)}-${Date.now()}${extname}`);
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  const filetypes = /jpe?g|png|webp$/;
-  const minetypes = /image\/jpe?g|image\/png|image\/webp/;
-
-  const extname = path.extname(file.originalname).toLowerCase();
-  const mimetype = file.mimetype;
-
-  if (filetypes.test(extname) && minetypes.test(mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("Images only"), false);
-  }
-};
-
-const upload = multer({ storage, fileFilter });
-const uploadSingleImage = upload.single("image");
-const uploadMultipleImages = upload.array("images");
-
 router.post("/", (req, res) => {
-  uploadMultipleImages(req, res, (err) => {
+  uploadMultiple(req, res, (err) => {
     if (err) {
-      res.status(400).send({ message: err.message });
-    } else if (req.files && req.files.length > 0) {
-      const paths = req.files.map((file) => `/${file.path}`);
-      res.status(200).send({
-        message: "images uploaded successfully",
-        paths,
-      });
-    } else {
-      res.status(400).send({ message: "no image files provided" });
+      return res.status(400).json({ message: err.message });
     }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "No image files provided" });
+    }
+
+    const paths = req.files.map((file) => `/${file.path}`);
+    res.status(200).json({
+      message: "Images uploaded successfully",
+      paths,
+    });
   });
 });
 
