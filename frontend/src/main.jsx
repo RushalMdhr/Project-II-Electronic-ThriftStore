@@ -49,6 +49,7 @@ import Checkout from "./pages/User/Checkout.jsx";
 import Products from "./pages/Home/ProductTools/Products.jsx";
 import ProductCard from "./TestComponents/ProductGridCardTest.jsx";
 import MyOrders from "./pages/User/Orders/MyOrders.jsx";
+import CategoryUsers from "./pages/Home/Category.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -85,7 +86,9 @@ const router = createBrowserRouter(
       <Route path="/faq" element={<FAQ />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/tester" element={<ProductCard />} />
-      <Route path="/myorders" element={<MyOrders />} />
+      <Route path="/categories" element={<CategoryUsers />} />
+
+      
 
 {/* ________________________________ VENDOR ________________________________________*/}
 
@@ -109,6 +112,7 @@ const router = createBrowserRouter(
 
       <Route path="/" element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
+        <Route path="/myorders" element={<MyOrders />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path ="/checkout" element={<Checkout />} />
         <Route path="/vendor" element={<VendorRegister />} />

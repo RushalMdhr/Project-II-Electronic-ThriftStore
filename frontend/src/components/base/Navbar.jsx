@@ -77,7 +77,7 @@ const Navbar = () => {
                 to="/products"
                 className="text-gray-300 hover:text-white transition-colors"
               >
-                Products
+                Shop
               </Link>
               <Link
                 to={userInfo?.isAdmin ? "/admin/categories" : "/categories"}
