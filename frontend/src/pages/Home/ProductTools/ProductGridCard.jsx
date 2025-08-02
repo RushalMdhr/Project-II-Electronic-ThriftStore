@@ -22,10 +22,10 @@ const ProductGridCard = ({ products }) => {
 
             {/* Discount Badge */}
             <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-md">
-              {Math.round(
+              {/* {Math.round(
                 ((product.price - product.discountedPrice) / product.price) * 100
-              )}
-              % OFF
+              )} */}
+              0 % OFF
             </div>
 
             {/* Wishlist Button */}
