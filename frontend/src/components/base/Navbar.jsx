@@ -8,17 +8,23 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import "remixicon/fonts/remixicon.css";
+import { setRole } from "../../redux/features/auth/authSlice";
 
 const Navbar = () => {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo, role } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [logoutApiCall] = useLogoutMutation();
 
   const [search, setSearch] = useState("");
-  const [role, setRole] = useState(userInfo?.isVendor ? "seller" : "buyer");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+    useEffect(() => {
+      // Redirect to home page on reload/app start
+      navigate("/");
+    }, [navigate]);
+
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -197,8 +203,9 @@ const Navbar = () => {
                     <div className="absolute mt-2 w-32 bg-white text-black rounded shadow-md z-50">
                       <button
                         onClick={() => {
-                          setRole("buyer");
+                          dispatch(setRole("buyer"));
                           setDropdownOpen(false);
+                          navigate("/");
                         }}
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
                         type="button"
@@ -207,8 +214,9 @@ const Navbar = () => {
                       </button>
                       <button
                         onClick={() => {
-                          setRole("seller");
+                          dispatch(setRole("seller"));
                           setDropdownOpen(false);
+                          navigate("/vendor/dashboard");
                         }}
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
                         type="button"
