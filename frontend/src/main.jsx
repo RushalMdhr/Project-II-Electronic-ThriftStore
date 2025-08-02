@@ -49,6 +49,7 @@ import Products from "./pages/Home/ProductTools/Products.jsx";
 import ProductCard from "./TestComponents/ProductGridCardTest.jsx";
 import MyOrders from "./pages/User/Orders/MyOrders.jsx";
 import CategoryManagement from "./components/Admin/CategoryManagement.jsx";
+import VendorLayout from "./components/Vendor/VendorLayout.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -87,14 +88,16 @@ const router = createBrowserRouter(
       <Route path="/tester" element={<ProductCard />} />
       <Route path="/myorders" element={<MyOrders />} />
 
-{/* ________________________________ VENDOR ________________________________________*/}
+      {/* ________________________________ VENDOR ________________________________________*/}
 
-      <Route path="/vendor" element={<VendorRoutes />}>
-        <Route path="products" element={<VendorProducts />} />
-        <Route path="upload" element={<UploadPageTest />} />
-        <Route path="dashboard" element={<Dashboard />} />
+      <Route element={<VendorRoutes />}>
+        <Route path="/vendor" element={<VendorLayout />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="products" element={<VendorProducts />} />
+          <Route path="upload" element={<UploadPageTest />} />
+        </Route>
       </Route>
-      
+
       {/* Vendor route guard: if already a vendor, redirect to dashboard */}
       <Route
         path="/vendor/register"
@@ -105,19 +108,19 @@ const router = createBrowserRouter(
         }
       />
 
-{/* ________________________________ LOGGED IN ________________________________________*/}
+      {/* ________________________________ LOGGED IN ________________________________________*/}
 
       <Route path="/" element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path ="/checkout" element={<Checkout />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="/vendor" element={<VendorRegister />} />
         {/* <Route path="/upload" element={<UploadPageTest />} /> */}
         <Route path="/admin/productcard" element={<ProductList />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
       </Route>
 
-{/* ________________________________ ADMIN ________________________________________*/}
+      {/* ________________________________ ADMIN ________________________________________*/}
       <Route element={<AdminRoute />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
