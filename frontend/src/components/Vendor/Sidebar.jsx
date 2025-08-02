@@ -4,13 +4,13 @@ import { NavLink } from "react-router-dom";
 const navItems = [
   { label: "Dashboard", path: "/vendor/dashboard" },
   { label: "Upload", path: "/vendor/upload" },
-  { label: "Summary", path: "/vendor/summary" },
-  { label: "Recent Orders", path: "/vendor/orders" },
+  // { label: "Summary", path: "/vendor/summary" },
+  // { label: "Recent Orders", path: "/vendor/orders" },
   { label: "Product Management", path: "/vendor/products" },
-  { label: "Sales Analytics", path: "/vendor/analytics" },
-  { label: "Messages/Notifications", path: "/vendor/notifications" },
-  { label: "Profile & Settings", path: "/vendor/profile" },
-  { label: "Reviews & Ratings", path: "/vendor/reviews" },
+  // { label: "Sales Analytics", path: "/vendor/analytics" },
+  // { label: "Messages/Notifications", path: "/vendor/notifications" },
+  // { label: "Profile & Settings", path: "/vendor/profile" },
+  // { label: "Reviews & Ratings", path: "/vendor/reviews" },
 ];
 
 const Sidebar = () => (
