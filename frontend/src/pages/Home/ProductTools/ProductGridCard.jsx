@@ -75,10 +75,10 @@ const ProductGridCard = ({ products }) => {
 
             {/* Add to Cart Button */}
             <AddToCart productId={product._id} disabled={!product.countInStock} />
-            <button className="w-full mt-3 flex items-center justify-center space-x-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-medium transition-all duration-300 hover:scale-[1.03] shadow-md">
+            {/* <button className="w-full mt-3 flex items-center justify-center space-x-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-medium transition-all duration-300 hover:scale-[1.03] shadow-md">
               <ShoppingCart className="h-4 w-4" />
               <span>Add to Cart</span>
-            </button>
+            </button> */}
           </div>
         </div>
       ))}
