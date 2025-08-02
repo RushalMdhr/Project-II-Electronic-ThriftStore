@@ -8,7 +8,7 @@ export default function VendorRegisterGuard({ children }) {
     return <Navigate to={`/login?redirect=${location.pathname}`} replace />;
   }
   if (userInfo && userInfo.isVendor) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/vendor/dashboard" replace />;
   }
   return children;
 }

@@ -63,13 +63,13 @@ const Home = () => {
         </>
       )}
 
-      {/* Admin-specific product view (optional) */}
+      {/* Admin-specific product view  */}
       {isAdmin && (
         <div className="mt-10 px-4">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-4">
             Admin Product Overview
           </h2>
-          {/* Replace below with actual AdminProductGrid if exists */}
+          {/*  to Replace below with actual AdminProductGrid */}
           <p className="text-center text-gray-600">
             Admin product grid goes here...
           </p>
