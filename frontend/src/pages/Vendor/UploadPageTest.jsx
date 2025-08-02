@@ -153,9 +153,6 @@ const UploadPageTest = () => {
 
   return (
     <div className="p-6 max-w-lg mx-auto">
-      <h2 className="text-2xl font-semibold text-white-800 mb-4">
-        Add Your Product
-      </h2>
       <form onSubmit={submitHandler} className="space-y-4">
         {/* Show existing product images if editing */}
         {product && product._id && (
@@ -257,9 +254,11 @@ const UploadPageTest = () => {
           className="w-full border rounded px-3 py-2"
         >
           <option value="">Select Condition</option>
-          <option value="1">New</option>
-          <option value="2">Used</option>
-          <option value="3">Refurbished</option>
+          <option value="Brand New">Brand New</option>
+          <option value="Like New">Like New</option>
+          <option value="Refurbished">Refurbished</option>
+          <option value="Good">Good</option>
+          <option value="Fair">Fair</option>
         </select>
         {!product ? (
           <button
