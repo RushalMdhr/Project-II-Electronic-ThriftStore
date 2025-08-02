@@ -10,7 +10,7 @@ const CategoryUsers = () => {
                 {categories?.map((category) => (
                     <div key={category.id} className="bg-white rounded-lg shadow p-4">
                         <h2 className="text-xl font-semibold mb-2">{category.name}</h2>
-                        <p className="text-gray-600">ID: {category.id}</p>
+                        {/* <p className="text-gray-600">ID: {category.id}</p> */}
                     </div>
                 ))}
             </div>
