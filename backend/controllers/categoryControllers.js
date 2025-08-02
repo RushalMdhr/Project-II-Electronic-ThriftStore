@@ -15,18 +15,20 @@ const getAllCategories = asyncHandler(async (req, res) => {
 })
 
 const createCategory = asyncHandler(async(req,res)=>{
-    const { name } = req.body;
+  const { name } = req.body;
+  const image = req.file ? `/uploads/categories/${req.file.filename}` : "";
 
     if (!name || typeof name !== 'string' || name.trim() === '') {
         return res.status(400).json({ error: 'Invalid category name' });
     }
 
     try {
-        const newCategory = new Category({ name });
+        const newCategory = new Category({ name, image });
         const savedCategory = await newCategory.save();
         res.status(201).json({
-            id: savedCategory._id.toString(),
-            name: savedCategory.name,
+          id: savedCategory._id.toString(),
+          name: savedCategory.name,
+          image: savedCategory.image,
         });
     } catch (error) {
         res.status(500).json({ error: "Internal Server Error" });
@@ -34,9 +36,10 @@ const createCategory = asyncHandler(async(req,res)=>{
 })
 
 
-export const updateCategory = async (req, res) => {
+export const updateCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
+  const image = req.file ? `/uploads/categories/${req.file.filename}` : null;
 
   try {
     const category = await Category.findById(id);
@@ -44,14 +47,23 @@ export const updateCategory = async (req, res) => {
       return res.status(404).json({ message: "Category not found" });
     }
 
-    category.name = name;
-    await category.save();
+    // Update only if values are provided
+    if (name && name.trim() !== "") category.name = name;
+    if (image) category.image = image;
 
-    res.json(category);
+    const updatedCategory = await category.save();
+
+    res.status(200).json({
+      id: updatedCategory._id.toString(),
+      name: updatedCategory.name,
+      image: updatedCategory.image,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error updating category:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-};
+});
+
 
 export const deleteCategory = async (req, res) => {
   try {
@@ -68,4 +80,15 @@ export const deleteCategory = async (req, res) => {
   }
 };
 
-export { getAllCategories,createCategory };
+const getTopCategories = asyncHandler(async(req,res)=>{
+  try {
+    const topCategories = await Category.find().sort({ used: -1 }).limit(4);
+    console.log(topCategories);
+    res.send(topCategories);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+    
+  }
+})
+
+export { getAllCategories,createCategory,getTopCategories };

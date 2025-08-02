@@ -4,8 +4,11 @@ import { Navigate } from "react-router-dom";
 
 export default function VendorRegisterGuard({ children }) {
   const userInfo = useSelector((state) => state.auth.userInfo);
+  if (!userInfo) {
+    return <Navigate to={`/login?redirect=${location.pathname}`} replace />;
+  }
   if (userInfo && userInfo.isVendor) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/vendor/dashboard" replace />;
   }
   return children;
 }

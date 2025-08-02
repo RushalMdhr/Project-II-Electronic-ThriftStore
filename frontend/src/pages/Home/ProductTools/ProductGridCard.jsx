@@ -79,7 +79,7 @@ const ProductGridCard = ({ products }) => {
                   </div>
                 </div>
                 <div>
-                  <i class="ri-eye-line">  {product.views?.length}</i>
+                  <i className="ri-eye-line">  {product.views?.length}</i>
                 </div>
 
                 {/* Add to Cart Button */}

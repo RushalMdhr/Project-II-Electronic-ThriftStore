@@ -36,7 +36,6 @@ import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
 import UserUpdate from "./pages/Admin/UserUpdate.jsx";
 import AdminLayout from "./components/Admin/AdminLayout.jsx";
 import ManageOrders from "./pages/Admin/ManageOrders.jsx";
-import Category from "./components/Admin/Category.jsx";
 import AdminRoute from "./components/Admin/AdminRoute.jsx";
 import Unauthorized from "./pages/User/Unauthorized.jsx";
 import ProductList from "./components/Product/ProductList.jsx";
@@ -49,6 +48,9 @@ import Checkout from "./pages/User/Checkout.jsx";
 import Products from "./pages/Home/ProductTools/Products.jsx";
 import ProductCard from "./TestComponents/ProductGridCardTest.jsx";
 import MyOrders from "./pages/User/Orders/MyOrders.jsx";
+import CategoryUsers from "./pages/Home/Category.jsx";
+import CategoryManagement from "./components/Admin/CategoryManagement.jsx";
+import VendorLayout from "./components/Vendor/VendorLayout.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -85,16 +87,20 @@ const router = createBrowserRouter(
       <Route path="/faq" element={<FAQ />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/tester" element={<ProductCard />} />
-      <Route path="/myorders" element={<MyOrders />} />
+      <Route path="/categories" element={<CategoryUsers />} />
 
-{/* ________________________________ VENDOR ________________________________________*/}
-
-      <Route path="/vendor" element={<VendorRoutes />}>
-        <Route path="products" element={<VendorProducts />} />
-        <Route path="upload" element={<UploadPageTest />} />
-        <Route path="dashboard" element={<Dashboard />} />
-      </Route>
       
+
+      {/* ________________________________ VENDOR ________________________________________*/}
+
+      <Route element={<VendorRoutes />}>
+        <Route path="/vendor" element={<VendorLayout />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="products" element={<VendorProducts />} />
+          <Route path="upload" element={<UploadPageTest />} />
+        </Route>
+      </Route>
+
       {/* Vendor route guard: if already a vendor, redirect to dashboard */}
       <Route
         path="/vendor/register"
@@ -105,26 +111,27 @@ const router = createBrowserRouter(
         }
       />
 
-{/* ________________________________ LOGGED IN ________________________________________*/}
+      {/* ________________________________ LOGGED IN ________________________________________*/}
 
       <Route path="/" element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
+        <Route path="/myorders" element={<MyOrders />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path ="/checkout" element={<Checkout />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="/vendor" element={<VendorRegister />} />
         {/* <Route path="/upload" element={<UploadPageTest />} /> */}
         <Route path="/admin/productcard" element={<ProductList />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
       </Route>
 
-{/* ________________________________ ADMIN ________________________________________*/}
+      {/* ________________________________ ADMIN ________________________________________*/}
       <Route element={<AdminRoute />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="users" element={<UserList />} />
           <Route path="orders" element={<ManageOrders />} />
           <Route path="users/:id/edit" element={<UserUpdate />} />
-          <Route path="categories" element={<Category />} />
+          <Route path="categories" element={<CategoryManagement />} />
         </Route>
       </Route>
     </Route>

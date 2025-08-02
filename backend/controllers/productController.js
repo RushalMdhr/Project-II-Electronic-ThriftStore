@@ -1,5 +1,6 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
 import Product from "../models/productModel.js";
+import Category from "../models/categoryModel.js";
 import fs from "fs";
 import path from "path";
 
@@ -9,8 +10,8 @@ const createProduct = asyncHandler(async (req, res) => {
     //   ? req.fields["images[]"]
     //   : [req.fields["images[]"]];
 
-    const images = JSON.parse(req.fields["images"] || "[]");  
-    console.log("images ; ",images)
+    const images = JSON.parse(req.fields["images"] || "[]");
+    console.log("images ; ", images)
     const { name, description, price, category, quantity, brand } = req.fields;
     switch (true) {
       case !name:
@@ -31,6 +32,8 @@ const createProduct = asyncHandler(async (req, res) => {
       uploadedBy: req.user._id
     });
     await product.save();
+    // Increment the used count for the category
+    await Category.findByIdAndUpdate(product.category, { $inc: { used: 1 } });
     res.json(product);
   } catch (error) {
     res.status(500).json({ error: "Server error", message: error.message });
@@ -41,6 +44,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
   try {
     const products = await Product.find({})
       .populate("category")
+      .populate("uploadedBy", "name") // populate vendor name here
       .limit(12)
       .sort({ createdAt: -1 });
 
@@ -72,12 +76,19 @@ const updateProductDetails = asyncHandler(async (req, res) => {
         return res.json({ error: "category is required" });
     }
 
-    const product = await Product.findById(
-      req.params.productId,
-      { ...req.fields },
-      { new: true }
-    );
+    const product = await Product.findById(req.params.productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    const oldCategory = product.category.toString();
+    // Update product fields
+    Object.assign(product, req.fields);
     await product.save();
+    // If category changed, update counts
+    if (req.fields.category && req.fields.category !== oldCategory) {
+      await Category.findByIdAndUpdate(oldCategory, { $inc: { used: -1 } });
+      await Category.findByIdAndUpdate(req.fields.category, { $inc: { used: 1 } });
+    }
     res.json(product);
   } catch (error) {
     console.error(error);
@@ -87,27 +98,40 @@ const updateProductDetails = asyncHandler(async (req, res) => {
 
 const deleteProductById = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.productId);
+    const product = await Product.findById(req.params.productId);
 
-    if (product && product.images && product.images.length > 0) {
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Delete product images if any
+    if (product.images && product.images.length > 0) {
       product.images.forEach((imgPath) => {
-        // Adjust the path as per your upload directory
         const uploadsDir = path.join(process.cwd(), "uploads");
-        const filePath = path.join(
-          uploadsDir,
-          path.basename(imgPath)
-        );
+        const filePath = path.join(uploadsDir, path.basename(imgPath));
         fs.unlink(filePath, (err) => {
           if (err) console.error("Failed to delete image:", filePath, err);
         });
       });
     }
-    res.json(product);
+
+    // Decrement category used count ONLY if category exists
+    if (product.category) {
+      await Category.findByIdAndUpdate(product.category, {
+        $inc: { used: -1 },
+      });
+    }
+
+    // Now delete the product document
+    await product.deleteOne();
+
+    res.json({ message: "Product deleted successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "server error" });
+    res.status(500).json({ error: "Server error" });
   }
 });
+
 
 const fetchProducts = asyncHandler(async (req, res) => {
   try {
@@ -124,7 +148,7 @@ const fetchProducts = asyncHandler(async (req, res) => {
       dbFilter._id = { $ne: req.query.productId }
     }
     // Only add search if keyword is present and not empty
-    if (req.query.keyword !== "null" && typeof req.query.keyword === String && req.query.keyword.trim().length > 0) {
+    if (req.query.keyword !== "null" && typeof req.query.keyword === "string" && req.query.keyword.trim().length > 0) {
       dbFilter.name = { $regex: req.query.keyword, $options: "i" };
     }
 
@@ -135,6 +159,7 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
     const count = await Product.countDocuments(dbFilter);
     const products = await Product.find(dbFilter)
+      .populate("uploadedBy", "name") // <-- Populate vendor name here
       .sort({ createdAt: -1 })
       .limit(pageSize)
       .skip(pageSize * (page - 1));
@@ -163,10 +188,9 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
 const getProductById = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId).populate(
-      "category",
-      "name"
-    );
+    const product = await Product.findById(req.params.productId)
+      .populate("category", "name")
+      .populate("uploadedBy", "name");
     // .populate("user", "username email");
 
     if (product) {
@@ -224,7 +248,9 @@ const addProductReview = asyncHandler(async (req, res) => {
 
 const fetchTopProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await Product.find({}).sort({ updatedAt: -1 }).limit(4);
+    const products = await Product.find({})
+      .sort({ views: -1 })
+      .limit(4);
     res.json(products);
   } catch (error) {
     console.error(error);
@@ -242,11 +268,54 @@ const fetchNewProducts = asyncHandler(async (req, res) => {
   }
 });
 
+// Fetch products grouped by category
+const fetchGroupedProducts = asyncHandler(async (req, res) => {
+  try {
+    // Get categories sorted by 'used' descending
+    const categories = await Category.find({}).sort({ used: -1 }).limit(4);
+    console.log(categories)
+
+    // Get products grouped by category
+    const groupedProducts = await Product.aggregate([
+      { $sort: { views: -1 } }, // sort products by views first
+      {
+        $group: {
+          _id: "$category",
+          products: { $push: "$$ROOT" },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          products: { $slice: ["$products", 4] } // limit 4 per category
+        }
+      }
+
+    ]);
+
+    // Map category info to grouped products and sort by category 'used'
+    const result = categories.map(cat => {
+      const group = groupedProducts.find(g => g._id && g._id.toString() === cat._id.toString());
+      return {
+        category: cat,
+        products: group ? group.products : [],
+        count: group ? group.count : 0
+      };
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
+
 const getMyProducts = asyncHandler(async (req, res) => {
   try {
-    
+
     const id = req.user._id;
-    
+
     console.log(id)
     // const myProducts = await Product.UploadedBy.find({  id})
     const myProducts = await Product.find({ uploadedBy: id }).populate(
@@ -305,4 +374,5 @@ export {
   fetchNewProducts,
   getMyProducts,
   increaseViewCount,
+  fetchGroupedProducts,
 };

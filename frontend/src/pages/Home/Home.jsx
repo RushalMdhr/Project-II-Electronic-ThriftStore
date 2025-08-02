@@ -1,54 +1,82 @@
-import HeroSection from './HeroSection.jsx';
-import ShopByCategories from '../User/ShopByCategories.jsx';
-import { useSelector } from 'react-redux';
-import ProductGrid from './ProductTools/ProductGrid.jsx';
-import { useGetTopProductQuery } from '../../redux/api/productsApiSlice.js';
-import { useEffect } from 'react';
+import HeroSectionUser from "./HeroSectionUser.jsx";
+import ShopByCategories from "../User/ShopByCategories.jsx";
+import { useSelector } from "react-redux";
+import ProductGrid from "./ProductTools/ProductGrid.jsx";
+import { useGetTopProductQuery } from "../../redux/api/productsApiSlice.js";
+import { useEffect } from "react";
+import HeroSectionAdmin from "./HeroSectionAdmin.jsx";
+import HeroSectionVendor from "./HeroSectionVendor.jsx";
+import HeroSection from "./HeroSection.jsx";
+import { Link } from "react-router-dom";
+// import AdminProductGrid from "./Admin/AdminProductGrid"; // If you have one
 
 const Home = () => {
-  const { userInfo } = useSelector((state) => state.auth);
-  console.log(userInfo);
-
-  const { data: topProducts,
+  const { userInfo, role } = useSelector((state) => state.auth); // role: "buyer" or "seller"
+  const {
+    data: topProducts,
     isLoading,
     isError,
-    refetch, } = useGetTopProductQuery();
+    refetch,
+  } = useGetTopProductQuery();
 
-    console.log(topProducts);
+  useEffect(() => {
+    refetch();
+  }, []);
 
-    useEffect(()=>{
-      refetch();
-    },[topProducts])
+  const renderHeroSection = () => {
+    if (userInfo) {
+      if (userInfo.isAdmin) return <HeroSectionAdmin />;
+      if (userInfo.isVendor) return <HeroSectionVendor />;
+      if (userInfo.isUser) return <HeroSectionUser />;
+    }
+    return <HeroSection />; // Guest
+  };
+
+  const isVendorSeller = userInfo?.isVendor && role === "seller";
+  const isAdmin = userInfo?.isAdmin;
 
   return (
     <div>
-      {/* {userInfo.isVendor? (<h1 className='px-100 py-10'>Vendor</h1>) : (<h1 className='px-100 py-10'>Not A Vendor</h1>)} */}
-      {/* {!userInfo &&
-        (<>
-        
-        </>)
-      } */}
-      <HeroSection />
-      <ShopByCategories />
-      <div className="text-center mb-12">
-        <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 text-white">
-          Trending Thrift Finds
-        </h2>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto text-white">
-          Discover the most popular pre-loved items from our community of
-          sellers
-        </p>
-      </div>
-      <ProductGrid products={topProducts} />
-      <div className="text-center mt-12">
-        <button className="px-8 py-3 border-2 border-emerald-600 text-emerald-600 rounded-full hover:bg-emerald-50 transition-colors font-medium">
-          View All Products
-        </button>
-      </div>
-      {/* Add more components or content here as needed */}
+      {renderHeroSection()}
+
+      {/* Only show categories and user product grid if NOT admin or vendor-as-seller */}
+      {!isAdmin && !isVendorSeller && (
+        <>
+          <ShopByCategories />
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Trending Thrift Finds
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Discover the most popular pre-loved items from our community of
+              sellers
+            </p>
+          </div>
+          <ProductGrid products={topProducts} />
+          <div className="text-center mt-12">
+            <Link to="/products">
+              <button className="px-8 py-3 border-2 border-emerald-600 text-emerald-600 rounded-full hover:bg-emerald-50 transition-colors font-medium">
+                View All Products
+              </button>
+            </Link>
+          </div>
+        </>
+      )}
+
+      {/* Admin-specific product view  */}
+      {isAdmin && (
+        <div className="mt-10 px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-4">
+            Admin Product Overview
+          </h2>
+          {/*  to Replace below with actual AdminProductGrid */}
+          <p className="text-center text-gray-600">
+            Admin product grid goes here...
+          </p>
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
 export default Home;
-

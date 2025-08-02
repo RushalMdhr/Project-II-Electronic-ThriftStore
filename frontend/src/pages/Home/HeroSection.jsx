@@ -30,7 +30,7 @@ export default function HeroSection() {
               Shop Now
             </Button>
           </Link>
-          <Link to="/upload">
+          <Link to="/vendor/register">
             <Button
               size="lg"
               variant="outline"

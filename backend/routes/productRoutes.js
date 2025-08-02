@@ -12,7 +12,8 @@ import {
   fetchTopProducts,
   fetchNewProducts,
   getMyProducts,
-  increaseViewCount
+  increaseViewCount,
+  fetchGroupedProducts
 } from "../controllers/productController.js";
 import checkId from "../middlewares/checkId.js";
 import { authenticate, authorizeAdmin, authorizeVendor, authorizeAdminOrVendor, isAuthenticated } from "../middlewares/authMiddleware.js";
@@ -32,6 +33,7 @@ router
 
 router.get("/top", fetchTopProducts);
 router.get("/new", fetchNewProducts);
+router.get("/groupedProducts", fetchGroupedProducts);
 
 router
   .route("/:productId")
