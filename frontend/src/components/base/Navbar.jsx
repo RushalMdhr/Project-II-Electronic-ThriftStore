@@ -86,6 +86,7 @@ const Navbar = () => {
                 Home
               </Link>
 
+
               {(role === "buyer" || !userInfo?.isVendor) &&
                 !userInfo?.isAdmin && (
                   <>
