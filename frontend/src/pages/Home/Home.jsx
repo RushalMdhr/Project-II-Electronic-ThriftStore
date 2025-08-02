@@ -8,6 +8,7 @@ import HeroSectionAdmin from "./HeroSectionAdmin.jsx";
 import HeroSectionVendor from "./HeroSectionVendor.jsx";
 import HeroSection from "./HeroSection.jsx";
 import { User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -65,9 +66,11 @@ console.log(userInfo);
       </div>
       <ProductGrid products={topProducts} />
       <div className="text-center mt-12">
-        <button className="px-8 py-3 border-2 border-emerald-600 text-emerald-600 rounded-full hover:bg-emerald-50 transition-colors font-medium">
-          View All Products
-        </button>
+        <Link to="/products">
+          <button className="px-8 py-3 border-2 border-emerald-600 text-emerald-600 rounded-full hover:bg-emerald-50 transition-colors font-medium">
+            View All Products
+          </button>
+        </Link>
       </div>
       {/* Add more components or content here as needed */}
     </div>
