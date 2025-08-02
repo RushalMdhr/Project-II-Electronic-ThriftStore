@@ -118,15 +118,21 @@ export const productApiSlice = apiSlice.injectEndpoints({
           : [{ type: "Product", id: "MY_LIST" }],
     }),
 
-    increaseViewCount: builder.mutation({
-      query: (productId) => ({
-        url: `${PRODUCT_URL}/${productId}/views`,
-        method: "PUT",
-      }),
-      invalidatesTags: (result, error, productId) => [
-        { type: "Product", id: productId },
-      ],
+    increaseViewCount : builder.mutation({
+      query : (productId)=>({
+        url : `${PRODUCT_URL}/${productId}/views`,
+        method : "PUT",
+      })
     }),
+
+    reportProduct : builder.mutation({
+      query : ({reason,productId})=>({
+        url : `${PRODUCT_URL}/${productId}/reported`,
+        method: "POST",
+        body: {reason},
+      })
+    })
+
   }),
 });
 
@@ -144,4 +150,5 @@ export const {
   useUploadProductImageMutation,
   useGetMyProductsQuery,
   useIncreaseViewCountMutation,
+  useReportProductMutation
 } = productApiSlice;

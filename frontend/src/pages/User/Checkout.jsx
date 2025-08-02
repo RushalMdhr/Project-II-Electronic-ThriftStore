@@ -45,7 +45,7 @@ const Checkout = () => {
                         {item.product.name}
                       </h4>
                       <div className="text-gray-500 text-sm">
-                        {item.product.category}
+                        {item.product.category?.name}
                       </div>
                     </div>
                     <div className="flex flex-col items-end">

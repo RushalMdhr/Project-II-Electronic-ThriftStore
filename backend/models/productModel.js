@@ -29,8 +29,12 @@ const ProductSchema = mongoose.Schema({
     category: { type: ObjectId, ref: "Category", required: true },
     description: { type: String, required: true },
     // reviews : [reviewsSchema],
-    // rating : [ratingsSchema],
-    condition: { type: Number, required: true, default: 0, min: 1, max: 5 }, // 0 - New, 1 - Used, 2 - Refurbished
+    condition: {
+        type: String,
+        required: true,
+        enum: ["Brand New", "Like New", "Refurbished", "Good", "Fair"],
+        default: "Brand New",
+    },
     // numReviews: { type: Number, required: true, default: 0 },
     price: { type: Number, required: true, default: 0 },
     discountedPrice: { type: Number, required: true, default: 0 },
@@ -40,8 +44,14 @@ const ProductSchema = mongoose.Schema({
         ref: "User",
         required: true
     },
-    views : [{ type: String }],
-    reported : [{ type: String }]
+    views: [{ type: String }],
+    reported: [{
+        user: {
+            type: ObjectId,
+            ref: "User"
+        },
+        reason: { type: String }
+    }]
 },
     { timestamps: true });
 

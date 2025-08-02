@@ -13,12 +13,16 @@ import {
   fetchNewProducts,
   getMyProducts,
   increaseViewCount,
-  fetchGroupedProducts
+  fetchGroupedProducts,
+  reportProduct
 } from "../controllers/productController.js";
 import checkId from "../middlewares/checkId.js";
 import { authenticate, authorizeAdmin, authorizeVendor, authorizeAdminOrVendor, isAuthenticated } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
+
+
+router.route("/:productId/reported").post(authenticate, reportProduct);
 
 router.route("/:productId/views").put(isAuthenticated, increaseViewCount);
 
@@ -40,6 +44,7 @@ router
   .get(getProductById)
   .put(authenticate, authorizeAdminOrVendor, formidable(), updateProductDetails)
   .delete(authenticate, authorizeAdminOrVendor, deleteProductById);
+
 
 
 // router

@@ -44,7 +44,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
   try {
     const products = await Product.find({})
       .populate("category")
-      .populate("uploadedBy", "name") // populate vendor name here
+      .populate("uploadedBy", "username") // populate vendor name here
       .limit(12)
       .sort({ createdAt: -1 });
 
@@ -149,6 +149,7 @@ const fetchProducts = asyncHandler(async (req, res) => {
     }
     // Only add search if keyword is present and not empty
     if (req.query.keyword !== "null" && typeof req.query.keyword === "string" && req.query.keyword.trim().length > 0) {
+      console.log(req.query.keyword, "keyword")
       dbFilter.name = { $regex: req.query.keyword, $options: "i" };
     }
 
@@ -162,7 +163,9 @@ const fetchProducts = asyncHandler(async (req, res) => {
       .populate("uploadedBy", "name") // <-- Populate vendor name here
       .sort({ createdAt: -1 })
       .limit(pageSize)
-      .skip(pageSize * (page - 1));
+      .skip(pageSize * (page - 1))
+      .populate("category", "name")
+      .populate("uploadedBy", "username");
 
     // const transformedProducts = products.map(p=>({
     //   ...p.toObject(),
@@ -177,9 +180,10 @@ const fetchProducts = asyncHandler(async (req, res) => {
       pages: Math.ceil(count / pageSize),
       hasMore: page < Math.ceil(count / pageSize),
     });
+    console.log("products : ", products)
 
   } catch (error) {
-    console.error(error);
+    console.error("error : ", error);
     res.status(500);
     throw new Error("Internal Server Error");
   }
@@ -190,7 +194,7 @@ const getProductById = asyncHandler(async (req, res) => {
   try {
     const product = await Product.findById(req.params.productId)
       .populate("category", "name")
-      .populate("uploadedBy", "name");
+      .populate("uploadedBy", "username");
     // .populate("user", "username email");
 
     if (product) {
@@ -250,7 +254,9 @@ const fetchTopProducts = asyncHandler(async (req, res) => {
   try {
     const products = await Product.find({})
       .sort({ views: -1 })
-      .limit(4);
+      .limit(4)
+      .populate("category", "name")
+      .populate("uploadedBy", "username");
     res.json(products);
   } catch (error) {
     console.error(error);
@@ -361,12 +367,43 @@ const increaseViewCount = asyncHandler(async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 });
+const reportProduct = asyncHandler(async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    const userId = req.user._id.toString();
+    const alreadyReported = product.reported && product.reported.some(
+      (report) => report.user.toString() === userId
+    );
+    if (alreadyReported) {
+      return res.status(400).json({ error: "You have already reported this product." });
+    }
+      // ...existing code for reporting (add report logic here)
+      const { reason } = req.body;
+      if (!reason || reason.trim() === "") {
+        return res.status(400).json({ error: "Reason is required" });
+      }
+      product.reported.push({
+        user: req.user._id,
+        reason: reason.trim()
+      })
+      res.send(product);
+      await product.save();
+
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server Error" });
+  }
+})
 
 export {
   createProduct,
   getAllProducts,
-  updateProductDetails,
   deleteProductById,
+  updateProductDetails,
   fetchProducts,
   getProductById,
   addProductReview,
@@ -375,4 +412,5 @@ export {
   getMyProducts,
   increaseViewCount,
   fetchGroupedProducts,
+  reportProduct,
 };
