@@ -98,28 +98,40 @@ const updateProductDetails = asyncHandler(async (req, res) => {
 
 const deleteProductById = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.productId);
+    const product = await Product.findById(req.params.productId);
 
-    if (product && product.images && product.images.length > 0) {
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Delete product images if any
+    if (product.images && product.images.length > 0) {
       product.images.forEach((imgPath) => {
-        // Adjust the path as per your upload directory
         const uploadsDir = path.join(process.cwd(), "uploads");
-        const filePath = path.join(
-          uploadsDir,
-          path.basename(imgPath)
-        );
+        const filePath = path.join(uploadsDir, path.basename(imgPath));
         fs.unlink(filePath, (err) => {
           if (err) console.error("Failed to delete image:", filePath, err);
         });
       });
     }
-    await Category.findByIdAndUpdate(product.category, { $inc: { used: -1 } });
-    res.json(product);
+
+    // Decrement category used count ONLY if category exists
+    if (product.category) {
+      await Category.findByIdAndUpdate(product.category, {
+        $inc: { used: -1 },
+      });
+    }
+
+    // Now delete the product document
+    await product.deleteOne();
+
+    res.json({ message: "Product deleted successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "server error" });
+    res.status(500).json({ error: "Server error" });
   }
 });
+
 
 const fetchProducts = asyncHandler(async (req, res) => {
   try {

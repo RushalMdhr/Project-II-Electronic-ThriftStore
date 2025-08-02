@@ -1,10 +1,13 @@
-import Slidebar from "./Sidebar";
+import React from 'react'
+
 const Dashboard = () => {
   return (
-    <>
-      <Slidebar/>
-    </>
-  );
-};
+    <div>
+      <h1>Vendor Dashboard</h1>
+      <p>Welcome to your dashboard!</p>
+    </div>
+  )
+}
 
-export default Dashboard;
+export default Dashboard
+

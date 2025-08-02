@@ -1,0 +1,292 @@
+import { useEffect, useState } from "react";
+import {
+  useListcategoryQuery,
+  useCreateCategoryMutation,
+  useDeleteCategoryMutation,
+  useUpdateCategoryMutation,
+} from "../../redux/api/categoryApiSlice";
+import { useAllProductsQuery } from "../../redux/api/productsApiSlice";
+import { toast } from "react-toastify";
+import Chart from "react-apexcharts";
+
+const CategoryManagement = () => {
+  const { data: categories = [], refetch } = useListcategoryQuery();
+  const { data: products = [] } = useAllProductsQuery();
+
+  const [createCategory] = useCreateCategoryMutation();
+  const [updateCategory] = useUpdateCategoryMutation();
+  const [deleteCategory] = useDeleteCategoryMutation();
+
+  const [name, setName] = useState("");
+  const [id, setId] = useState(null);
+  const [image, setImage] = useState(null);
+
+  const handleEdit = (category) => {
+    setName(category.name);
+    setId(category._id);
+    setImage(null);
+  };
+
+  const handleCancel = () => {
+    setName("");
+    setId(null);
+    setImage(null);
+  };
+
+  const handleDelete = async (categoryId) => {
+    if (window.confirm("Are you sure you want to delete this category?")) {
+      try {
+        await deleteCategory(categoryId).unwrap();
+        toast.success("Category deleted successfully");
+        refetch();
+        if (id === categoryId) handleCancel();
+      } catch (err) {
+        console.error(err);
+        toast.error("Error deleting category");
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) return toast.error("Category name is required");
+
+    const formData = new FormData();
+    formData.append("name", name);
+    if (image) formData.append("image", image);
+
+    try {
+      if (id) {
+        await updateCategory({ id, data: formData }).unwrap();
+        toast.success("Category updated");
+      } else {
+        await createCategory(formData).unwrap();
+        toast.success("Category created");
+      }
+
+      handleCancel();
+      refetch();
+    } catch (err) {
+      console.error(err);
+      toast.error("Error saving category");
+    }
+  };
+
+  // Prepare chart data
+  const categoriesWithCount = categories.map((cat) => ({
+    ...cat,
+    productCount: cat.used || 0,
+  }));
+
+  const chartSeries = categoriesWithCount.map((cat) => cat.productCount);
+  const chartLabels = categoriesWithCount.map((cat) => cat.name);
+  const totalProducts = chartSeries.reduce((a, b) => a + b, 0);
+
+  return (
+    <div className="bg-[#131a2b] min-h-screen px-10 py-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6 border-b border-gray-700 pb-4">
+        <div>
+          <h2 className="text-3xl text-[#1de9b6] font-bold">
+            Manage Categories
+          </h2>
+          <p className="text-sm text-gray-400 mt-1">
+            View, edit, and manage all product categories.
+          </p>
+        </div>
+        <div>
+          <span className="text-md bg-[#1de9b6]/10 text-[#1de9b6] px-3 py-1 rounded-full font-medium">
+            Total: {categories.length}
+          </span>
+        </div>
+      </div>
+
+      {/* Form and Image side by side */}
+      <div className="flex gap-8 max-w-10xl mb-10">
+        {/* Your unchanged form */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-[#0f172a] p-6 rounded-lg max-w-3xl w-full"
+        >
+          <div className="mb-4">
+            <label className="block mb-1">Category Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-2 rounded-md bg-[#1e293b] text-white border border-gray-700 focus:ring-2 focus:ring-[#1de9b6]"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-1">Image (optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files[0])}
+              className="w-full px-4 py-2 rounded-md bg-[#0f172a] text-white border border-gray-700 focus:ring-2 focus:ring-[#1de9b6]"
+            />
+          </div>
+
+          <div className="flex gap-4">
+            <button
+              type="submit"
+              className="bg-[#1de9b6] text-black px-6 py-2 rounded hover:bg-[#13c7a6] transition"
+            >
+              {id ? "Update" : "Add"} Category
+            </button>
+            {id && (
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-500 transition"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
+
+        {/* Image to fill the empty space */}
+        <div className="flex items-center justify-center w-117 rounded-lg overflow-hidden shadow-lg bg-[#0f172a]">
+          <img
+            src="
+https://taylorwells.com.au/wp-content/uploads/2020/05/ING_19061_177314-1200x675.jpg"
+            alt="Category Management Illustration"
+            className="object-cover w-full h-64"
+          />
+        </div>
+      </div>
+
+      {/* Two-column layout: Category List + Donut Chart */}
+      <div className="grid md:grid-cols-2 gap-8">
+        {/* Category List Section */}
+        <div className="bg-[#1e293b] p-6 rounded-lg max-h-[500px] overflow-y-auto">
+          <h2 className="text-xl font-semibold mb-4 text-[#1de9b6]">
+            Existing Categories
+          </h2>
+          {categoriesWithCount.length > 0 ? (
+            categoriesWithCount.map((cat) => (
+              <div
+                key={cat._id}
+                className="flex justify-between items-center bg-[#0f172a] px-4 py-3 rounded-lg mb-3 hover:bg-[#131c31] transition"
+              >
+                <div className="flex items-center gap-4">
+                  {cat.image ? (
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="w-10 h-10 object-cover rounded-full"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center text-sm text-gray-300">
+                      ?
+                    </div>
+                  )}
+                  <span className="capitalize">{cat.name}</span>
+                  <span className="ml-3 text-sm text-gray-400">
+                    ({cat.productCount} products)
+                  </span>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleEdit(cat)}
+                    className="text-sm text-[#1de9b6] hover:underline"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(cat._id)}
+                    className="text-sm text-red-400 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-400">No categories found.</p>
+          )}
+        </div>
+
+        {/* Donut Chart Section */}
+        <div className="bg-[#1e293b] p-6 rounded-lg max-h-[500px]">
+          <h2 className="text-xl font-semibold mb-4 text-[#1de9b6]">
+            Product Distribution
+          </h2>
+          {chartSeries.length > 0 ? (
+            <Chart
+              type="donut"
+              width="100%"
+              height={320}
+              series={chartSeries}
+              options={{
+                labels: chartLabels,
+                colors: ["#1de9b6", "#f59e0b", "#3b82f6", "#10b981", "#f43f5e"],
+                legend: {
+                  show: true,
+                  position: "right",
+                  labels: {
+                    colors: "#fff",
+                    formatter: (val, opts) => {
+                      const index = opts.seriesIndex;
+                      const count = chartSeries[index];
+                      const percent = ((count / totalProducts) * 100).toFixed(
+                        1
+                      );
+                      return `${val} - ${percent}% (${count})`;
+                    },
+                  },
+                  markers: {
+                    width: 12,
+                    height: 12,
+                    radius: 6,
+                  },
+                  itemMargin: {
+                    horizontal: 10,
+                    vertical: 5,
+                  },
+                },
+                tooltip: {
+                  theme: "dark",
+                  y: {
+                    formatter: (val) => `${val} products`,
+                  },
+                },
+                dataLabels: {
+                  enabled: false,
+                },
+                stroke: {
+                  show: false,
+                },
+                plotOptions: {
+                  pie: {
+                    donut: {
+                      size: "65%",
+                      labels: {
+                        show: true,
+                        total: {
+                          show: true,
+                          label: "Total",
+                          fontSize: "16px",
+                          color: "#fff",
+                          formatter: () => totalProducts,
+                        },
+                      },
+                    },
+                  },
+                },
+              }}
+            />
+          ) : (
+            <p className="text-gray-400">No product data available.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CategoryManagement;

@@ -47,7 +47,20 @@ const ProductGridCard = ({ products }) => {
               </h3>
               <p className="text-sm text-gray-400">by {product.uploadedBy?.username}</p>
             </div>
-
+                {/* Price */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-lg font-bold text-emerald-600">
+                      ${product.price}
+                    </span>
+                    <span className="text-sm text-gray-500 line-through">
+                      ${product.originalPrice}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <i className="ri-eye-line">  {product.views?.length}</i>
+                </div>
             {/* Rating */}
             <div className="flex items-center space-x-1 mb-2">
               <Star className="h-4 w-4 text-yellow-400 fill-current" />

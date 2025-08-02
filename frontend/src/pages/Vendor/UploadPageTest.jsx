@@ -102,7 +102,7 @@ const UploadPageTest = () => {
     // formData.append("images", JSON.stringify(imagePaths));
     formData.append("images", JSON.stringify(imagePaths));
     // console.log("Form data being sent:",  formData);
-    
+
     try {
       let createdProduct;
       if (!product || !product._id) {
@@ -153,6 +153,9 @@ const UploadPageTest = () => {
 
   return (
     <div className="p-6 max-w-lg mx-auto">
+      <h2 className="text-2xl font-semibold text-white-800 mb-4">
+        Add Your Product
+      </h2>
       <form onSubmit={submitHandler} className="space-y-4">
         {/* Show existing product images if editing */}
         {product && product._id && (
