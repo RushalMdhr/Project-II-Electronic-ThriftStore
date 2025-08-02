@@ -15,7 +15,7 @@ const navItems = [
 
 const Sidebar = () => (
   <aside className="bg-[#10172a] text-white w-64 min-h-screen flex flex-col p-6">
-    <h2 className="text-2xl font-bold mb-8 text-[#1de9b6]">Vendor</h2>
+    <h2 className="text-2xl font-bold mb-8 text-[#1de9b6]">Seller</h2>
     <nav className="flex flex-col gap-2">
       {navItems.map((item) => (
         <NavLink
