@@ -4,21 +4,34 @@ import { toast } from "react-toastify";
 import { useLogoutMutation } from "../../redux/api/usersApiSlice";
 import { logout } from "../../redux/features/auth/authSlice";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import "remixicon/fonts/remixicon.css";
-
 
 const Navbar = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [logoutApiCall] = useLogoutMutation();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [search, setSearch] = useState("");
 
-  const logoutHandler = async (e) => {
+  const [search, setSearch] = useState("");
+  const [role, setRole] = useState(userInfo?.isVendor ? "seller" : "buyer");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const logoutHandler = async () => {
     try {
       await logoutApiCall().unwrap();
       dispatch(logout());
@@ -30,7 +43,6 @@ const Navbar = () => {
     }
   };
 
-  // Search submit handler
   const handleSearch = (e) => {
     e.preventDefault();
     if (search.trim()) {
@@ -40,14 +52,17 @@ const Navbar = () => {
       navigate("/products");
     }
   };
-  console.log("userInfo from Redux/localStorage", userInfo);
-  console.log("typeof userInfo.isVendor:", typeof userInfo?.isVendor);
 
+  // Handler to navigate to vendor register page and close dropdown
+  const handleBeSellerClick = () => {
+    setDropdownOpen(false);
+    navigate("/vendor/register");
+  };
 
-  // Spacer div to create space for the fixed navbar
   return (
     <>
       <div className="h-16 w-full" />
+
       <nav
         className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b ${
           userInfo?.isAdmin ? "bg-gray-900/80" : "bg-teal-900/90"
@@ -65,79 +80,86 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link
-                to="/"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
+            {/* Navigation Links */}
+            <div className="flex items-center space-x-8">
+              <Link to="/" className="text-gray-300 hover:text-white">
                 Home
               </Link>
-              <Link
-                to="/products"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Products
-              </Link>
-              <Link
-                to={userInfo?.isAdmin ? "/admin/categories" : "/categories"}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Categories
-              </Link>
+
+              {(role === "buyer" || !userInfo?.isVendor) &&
+                !userInfo?.isAdmin && (
+                  <>
+                    <Link
+                      to="/products"
+                      className="text-gray-300 hover:text-white"
+                    >
+                      Shop
+                    </Link>
+                    <Link
+                      to="/categories"
+                      className="text-gray-300 hover:text-white"
+                    >
+                      Categories
+                    </Link>
+                  </>
+                )}
+
               {userInfo?.isAdmin && (
-                <Link
-                  to="/admin"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  Admin Panel
-                </Link>
+                <>
+                  <Link
+                    to="/products"
+                    className="text-gray-300 hover:text-white"
+                  >
+                    Products
+                  </Link>
+                  <Link
+                    to="/admin/categories"
+                    className="text-gray-300 hover:text-white"
+                  >
+                    Categories
+                  </Link>
+                  <Link to="/admin" className="text-gray-300 hover:text-white">
+                    Admin Panel
+                  </Link>
+                </>
               )}
-              {userInfo && !userInfo.isAdmin ? (
-                userInfo.isVendor ? (
+
+              {/* Seller links */}
+              {role === "seller" &&
+                userInfo?.isVendor &&
+                !userInfo?.isAdmin && (
                   <>
                     <Link
                       to="/vendor/dashboard"
-                      className="text-gray-300 hover:text-white transition-colors"
+                      className="text-gray-300 hover:text-white"
                     >
                       Dashboard
                     </Link>
                     <Link
                       to="/vendor/upload"
-                      className="text-gray-300 hover:text-white transition-colors"
+                      className="text-gray-300 hover:text-white"
                     >
                       Upload
                     </Link>
                   </>
-                ) : (
-                  <Link
-                    to="/vendor/register"
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
-                    Vendors
-                  </Link>
-                )
-              ) : null}
+                )}
             </div>
 
             {/* Search Bar */}
             <form
-              className="hidden md:flex items-center flex-1 max-w-md mx-8"
+              className="flex items-center flex-1 max-w-md mx-8"
               onSubmit={handleSearch}
             >
               <div className="relative w-full">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <button type="submit" className="focus:outline-none">
-                    <i className="ri-search-line"></i>
+                  <button type="submit" aria-label="Search">
+                    <i className="ri-search-line" />
                   </button>
                 </span>
                 <Input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSearch(e);
-                  }}
                   placeholder="Search for products..."
                   className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-400"
                 />
@@ -146,29 +168,106 @@ const Navbar = () => {
 
             {/* Right Side Icons */}
             <div className="flex items-center space-x-4">
-              
-              <Link
-                to="/cart"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
+              <Link to="/cart">
                 <Button
                   variant="ghost"
                   size="icon"
                   className="text-gray-300 hover:text-white"
+                  aria-label="Cart"
                 >
-                  <i className="ri-shopping-cart-line text-xl"></i>
+                  <i className="ri-shopping-cart-line text-xl" />
                 </Button>
               </Link>
+
+              {/* Vendor user: Buyer/Seller toggle */}
+              {userInfo && userInfo.isVendor && !userInfo.isAdmin && (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="text-gray-300 hover:text-white flex items-center gap-1"
+                    aria-haspopup="true"
+                    aria-expanded={dropdownOpen}
+                    type="button"
+                  >
+                    {role === "seller" ? "Seller" : "Buyer"} <span>▾</span>
+                  </button>
+
+                  {dropdownOpen && (
+                    <div className="absolute mt-2 w-32 bg-white text-black rounded shadow-md z-50">
+                      <button
+                        onClick={() => {
+                          setRole("buyer");
+                          setDropdownOpen(false);
+                        }}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                        type="button"
+                      >
+                        Buyer
+                      </button>
+                      <button
+                        onClick={() => {
+                          setRole("seller");
+                          setDropdownOpen(false);
+                        }}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                        type="button"
+                      >
+                        Seller
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Non-vendor user: Buyer + Be a Seller option */}
+              {userInfo && !userInfo.isVendor && !userInfo.isAdmin && (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="text-gray-300 hover:text-white flex items-center gap-1"
+                    aria-haspopup="true"
+                    aria-expanded={dropdownOpen}
+                    type="button"
+                  >
+                    Buyer <span>▾</span>
+                  </button>
+
+                  {dropdownOpen && (
+                    <div className="absolute mt-2 w-40 bg-white text-black rounded shadow-md z-50">
+                      {/* Just text Buyer */}
+                      <div className="px-4 py-2 text-left cursor-default text-gray-700 select-none">
+                        Buyer
+                      </div>
+                      {/* Be a Seller link */}
+                      <button
+                        onClick={handleBeSellerClick}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                        type="button"
+                      >
+                        Be a Seller
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {userInfo ? (
                 <>
-                  <Link to="/profile">
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-2 text-gray-300 hover:text-white"
+                  >
                     <Button
                       variant="ghost"
                       size="icon"
                       className="text-gray-300 hover:text-white"
+                      aria-label="Profile"
                     >
-                      <i className="ri-user-line text-xl">{userInfo.username}</i>
+                      <i className="ri-user-line text-xl" />
                     </Button>
+                    <span className="hidden sm:inline">
+                      {userInfo.username}
+                    </span>
                   </Link>
                   <Button
                     variant="ghost"
@@ -176,8 +275,9 @@ const Navbar = () => {
                     className="text-gray-300 hover:text-white"
                     onClick={logoutHandler}
                     title="Logout"
+                    aria-label="Logout"
                   >
-                    <i className="ri-logout-box-line text-xl"></i>
+                    <i className="ri-logout-box-line text-xl" />
                   </Button>
                 </>
               ) : (
@@ -186,128 +286,14 @@ const Navbar = () => {
                     variant="ghost"
                     size="icon"
                     className="text-gray-300 hover:text-white"
+                    aria-label="Login"
                   >
-                    <i className="ri-login-circle-line text-xl"></i>
+                    <i className="ri-login-circle-line text-xl" />
                   </Button>
                 </Link>
               )}
-              {/* Mobile Menu Button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden text-gray-300 hover:text-white"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                aria-label="Toggle menu"
-              >
-                <i
-                  className={`ri-${
-                    isMenuOpen ? "close-line" : "menu-line"
-                  } text-xl`}
-                ></i>
-              </Button>
             </div>
           </div>
-
-          {/* Mobile Menu */}
-          {isMenuOpen && (
-            <div className="md:hidden py-4 border-t border-gray-800">
-              <div className="flex flex-col space-y-4">
-                <form onSubmit={handleSearch} className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    <button type="submit" className="focus:outline-none">
-                      <i className="ri-search-line"></i>
-                    </button>
-                  </span>
-                  <Input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleSearch(e);
-                    }}
-                    placeholder="Search for products..."
-                    className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400"
-                  />
-                </form>
-                <Link
-                  to="/"
-                  className="text-gray-300 hover:text-white transition-colors py-2"
-                >
-                  Home
-                </Link>
-                <Link
-                  to="/admin/productcard"
-                  className="text-gray-300 hover:text-white transition-colors py-2"
-                >
-                  Products
-                </Link>
-                <Link
-                  to="/admin/categories"
-                  className="text-gray-300 hover:text-white transition-colors py-2"
-                >
-                  Categories
-                </Link>
-                {userInfo?.isAdmin && (
-                  <Link
-                    to="/admin"
-                    className="text-gray-300 hover:text-white transition-colors py-2"
-                  >
-                    Admin Panel
-                  </Link>
-                )}
-                {userInfo && userInfo.isVendor ? (
-                  <>
-                    <Link
-                      to="/vendor/dashboard"
-                      className="text-gray-300 hover:text-white transition-colors py-2"
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      to="/vendor/upload"
-                      className="text-gray-300 hover:text-white transition-colors py-2"
-                    >
-                      Upload
-                    </Link>
-                  </>
-                ) : (
-                  <Link
-                    to="/vendor/register"
-                    className="text-gray-300 hover:text-white transition-colors py-2"
-                  >
-                    Vendors
-                  </Link>
-                )}
-                <Link
-                  to="#"
-                  className="text-gray-300 hover:text-white transition-colors py-2"
-                >
-                  Blog
-                </Link>
-                {userInfo ? (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-gray-300 hover:text-white"
-                    onClick={logoutHandler}
-                    title="Logout"
-                  >
-                    <i className="ri-logout-box-line text-xl"></i>
-                  </Button>
-                ) : (
-                  <Link to="/login">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-gray-300 hover:text-white"
-                    >
-                      <i className="ri-login-circle-line text-xl"></i>
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </nav>
     </>
