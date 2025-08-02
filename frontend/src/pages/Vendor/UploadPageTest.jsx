@@ -232,7 +232,7 @@ const UploadPageTest = () => {
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="w-full border rounded px-3 py-2"
+          className="w-full border rounded px-3 py-2 bg-gray-700"
         >
           <option value="">Select Category</option>
           {categories.map((category) => (
@@ -251,7 +251,7 @@ const UploadPageTest = () => {
         <select
           value={condition}
           onChange={(e) => setCondition(e.target.value)}
-          className="w-full border rounded px-3 py-2"
+          className="w-full border rounded px-3 py-2 bg-gray-700"
         >
           <option value="">Select Condition</option>
           <option value="Brand New">Brand New</option>
