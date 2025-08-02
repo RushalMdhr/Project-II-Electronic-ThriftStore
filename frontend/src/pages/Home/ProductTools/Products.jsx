@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { use, useEffect } from 'react';
 import ProductGrid from './ProductGrid';
 import { useGetProductsQuery } from '../../../redux/api/productsApiSlice';
 import { useLocation, useSearchParams } from 'react-router';
@@ -11,7 +11,8 @@ const Products = () => {
   const { state } = useLocation();
   const searched = state?.Search || null; // Handle case where no product is provided
   console.log(searched)
-
+  const { userInfo } = useSelector((state) => state.auth);
+  console.log( "userInfo",userInfo?.isAdmin);  
   const {
     data: productPage = [],
     isLoading,
@@ -34,7 +35,7 @@ const Products = () => {
       setSearchParams({ page: pageNum });
     }
   };
-const { userInfo } = useSelector((state) => state.auth);
+
   return (
     <div>
       Count : {productPage.count || 0}

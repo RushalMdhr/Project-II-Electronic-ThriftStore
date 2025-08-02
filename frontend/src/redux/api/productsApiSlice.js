@@ -91,6 +91,14 @@ export const productApiSlice = apiSlice.injectEndpoints({
         url : `${PRODUCT_URL}/${productId}/views`,
         method : "PUT",
       })
+    }),
+
+    reportProduct : builder.mutation({
+      query : ({reason,productId})=>({
+        url : `${PRODUCT_URL}/${productId}/reported`,
+        method: "POST",
+        body: {reason},
+      })
     })
   }),
 });
@@ -108,5 +116,6 @@ export const {
   useGetNewProductsQuery,
   useUploadProductImageMutation,
   useGetMyProductsQuery,
-  useIncreaseViewCountMutation
+  useIncreaseViewCountMutation,
+  useReportProductMutation
 } = productApiSlice;
