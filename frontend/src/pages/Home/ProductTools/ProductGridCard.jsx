@@ -70,7 +70,7 @@ const ProductGridCard = ({ products }) => {
 
             {/* Views */}
             <div className="text-gray-400 text-sm mb-3">
-              👁 Views: {product.views?.length}
+              Views: {product.views?.length}
             </div>
 
             {/* Add to Cart Button */}
