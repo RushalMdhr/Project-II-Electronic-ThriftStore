@@ -1,16 +1,20 @@
 import React from "react";
 import { useAddToCartMutation } from "../../../redux/api/cartApiSlice";
 import { useUserId } from "../../../components/UserProvider";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 // added a buttons
 
 const AddToCart = ({ productId, disabled }) => {
   const userId = useUserId();
   const [addToCart, { isLoading }] = useAddToCartMutation();
+  const navigate = useNavigate();
 
   const handleClick = async () => {
     if (!userId) {
-      alert("Please login first");
+      toast.error("Please login first");
+      navigate("/login")
       return;
     }
 
