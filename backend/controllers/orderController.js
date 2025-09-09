@@ -7,43 +7,51 @@ import mongoose from "mongoose";
 // @route   POST /api/orders
 // @access  Private
 const createOrder = asyncHandler(async (req, res) => {
-  console.log("hello world from buy")
+  console.time('createOrder')
+
   const { orderItems } = req.body;
-  console.log(orderItems);
+  console.log(orderItems)
+
+  if (!orderItems || orderItems.length === 0) {
+    return res.status(400).json({ error: "No order items" });
+  }
+
   try {
+    const validatedItems = await Promise.all(orderItems.map(async (items) => {
+      const productDoc = await Product.findById(items.productId)
+      if (!productDoc) {
+        throw new Error("Product not found");
+      }
+      if (productDoc.countInStock < items.quantity) {
+        throw new Error(`Not enough stock for ${productDoc.name}`);
+      }
+      return {
+        // ...items,
+        product: productDoc._id,
+        vendor: productDoc.uploadedBy,
+        quantity: items.quantity,
+        // product: ObjectId(items.productId),
+        // vendor: ObjectId(items.vendor),
+        // quantity: items.quantity,
 
-    if (!orderItems || orderItems.length === 0) {
-      res.status(400);
-      throw new Error("No order items");
-    }
-    // Calculate total price by fetching each product's price and multiplying by quantity
-    const itemsPrice = (
-      await Promise.all(
-        orderItems.map(async (item) => {
-          console.log("mappin")
-          const productDoc = await Product.findById(item.productId);
-          if (!productDoc){
-            console.error("product not found")
-          }
-          if(productDoc.countInStock<item.quantity){
-            console.log("quantity above stock")
-            return res.send({error : "quantity above stock"})
-          }
-          return productDoc.price * item.quantity;
-        })
-      )
-    ).reduce((acc, price) => acc + price, 0);
-console.log('working')
-    console.log('Total items price:', itemsPrice,);
-    console.log(itemsPrice)
+        price: productDoc.price,
+      }
+    }))
+    console.log(validatedItems)
 
-    const newOrder = new Order({ customer: req.user._id, orderItems, total_price: itemsPrice })
-    // console.log("creating order : ", newOrder);
+    const newOrder = new Order({
+      customer: req.user._id,
+      orderItems: validatedItems,
+    });
+    console.log("new now 2", newOrder);
+
     const orderCreated = await newOrder.save();
-    console.log("orderCreated : ", orderCreated);
-    res.send(orderCreated)
+    console.timeEnd('createOrder')
+
+    res.status(201).json(orderCreated);
   } catch (error) {
-    console.log('error', error)
+    console.error("Order creation failed:", error);
+    res.status(500).json({ error: "Server error creating order" });
   }
 });
 
@@ -51,9 +59,9 @@ console.log('working')
 // @route   GET /api/orders/myorders
 // @access  Private
 const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ customer : req.user._id })
+  const orders = await Order.find({ customer: req.user._id })
     .populate({
-      path: 'orderItems.productId',
+      path: 'orderItems.product',
       model: 'Product',
     });
 
@@ -124,14 +132,14 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
   }
 });
 
-console.time("getSoldOrders");
 const getSoldOrders = asyncHandler(async (req, res) => {
+  console.time("getSoldOrders");
   try {
-    const vendorObjectId = new mongoose.Types.ObjectId(req.user.id);
+    const vendorObjectId = req.user._id
 
     const Ordered = await Order.aggregate([
       // Step 1: match only orders that include this vendor
-      { $match: { "orderItems.vendorId": vendorObjectId } },
+      { $match: { "orderItems.vendor": vendorObjectId } },
 
       // Step 2: project only customer + filtered vendor items
       {
@@ -141,12 +149,14 @@ const getSoldOrders = asyncHandler(async (req, res) => {
             $filter: {
               input: "$orderItems",
               as: "item",
-              cond: { $eq: ["$$item.vendorId", vendorObjectId] }
+              cond: { $eq: ["$$item.vendor", vendorObjectId] }
             }
           }
         }
       }
     ]);
+    console.timeEnd("getSoldOrders");
+
 
     res.status(200).json(Ordered);
   } catch (error) {
@@ -154,7 +164,6 @@ const getSoldOrders = asyncHandler(async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
-console.timeEnd("getSoldOrders");
 
 export {
   createOrder,

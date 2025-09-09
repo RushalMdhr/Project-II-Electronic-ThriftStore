@@ -5,13 +5,10 @@ import fs from "fs";
 import path from "path";
 
 const createProduct = asyncHandler(async (req, res) => {
+  console.time('createProduct')
   try {
-    // const images = Array.isArray(JSON.parse(req.fields["images"]))
-    //   ? req.fields["images[]"]
-    //   : [req.fields["images[]"]];
-
     const images = JSON.parse(req.fields["images"] || "[]");
-    console.log("images ; ", images)
+    console.log("images : ", images)
     const { name, description, price, category, quantity, brand } = req.fields;
     switch (true) {
       case !name:
@@ -38,6 +35,7 @@ const createProduct = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Server error", message: error.message });
   }
+  console.timeEnd('createProduct')
 });
 
 const getAllProducts = asyncHandler(async (req, res) => {
@@ -58,41 +56,35 @@ const getAllProducts = asyncHandler(async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 });
-
 const updateProductDetails = asyncHandler(async (req, res) => {
+  console.time("updateProductDetails");
+
   try {
-    const { name, description, price, category, quantity, brand } = req.fields;
-    //validation
-    switch (true) {
-      case !name:
-        return res.json({ error: "name is required" });
-      case !brand:
-        return res.json({ error: "brand is required" });
-      case !description:
-        return res.json({ error: "description is required" });
-      case !price:
-        return res.json({ error: "price is required" });
-      case !category:
-        return res.json({ error: "category is required" });
-    }
+    const updates = req.fields; // dynamic updates from client
 
     const product = await Product.findById(req.params.productId);
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
-    const oldCategory = product.category.toString();
-    // Update product fields
-    Object.assign(product, req.fields);
+
+    const oldCategory = product.category?.toString();
+
+    // update only provided fields
+    Object.assign(product, updates);
     await product.save();
-    // If category changed, update counts
-    if (req.fields.category && req.fields.category !== oldCategory) {
+
+    // if category changed, adjust counts
+    if (updates.category && updates.category !== oldCategory) {
       await Category.findByIdAndUpdate(oldCategory, { $inc: { used: -1 } });
-      await Category.findByIdAndUpdate(req.fields.category, { $inc: { used: 1 } });
+      await Category.findByIdAndUpdate(updates.category, { $inc: { used: 1 } });
     }
+    console.timeEnd("updateProductDetails");
+
     res.json(product);
+
   } catch (error) {
     console.error(error);
-    res.status(400).json(error.message);
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -380,17 +372,17 @@ const reportProduct = asyncHandler(async (req, res) => {
     if (alreadyReported) {
       return res.status(400).json({ error: "You have already reported this product." });
     }
-      // ...existing code for reporting (add report logic here)
-      const { reason } = req.body;
-      if (!reason || reason.trim() === "") {
-        return res.status(400).json({ error: "Reason is required" });
-      }
-      product.reported.push({
-        user: req.user._id,
-        reason: reason.trim()
-      })
-      res.send(product);
-      await product.save();
+    // ...existing code for reporting (add report logic here)
+    const { reason } = req.body;
+    if (!reason || reason.trim() === "") {
+      return res.status(400).json({ error: "Reason is required" });
+    }
+    product.reported.push({
+      user: req.user._id,
+      reason: reason.trim()
+    })
+    res.send(product);
+    await product.save();
 
 
   } catch (error) {
