@@ -1,59 +1,65 @@
 import asyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
+import mongoose from "mongoose";
 
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
 const createOrder = asyncHandler(async (req, res) => {
-  console.log("hello world from buy")
+  console.time('createOrder')
+
   const { orderItems } = req.body;
-  console.log(orderItems);
+  console.log(orderItems)
 
   if (!orderItems || orderItems.length === 0) {
-    res.status(400);
-    throw new Error("No order items");
+    return res.status(400).json({ error: "No order items" });
   }
-  // Calculate total price by fetching each product's price and multiplying by quantity
-  const itemsPrice = (
-    await Promise.all(
-      orderItems.map(async (item) => {
-        console.log("mappin")
-        const productDoc = await Product.findById(item.product);
-        if (!productDoc) throw new Error("Product not found");
-        return productDoc.price * item.quantity;
-      })
-    )
-  ).reduce((acc, price) => acc + price, 0);
 
-  console.log('Total items price:', itemsPrice,);
-  console.log(itemsPrice)
+  try {
+    const validatedItems = await Promise.all(orderItems.map(async (items) => {
+      const productDoc = await Product.findById(items.productId)
+      if (!productDoc) {
+        throw new Error("Product not found");
+      }
+      if (productDoc.countInStock < items.quantity) {
+        throw new Error(`Not enough stock for ${productDoc.name}`);
+      }
+      return {
+        // ...items,
+        product: productDoc._id,
+        vendor: productDoc.uploadedBy,
+        quantity: items.quantity,
+        // product: ObjectId(items.productId),
+        // vendor: ObjectId(items.vendor),
+        // quantity: items.quantity,
 
-  const newOrder = new Order({ user: req.user._id, orderItems, total_price: itemsPrice })
-  console.log("creating order : ", newOrder);
-  const orderCreated = await newOrder.save();
-  console.log("orderCreated : ",orderCreated)
+        price: productDoc.price,
+      }
+    }))
+    console.log(validatedItems)
 
-  // console.log(itemsPrice);
-  // const order = new Order({
-  //   user: req.user._id,
-  //   orderItems,
+    const newOrder = new Order({
+      customer: req.user._id,
+      orderItems: validatedItems,
+    });
+    console.log("new now 2", newOrder);
 
-  // });
+    const orderCreated = await newOrder.save();
+    console.timeEnd('createOrder')
 
-  // const createdOrder = await order.save();
-
-  // console.log("Order created:", createdOrder._id); // DEBUG
-
-  // res.status(201).json(createdOrder);
-
+    res.status(201).json(orderCreated);
+  } catch (error) {
+    console.error("Order creation failed:", error);
+    res.status(500).json({ error: "Server error creating order" });
+  }
 });
 
 // @desc    Get logged in user's orders
 // @route   GET /api/orders/myorders
 // @access  Private
 const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ user: req.user._id })
+  const orders = await Order.find({ customer: req.user._id })
     .populate({
       path: 'orderItems.product',
       model: 'Product',
@@ -126,6 +132,39 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
   }
 });
 
+const getSoldOrders = asyncHandler(async (req, res) => {
+  console.time("getSoldOrders");
+  try {
+    const vendorObjectId = req.user._id
+
+    const Ordered = await Order.aggregate([
+      // Step 1: match only orders that include this vendor
+      { $match: { "orderItems.vendor": vendorObjectId } },
+
+      // Step 2: project only customer + filtered vendor items
+      {
+        $project: {
+          customer: 1,
+          orderItems: {
+            $filter: {
+              input: "$orderItems",
+              as: "item",
+              cond: { $eq: ["$$item.vendor", vendorObjectId] }
+            }
+          }
+        }
+      }
+    ]);
+    console.timeEnd("getSoldOrders");
+
+
+    res.status(200).json(Ordered);
+  } catch (error) {
+    console.error("Error fetching sold orders:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
 export {
   createOrder,
   getMyOrders,
@@ -133,4 +172,5 @@ export {
   getOrderById,
   updateOrderToPaid,
   updateOrderToDelivered,
+  getSoldOrders
 };

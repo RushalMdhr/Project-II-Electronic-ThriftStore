@@ -1,74 +1,91 @@
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Schema.Types;
 
-const orderSchema = mongoose.Schema(
-  {
-    user: {
-      type: ObjectId,
-      required: true,
-      ref: "User",
-    },
-    orderItems: [ 
-      {
-        product: {
-          type: ObjectId,
-          ref: "Product",
-          required: true,
-        }, 
-        quantity: {
-          type: Number,
-          required: true,
-          min: 1,
-          // max : instock
-        },
-      },
-    ],
-  //   shippingAddress: {
-  //     address: { type: String, required: true },
-  //     city: { type: String, required: true },
-  //     postalCode: { type: String, required: true },
-  //     country: { type: String, required: true },
-  //   },
-  //   paymentMethod: {
-  //     type: String,
-  //     required: true,
-  //   },
-  //   paymentResult: {
-  //     id: { type: String },
-  //     status: { type: String },
-  //     update_time: { type: String },
-  //     email_address: { type: String },
-  //   },
-  //   totalPrice: {
-  //     type: Number,
-  //     required: true,
-  //   },
-  //   isPaid: {
-  //     type: Boolean,
-  //     default: false,
-  //   },
-  //   paidAt: {
-  //     type: Date,
-  //   },
-  //   isDelivered: {
-  //     type: Boolean,
-  //     default: false,
-  //   },
-  //   deliveredAt: {
-  //     type: Date,
-  //   },
-  total_price:{
-    type: Number,
-    required: true,
-    default: 0,
+// const OrderSchema = new mongoose.Schema(
+//   {
+//     customer: {
+//       type: ObjectId,
+//       required: true,
+//       ref: "User",
+//     },
+//     orderItems: [
+//       {
+//         productId : {
+//           type: ObjectId,
+//           ref: "Product",
+//           required: true,
+//         },
+//         vendorId : {
+//           type: ObjectId,
+//           ref: "User",
+//           required: true,
+//         },
+//         quantity: {
+//           type: Number,
+//           required: true,
+//           min: 1,
+//           // max : instock
+//         },
+//       },
+//     ],
+//     total_price: {
+//       type: Number,
+//       required: true,
+//       default: 0,
+//     },
+//     status: {
+//       type: String,
+//       enum: ['pending', 'paid', 'shipped', 'delivered', 'cancelled'],
+//       default: 'pending',
+//     }
+//   },
+//   { timestamps: true }
+// );
+const OrderSchema = new mongoose.Schema({
+  customer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  orderItems: [{
+    product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+    vendor: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    quantity: { type: Number, required: true, min: 1 },
+    price: { type: Number, required: true }
+  }],
+  subtotal: { type: Number, default: 0 },
+  shipping: { type: Number, default: 0 },
+  tax: { type: Number, default: 0 },
+  total: { type: Number, default: 0 },
+  status: {
+    type: String,
+    enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'],
+    default: 'pending'
   },
-  completed : {
-    type: Boolean,
-    default: false,
-  }
+  shippingAddress: {
+    name: String,
+    street: String,
+    city: String,
+    state: String,
+    zipCode: String,
+    country: String,
+    phone: String
   },
-  { timestamps: true }
-);
+  payment: {
+    method: { type: String, enum: ['card', 'cod', 'esewa'], required: true , default:'cod'},
+    status: { type: String, enum: ['pending', 'paid', 'failed', 'refunded'], default: 'pending' },
+    transactionId: String,
+    paidAt: Date
+  },
+  deliveredAt: Date
+}, { timestamps: true });
 
-const Order = mongoose.model("Order", orderSchema);
+// Auto-calc subtotal, tax, total
+OrderSchema.pre('save', function (next) {
+  this.subtotal = this.orderItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  if (!this.shipping) this.shipping = 100; // default shipping
+  if (!this.tax) this.tax = this.subtotal * 0.13; // 13% VAT
+  this.total = this.subtotal + this.shipping + this.tax;
+  next();
+});
+
+OrderSchema.index({ "items.vendorId": 1 });
+
+const Order = mongoose.model("Order", OrderSchema);
 export default Order;

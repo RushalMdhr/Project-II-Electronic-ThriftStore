@@ -1,15 +1,25 @@
 import User from "../models/userModel.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import createToken from "../utils/createToken.js";
 import mongoose from "mongoose";
+import Joi from "joi";
 
-const SECRET_KEY = "bgtery";
+// const SECRET_KEY = "bgtery";
 // salt is random
 
 const createUser = asyncHandler(async (req, res) => {
   console.log("req.body:", req.body); // Debug log to see incoming data
+  const schema = Joi.object({
+    username: Joi.string().min(3).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
