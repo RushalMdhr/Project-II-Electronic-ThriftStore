@@ -18,6 +18,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js"; 
 import orderRoutes from "./routes/orderRoutes.js";
 import cartitemRoutes from "./routes/cartitemRoutes.js";
+import esewaRoutes from "./routes/esewaRoutes.js"
 
 
 //db connection
@@ -45,6 +46,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/cart",cartitemRoutes);
+app.use("/api/esewa",esewaRoutes);
 
 
 // __________________IMAGE________________________________________
