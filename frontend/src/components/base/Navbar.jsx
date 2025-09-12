@@ -90,7 +90,10 @@ const Navbar = () => {
 
             {/* Navigation Links */}
             <div className="flex items-center space-x-8">
-              <Link to="/" className="text-gray-300 hover:text-white">
+              <Link to="/"
+                className="text-gray-300 hover:text-white"
+                onClick={() => dispatch(setRole("buyer"))}
+              >
                 Home
               </Link>
 
