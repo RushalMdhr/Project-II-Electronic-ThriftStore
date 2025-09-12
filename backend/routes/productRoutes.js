@@ -24,9 +24,10 @@ const router = express.Router();
 
 router.route("/:productId/reported").post(authenticate, reportProduct);
 
-router.route("/:productId/views").put(isAuthenticated, increaseViewCount);
+// router.route("/getmyproducts/:vendorId").get(authenticate, getMyProducts); 
+router.get("/getmyproducts/:vendorId",authenticate, getMyProducts)
 
-router.route("/getmyproducts").get(authenticate, authorizeVendor, getMyProducts);
+router.route("/:productId/views").put(isAuthenticated, increaseViewCount);
 
 router.route("/allproducts").get(getAllProducts);
 
