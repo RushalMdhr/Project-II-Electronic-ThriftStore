@@ -20,10 +20,10 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-    useEffect(() => {
-      // Redirect to home page on reload/app start
-      navigate("/");
-    }, [navigate]);
+  useEffect(() => {
+    // Redirect to home page on reload/app start
+    navigate("/");
+  }, [navigate]);
 
 
   // Close dropdown if clicked outside
@@ -70,15 +70,17 @@ const Navbar = () => {
       <div className="h-16 w-full" />
 
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b ${
-          userInfo?.isAdmin ? "bg-gray-900/80" : "bg-teal-900/90"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b ${userInfo?.isAdmin ? "bg-gray-900/80" : "bg-teal-900/90"
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center mr-8">
-              <Link to="/" className="flex items-center space-x-2">
+              <Link to="/"
+                className="flex items-center space-x-2"
+                onClick={() => dispatch(setRole("buyer"))}
+              >
                 <div className="text-2xl font-bold text-emerald-400">
                   Thrift
                 </div>
@@ -88,7 +90,10 @@ const Navbar = () => {
 
             {/* Navigation Links */}
             <div className="flex items-center space-x-8">
-              <Link to="/" className="text-gray-300 hover:text-white">
+              <Link to="/"
+                className="text-gray-300 hover:text-white"
+                onClick={() => dispatch(setRole("buyer"))}
+              >
                 Home
               </Link>
 
