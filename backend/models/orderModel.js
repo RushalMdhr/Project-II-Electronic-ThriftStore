@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-const { ObjectId } = mongoose.Schema.Types;
+// const { ObjectId } = mongoose.Schema.Types;
 
 // const OrderSchema = new mongoose.Schema(
 //   {
@@ -68,7 +68,7 @@ const OrderSchema = new mongoose.Schema({
     phone: String
   },
   payment: {
-    method: { type: String, enum: ['card', 'cod', 'esewa'], required: true , default:'cod'},
+    method: { type: String, enum: ['cod', 'esewa'], required: true , default:'cod'},
     status: { type: String, enum: ['pending', 'paid', 'failed', 'refunded'], default: 'pending' },
     transactionId: String,
     paidAt: Date
