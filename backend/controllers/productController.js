@@ -136,7 +136,8 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
     // Search keyword
     let dbFilter = {};
-    const keyword  = req.query.keyword.trim()
+    const keyword = (req.query.keyword || "").trim();
+
 
     if(keyword.length>0 && keyword.length<4){
       return res.status(400).send("atleast keyword of size 4 required")
