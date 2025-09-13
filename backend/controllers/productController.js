@@ -56,6 +56,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 });
+
 const updateProductDetails = asyncHandler(async (req, res) => {
   console.time("updateProductDetails");
 
@@ -135,15 +136,19 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
     // Search keyword
     let dbFilter = {};
+    const keyword  = req.query.keyword.trim()
 
+    if(keyword.length>0 && keyword.length<4){
+      return res.status(400).send("atleast keyword of size 4 required")
+    }
     if (req.query.productId) {
       dbFilter._id = { $ne: req.query.productId }
     }
     // Only add search if keyword is present and not empty
-    if (req.query.keyword !== "null" && typeof req.query.keyword === "string" && req.query.keyword.trim().length > 0) {
-      console.log(req.query.keyword, "keyword")
-      dbFilter.name = { $regex: req.query.keyword, $options: "i" };
+    if (keyword !== "null" && typeof keyword === "string") {
+      dbFilter.name = { $regex: keyword, $options: "i" };
     }
+    console.log(keyword, "keyword")
 
     // Exclude own products only if logged in as vendor
     if (req.user !== null && req.user.isVendor) {
@@ -152,7 +157,6 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
     const count = await Product.countDocuments(dbFilter);
     const products = await Product.find(dbFilter)
-      .populate("uploadedBy", "name") // <-- Populate vendor name here
       .sort({ createdAt: -1 })
       .limit(pageSize)
       .skip(pageSize * (page - 1))
@@ -311,17 +315,11 @@ const fetchGroupedProducts = asyncHandler(async (req, res) => {
 
 const getMyProducts = asyncHandler(async (req, res) => {
   try {
-
-    const id = req.user._id;
-
-    console.log(id)
-    // const myProducts = await Product.UploadedBy.find({  id})
-    const myProducts = await Product.find({ uploadedBy: id }).populate(
+    const { vendorId } = req.params;
+    const myProducts = await Product.find({ uploadedBy: vendorId }).populate(
       "category"
     );
-    // .populate('category', 'name');
     res.send(myProducts);
-    console.log("getting your products");
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }

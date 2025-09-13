@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import mongoose from "mongoose";
+import { Transaction } from "../models/esewaModel.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -9,14 +10,52 @@ import mongoose from "mongoose";
 const createOrder = asyncHandler(async (req, res) => {
   console.time('createOrder')
 
-  const { orderItems } = req.body;
-  console.log(orderItems)
+  const { orderItems, method, paymentId } = req.body;
 
   if (!orderItems || orderItems.length === 0) {
     return res.status(400).json({ error: "No order items" });
   }
 
   try {
+    // const statusMap = {
+    //   'PENDING': 'pending',
+    //   'COMPLETE': 'paid',
+    //   'FAILED': 'failed',
+    //   'REFUNDED': 'refunded'
+    // };
+    let status
+
+    if (!['cod', 'esewa'].includes(method)) {
+      return res.status(400).send('invalid method')
+    }
+    if (method == 'esewa') {
+      const esewaPayment = await Transaction.findById(paymentId);
+      if (!esewaPayment) return res.status(404).send("esewa payment not found !")
+      console.log(esewaPayment)
+      switch (esewaPayment.status) {
+        case "COMPLETE":
+          status = 'paid'
+          break;
+
+        case "PENDING":
+          return res.status(400).json({
+            error: "Payment still processing. Please wait or try again."
+          });
+
+        case "FAILED":
+          return res.status(400).json({
+            error: "Payment failed. Please try again."
+          });
+
+        case "REFUNDED":
+          return res.status(400).json({
+            error: "Payment was refunded. Cannot create order."
+          });
+
+        default:
+          return res.status(400).json({ error: "Unknown payment status" });
+      }
+    }
     const validatedItems = await Promise.all(orderItems.map(async (items) => {
       const productDoc = await Product.findById(items.productId)
       if (!productDoc) {
@@ -26,14 +65,9 @@ const createOrder = asyncHandler(async (req, res) => {
         throw new Error(`Not enough stock for ${productDoc.name}`);
       }
       return {
-        // ...items,
         product: productDoc._id,
         vendor: productDoc.uploadedBy,
         quantity: items.quantity,
-        // product: ObjectId(items.productId),
-        // vendor: ObjectId(items.vendor),
-        // quantity: items.quantity,
-
         price: productDoc.price,
       }
     }))
@@ -42,11 +76,16 @@ const createOrder = asyncHandler(async (req, res) => {
     const newOrder = new Order({
       customer: req.user._id,
       orderItems: validatedItems,
+      payment: {
+        method: method,
+        status: status
+      }
     });
     console.log("new now 2", newOrder);
 
     const orderCreated = await newOrder.save();
     console.timeEnd('createOrder')
+
 
     res.status(201).json(orderCreated);
   } catch (error) {
@@ -114,6 +153,23 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
   }
 });
 
+const updateOrderStatus = asyncHandler(async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+    const { status } = req.body;
+    if (!['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'].includes(status) | order.status === status) {
+      return res.status(400).json({ error: 'Invalid status' })
+    }
+    order.status = status;
+    order.save();
+    res.send(order)
+  } catch (error) {
+    res.status(500).send('error', error)
+  }
+
+
+})
+
 // @desc    Update order to delivered
 // @route   PUT /api/orders/:id/deliver
 // @access  Private/Admin
@@ -171,6 +227,7 @@ export {
   getOrders,
   getOrderById,
   updateOrderToPaid,
+  updateOrderStatus,
   updateOrderToDelivered,
   getSoldOrders
 };
