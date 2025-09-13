@@ -81,7 +81,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         url: `${USERS_URL}/profile`,
         method: "GET",
       }),
-    }),
+  }),
   }),
 });
 
