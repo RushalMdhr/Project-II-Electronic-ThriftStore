@@ -1,27 +1,31 @@
-import React, { use, useEffect } from 'react';
-import ProductGrid from './ProductGrid';
-import { useGetProductsQuery } from '../../../redux/api/productsApiSlice';
-import { useLocation, useSearchParams } from 'react-router';
+import React, { use, useEffect } from "react";
+import ProductGrid from "./ProductGrid";
+import { useGetProductsQuery } from "../../../redux/api/productsApiSlice";
+import { useLocation, useSearchParams } from "react-router";
 import { useSelector } from "react-redux";
-import { toast } from 'react-toastify';
-import {ChevronLeft, ChevronRight} from "lucide-react";
+import { toast } from "react-toastify";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentPage = Number(searchParams.get('page')) || 1;
+  const currentPage = Number(searchParams.get("page")) || 1;
   const { state } = useLocation();
   const searched = state?.Search || null; // Handle case where no product is provided
-  console.log(searched)
+  console.log(searched);
   const { userInfo } = useSelector((state) => state.auth);
-  console.log( "userInfo",userInfo?.isAdmin);  
+  console.log("userInfo", userInfo?.isAdmin);
   const {
     data: productPage = [],
     isLoading,
     isError,
     refetch,
   } = useGetProductsQuery({ page: currentPage, keyword: searched });
-  console.log("respond", productPage)
+  console.log("product page ; ", productPage);
+
   useEffect(() => {
+    if (isError && error) {
+      toast.error(error.data?.message || "Failed to fetch products");
+    }
     refetch();
   }, [currentPage, refetch]);
 
@@ -39,19 +43,20 @@ const Products = () => {
 
   return (
     <div>
-      <div className='m-5 ml-60'>{/* Main Heading */}
-      <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 mb-2 tracking-tight ">
-        Shop All Products
-      </h1>
+      <div className="m-5 ml-60">
+        {/* Main Heading */}
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 mb-2 tracking-tight ">
+          Shop All Products
+        </h1>
 
-      {/* Subheading / Product Count */}
-      <p className="text-gray-600 text-lg">
-        {productPage.count || 0} products available
-      </p>
+        {/* Subheading / Product Count */}
+        <p className="text-gray-600 text-lg">
+          {productPage.count || 0} products available
+        </p>
 
-      {/* Optional accent line */}
-      <div className="w-24 h-1 bg-emerald-500 mt-3 rounded-full"></div></div>
-      
+        {/* Optional accent line */}
+        <div className="w-24 h-1 bg-emerald-500 mt-3 rounded-full"></div>
+      </div>
 
       {/* Count : {productPage.count || 0} */}
       <ProductGrid

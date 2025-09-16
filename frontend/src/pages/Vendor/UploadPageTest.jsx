@@ -8,20 +8,16 @@ import {
 } from "../../redux/api/productsApiSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+// import ProductOverView from "../Home/ProductTools/ProductOverview";
 
 const UploadPageTest = () => {
   const { state } = useLocation();
   const product = state?.product || null; // Handle case where no product is provided
-  console.log("update", product);
 
-  const imgs = product?.images || []; // Use existing images if editing
-  console.log("images", imgs);
-
+  const [imgs, setImgs] = useState(product ? product.images : []); // Use existing images if editing
+  console.log("imgs : ", imgs);
   const [images, setImages] = useState([]);
-  console.log(images);
-
-  // Update file input handler in the form:
-  // onChange={(e) => setImages(Array.from(e.target.files))}
+  console.log("url.set images : ", images);
   const [name, setName] = useState(product ? product.name : "");
   const [brand, setBrand] = useState(product ? product.brand : "");
   const [price, setPrice] = useState(product ? product.price : "");
@@ -30,7 +26,7 @@ const UploadPageTest = () => {
     product ? product.description : ""
   );
   const [category, setCategory] = useState(product ? product.category._id : "");
-  const [quantity, setQuantity] = useState(product ? product.quantity : "");
+  const [quantity, setQuantity] = useState(product ? product.countInStock : "");
 
   // Reset form when switching to upload mode (no product)
   useEffect(() => {
@@ -58,7 +54,7 @@ const UploadPageTest = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     if (
-      // !images ||
+      !images ||
       !name ||
       !brand ||
       !price ||
@@ -78,7 +74,7 @@ const UploadPageTest = () => {
     formData.append("price", price);
     formData.append("description", description);
     formData.append("category", category);
-    formData.append("quantity", quantity);
+    formData.append("countInStock", quantity);
     formData.append("condition", condition);
 
     // Upload all images in one request
@@ -91,17 +87,25 @@ const UploadPageTest = () => {
         if (response && response.paths) {
           imagePaths = response.paths;
           console.log("Image paths:", imagePaths);
+          // img?.imagePaths.push(img); // Optional chaining + push
         }
       } catch (err) {
         toast.error("Failed to upload images");
         return;
       }
     }
+    if (imgs) {
+      console.log("theres img : ", imgs);
+      imagePaths = [...imgs, ...imagePaths];
+      console.log("image path with imgs", imagePaths);
+    } else {
+      console.log("no img");
+    }
     // Add image paths as a comma-separated string
     // console.log(JSON.stringify(imagePaths))
     // formData.append("images", JSON.stringify(imagePaths));
     formData.append("images", JSON.stringify(imagePaths));
-    // console.log("Form data being sent:",  formData);
+    console.log(formData.get("images"));
 
     try {
       let createdProduct;
@@ -155,15 +159,29 @@ const UploadPageTest = () => {
     <div className="p-6 max-w-lg mx-auto">
       <form onSubmit={submitHandler} className="space-y-4">
         {/* Show existing product images if editing */}
-        {product && product._id && (
+        {product && product._id && imgs &&(
           <div className="flex gap-2 mb-2">
-            {product.images?.map((image, idx) => (
-              <img
-                key={`existing-${idx}`}
-                src={image}
-                alt="product"
-                className="w-14 h-14 object-cover rounded border"
-              />
+            {imgs?.map((image, idx) => (
+              <div key={`existing-${idx}`} className="relative">
+                {" "}
+                {console.log("idx : ", idx)}
+                {/* Add relative */}
+                <img
+                  src={image}
+                  alt="product"
+                  className="w-14 h-14 object-cover rounded border"
+                />
+                <button
+                  type="button" // ← MUST ADD THIS!
+                  onClick={() => {
+                    setImgs(imgs.filter((_, i) => i !== idx));
+                    console.log("imgs", imgs);
+                  }}
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 text-xs"
+                >
+                  ×
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -187,7 +205,8 @@ const UploadPageTest = () => {
                 aria-label="Remove image"
               >
                 ×
-              </button>
+              </button>{" "}
+              {/* //so much work to do on this one for sure */}
             </div>
           ))}
         </div>
@@ -243,7 +262,7 @@ const UploadPageTest = () => {
         </select>
         <input
           type="number"
-          placeholder="Quantity"
+          placeholder="In Stock"
           value={quantity}
           onChange={(e) => setQuantity(e.target.value)}
           className="w-full border rounded px-3 py-2"

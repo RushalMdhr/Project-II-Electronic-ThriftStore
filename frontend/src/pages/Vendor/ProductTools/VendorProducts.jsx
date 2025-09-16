@@ -1,9 +1,12 @@
 import { useGetMyProductsQuery } from "../../../redux/api/productsApiSlice"
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const VendorProducts = () => {
-  const { data: myproducts, isLoading, isError, refetch } = useGetMyProductsQuery();
+  const {userInfo} = useSelector(state=>state.auth)
+  console.log("userInfo :",userInfo)
+  const { data: myproducts, isLoading, isError, refetch } = useGetMyProductsQuery(userInfo._id);
   console.log(myproducts)
   const navigate = useNavigate();
   const location = useLocation();

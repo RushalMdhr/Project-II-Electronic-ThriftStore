@@ -13,6 +13,7 @@ const ProductOverView = () => {
     const { data: product = [] } = useGetProductByIdQuery(param.productId);
     console.log("product from overview",product)
     const { data: productpage = [], isLoading, isError } = useGetProductsQuery({ productId: param.productId });
+    console.log('related products : ',productpage)
 
     const [view, setview] = useState(false);
     const [reason, setReason] = useState("");

@@ -79,12 +79,11 @@ const loginUser = asyncHandler(async (req, res) => {
       exitingUser.status = "inactive";
       await exitingUser.save();
       return res.status(403).json({
-        message: `Account set to inactive due to ${
-          INACTIVITY_LIMIT_MINUTES / 60
-        } hours of inactivity. Log in again to reactivate.`,
+        message: `Account set to inactive due to ${INACTIVITY_LIMIT_MINUTES / 60
+          } hours of inactivity. Log in again to reactivate.`,
       });
     }
-    
+
 
     const isPasswordValid = await bcrypt.compare(
       password,
@@ -166,8 +165,12 @@ const getAllUsers = asyncHandler(async (req, res) => {
 
 export const getUserById = async (req, res) => {
   try {
+    console.log('i m here')
+    console.log(req.params.id)
     const user = await User.findById(req.params.id).select("-password");
+    console.log("user",user)
     if (user) {
+      console.log(user)
       res.json(user);
     } else {
       res.status(404).json({ message: "User not found" });
@@ -227,35 +230,26 @@ export const updateUserById = asyncHandler(async (req, res) => {
 
 
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
 
-  if (user) {
-    user.username = req.body.username || user.username;
-    user.email = req.body.email || user.email;
-
-    if (req.body.password) {
-      console.log("theres is password : ", req.body.password);
-
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(req.body.password, salt);
-      console.log("new password : ", hashedPassword);
-      user.password = hashedPassword;
-    } else {
-      console.log("theres no password : ", req.body.password);
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).send("user not found")
     }
 
-    const updateUser = await user.save();
+    // const updates = req.body
+    const { shopName, shopDescription, username } = req.body
 
-    res.json({
-      _id: updateUser._id,
-      username: updateUser.username,
-      email: updateUser.email,
-      isAdmin: updateUser.isAdmin,
-      isVendor: updateUser.isVendor,
-    });
-  } else {
-    res.status(404);
-    throw new Error("user not found");
+    if (username !== undefined) user.username = username;
+    if (shopName !== undefined) user.shopName = shopName;
+    if (shopDescription !== undefined) user.shopDescription = shopDescription;
+
+    const updatedUser = await user.save();
+    res.status(200).send({message : "user details updated sucessfully !"})
+    console.log("updated",updatedUser)
+
+  } catch (error) {
+    return res.status(500).send("internal server error")
   }
 });
 
@@ -301,4 +295,4 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
-export { createUser, loginUser, logout, getAllUsers,deleteUser,updateCurrentUserProfile, updateVendorShop, getCurrentUserProfile };
+export { createUser, loginUser, logout, getAllUsers, deleteUser, updateCurrentUserProfile, updateVendorShop, getCurrentUserProfile };

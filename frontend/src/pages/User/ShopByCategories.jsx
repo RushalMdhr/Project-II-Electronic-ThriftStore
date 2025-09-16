@@ -38,7 +38,7 @@ const ShopByCategories = () => {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div
-                  className={`absolute inset-0 bg-gradient-to-t opacity-60 group-hover:opacity-70 transition-opacity`}
+                  className={`absolute inset-0 bg-gradient-to-t ${category.image?"" : "bg-blue-300"}  opacity-60 group-hover:opacity-70 transition-opacity`}
                 />
 
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
