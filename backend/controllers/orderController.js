@@ -1,14 +1,14 @@
 import asyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
-import Product from "../models/productModel.js";
 import mongoose from "mongoose";
+import Product from "../models/productModel.js";
 import { Transaction } from "../models/esewaModel.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
 const createOrder = asyncHandler(async (req, res) => {
-  console.time('createOrder')
+  console.time("createOrder");
 
   const { orderItems, method, paymentId } = req.body;
 
@@ -17,75 +17,69 @@ const createOrder = asyncHandler(async (req, res) => {
   }
 
   try {
-    // const statusMap = {
-    //   'PENDING': 'pending',
-    //   'COMPLETE': 'paid',
-    //   'FAILED': 'failed',
-    //   'REFUNDED': 'refunded'
-    // };
-    let status
+    let status;
 
-    if (!['cod', 'esewa'].includes(method)) {
-      return res.status(400).send('invalid method')
+    if (!["cod", "esewa"].includes(method)) {
+      return res.status(400).send("invalid method");
     }
-    if (method == 'esewa') {
+    if (method == "esewa") {
       const esewaPayment = await Transaction.findById(paymentId);
-      if (!esewaPayment) return res.status(404).send("esewa payment not found !")
-      console.log(esewaPayment)
+      if (!esewaPayment)
+        return res.status(404).send("esewa payment not found !");
       switch (esewaPayment.status) {
         case "COMPLETE":
-          status = 'paid'
+          status = "paid";
           break;
 
         case "PENDING":
           return res.status(400).json({
-            error: "Payment still processing. Please wait or try again."
+            error: "Payment still processing. Please wait or try again.",
           });
 
         case "FAILED":
           return res.status(400).json({
-            error: "Payment failed. Please try again."
+            error: "Payment failed. Please try again.",
           });
 
         case "REFUNDED":
           return res.status(400).json({
-            error: "Payment was refunded. Cannot create order."
+            error: "Payment was refunded. Cannot create order.",
           });
 
         default:
           return res.status(400).json({ error: "Unknown payment status" });
       }
     }
-    const validatedItems = await Promise.all(orderItems.map(async (items) => {
-      const productDoc = await Product.findById(items.productId)
-      if (!productDoc) {
-        throw new Error("Product not found");
-      }
-      if (productDoc.countInStock < items.quantity) {
-        throw new Error(`Not enough stock for ${productDoc.name}`);
-      }
-      return {
-        product: productDoc._id,
-        vendor: productDoc.uploadedBy,
-        quantity: items.quantity,
-        price: productDoc.price,
-      }
-    }))
-    console.log(validatedItems)
+    const validatedItems = await Promise.all(
+      orderItems.map(async (items) => {
+        const productDoc = await Product.findById(items.productId);
+        if (!productDoc) {
+          throw new Error("Product not found");
+        }
+        if (productDoc.countInStock < items.quantity) {
+          throw new Error(`Not enough stock for ${productDoc.name}`);
+        }
+        return {
+          product: productDoc._id,
+          vendor: productDoc.uploadedBy,
+          quantity: items.quantity,
+          price: productDoc.price,
+        };
+      })
+    );
 
     const newOrder = new Order({
       customer: req.user._id,
       orderItems: validatedItems,
       payment: {
         method: method,
-        status: status
-      }
+        status: status,
+      },
     });
-    console.log("new now 2", newOrder);
 
     const orderCreated = await newOrder.save();
-    console.timeEnd('createOrder')
-
+    
+    console.timeEnd("createOrder");
 
     res.status(201).json(orderCreated);
   } catch (error) {
@@ -98,11 +92,10 @@ const createOrder = asyncHandler(async (req, res) => {
 // @route   GET /api/orders/myorders
 // @access  Private
 const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ customer: req.user._id })
-    .populate({
-      path: 'orderItems.product',
-      model: 'Product',
-    });
+  const orders = await Order.find({ customer: req.user._id }).populate({
+    path: "orderItems.product",
+    model: "Product",
+  });
 
   console.log(`Found ${orders.length} orders for user ${req.user._id}`); // DEBUG
   console.log(orders.orderItems);
@@ -155,20 +148,29 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id)
+    const order = await Order.findById(req.params.id);
     const { status } = req.body;
-    if (!['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'].includes(status) | order.status === status) {
-      return res.status(400).json({ error: 'Invalid status' })
+    if (
+      ![
+        "pending",
+        "confirmed",
+        "processing",
+        "shipped",
+        "delivered",
+        "cancelled",
+        "refunded",
+      ].includes(status) |
+      (order.status === status)
+    ) {
+      return res.status(400).json({ error: "Invalid status" });
     }
     order.status = status;
     order.save();
-    res.send(order)
+    res.send(order);
   } catch (error) {
-    res.status(500).send('error', error)
+    res.status(500).send("error", error);
   }
-
-
-})
+});
 
 // @desc    Update order to delivered
 // @route   PUT /api/orders/:id/deliver
@@ -191,7 +193,7 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
 const getSoldOrders = asyncHandler(async (req, res) => {
   console.time("getSoldOrders");
   try {
-    const vendorObjectId = req.user._id
+    const vendorObjectId = req.user._id;
 
     const Ordered = await Order.aggregate([
       // Step 1: match only orders that include this vendor
@@ -205,14 +207,13 @@ const getSoldOrders = asyncHandler(async (req, res) => {
             $filter: {
               input: "$orderItems",
               as: "item",
-              cond: { $eq: ["$$item.vendor", vendorObjectId] }
-            }
-          }
-        }
-      }
+              cond: { $eq: ["$$item.vendor", vendorObjectId] },
+            },
+          },
+        },
+      },
     ]);
     console.timeEnd("getSoldOrders");
-
 
     res.status(200).json(Ordered);
   } catch (error) {
@@ -229,5 +230,5 @@ export {
   updateOrderToPaid,
   updateOrderStatus,
   updateOrderToDelivered,
-  getSoldOrders
+  getSoldOrders,
 };
