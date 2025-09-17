@@ -165,7 +165,14 @@ const fetchProducts = asyncHandler(async (req, res) => {
     // Search keyword
     let dbFilter = {};
     const keyword = req.query.keyword ? req.query.keyword.trim() : "";
-
+    console.log(
+      "Keyword:",
+      keyword,
+      "Length:",
+      keyword.length,
+      "Truthy:",
+      !!keyword
+    );
     if (keyword.length > 0 && keyword.length < 3) {
       return res
         .status(400)
@@ -176,7 +183,7 @@ const fetchProducts = asyncHandler(async (req, res) => {
       dbFilter._id = { $ne: req.query.productId };
     }
     // Only add search if keyword is present and not empty
-    if (keyword) {
+    if (keyword && keyword !== "null" && keyword !== "undefined") {
       dbFilter.$or = [
         { name: { $regex: keyword, $options: "i" } },
         { description: { $regex: keyword, $options: "i" } },
