@@ -164,7 +164,8 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
     // Search keyword
     let dbFilter = {};
-    const keyword = req.query.keyword ? req.query.keyword.trim() : "";
+    
+    const keyword = req.query.keyword ? decodeURIComponent(req.query.keyword).trim() : "";
     console.log(
       "Keyword:",
       keyword,
