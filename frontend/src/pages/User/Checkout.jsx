@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { useCreateOrderMutation } from "../../redux/api/orderApiSlice";
 import { toast } from "react-toastify";
+import { useEsewaPaymentMutation } from "../../redux/api/transactionApiSlice";
+import { generateUniqueId } from "esewajs";
 
 const Checkout = () => {
   const { state } = useLocation();
@@ -13,16 +15,16 @@ const Checkout = () => {
     0
   );
   const [createOrder] = useCreateOrderMutation();
+  const [esewaPayment] = useEsewaPaymentMutation();
   const dropdownRef = useRef();
 
   const data = {
-    orderItems: 
-      products?.map((e) => {
-        return {
-          productId: e.product._id,
-          quantity: e.quantity,
-        };
-      }),
+    orderItems: products?.map((e) => {
+      return {
+        productId: e.product._id,
+        quantity: e.quantity,
+      };
+    }),
     method: selectedPayment,
   };
   console.log("data : ", data);
@@ -45,11 +47,30 @@ const Checkout = () => {
 
   const HandleOrder = async () => {
     try {
-      const order = await createOrder(data);
+      const LinkId = generateUniqueId();
+      if (selectedPayment === "esewa") {
+        const payment = await esewaPayment({
+          amount: total,
+          productId: LinkId,
+        }).unwrap();
+        console.log(payment);
+
+        if (payment?.url) {
+          window.location.href = payment.url;
+        } else {
+          console.log("No URL found in response");
+        }
+      }
+      const order = await createOrder({ ...data, paymentId: LinkId });
+      if(order.error){
+        toast.error(error.message);
+        console.error(error)
+      }
+      toast.success("checkout success, your order is now pending")
       console.log(order);
     } catch (error) {
-      toast.error(error?.error?.omessage || "order creation failed")
-      console.error('order error : ',error)
+      toast.error(error?.message || "order creation failed");
+      console.error("order error : ", error);
     }
   };
 

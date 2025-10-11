@@ -23,9 +23,9 @@ const createOrder = asyncHandler(async (req, res) => {
       return res.status(400).send("invalid method");
     }
     if (method == "esewa") {
-      const esewaPayment = await Transaction.findById(paymentId);
+      const esewaPayment = await Transaction.findOne({ProductId : paymentId});
       if (!esewaPayment)
-        return res.status(404).send("esewa payment not found !");
+        return res.status(404).send({message : "esewa payment not found !"});
       switch (esewaPayment.status) {
         case "COMPLETE":
           status = "paid";
