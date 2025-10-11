@@ -9,7 +9,7 @@ export const getAdminSummary = async (req, res) => {
     const vendors = await User.countDocuments({ isVendor: true });
     const products = await Product.countDocuments();
 
-    const orders = await Order.find().populate("user", "email").lean();
+    const orders = await Order.find().populate("customer", "email").lean();
     const revenue = orders.reduce(
       (acc, order) => acc + (order.totalPrice ?? 0),
       0
