@@ -22,6 +22,13 @@ export const orderApiSlice = apiSlice.injectEndpoints({
       providesTags: (result, error, id) => [{ type: "Order", id }],
       keepUnusedDataFor: 5,
     }),
+
+    //get sold orders
+    getSoldOrders : builder.query({
+      query : ()=>`${ORDERS_URL}/soldorders`,
+      providesTags : (result,error)=>[{type:"Order"}],
+      keepUnusedDataFor:5
+    }),
     // Create new order
     createOrder: builder.mutation({
       query: (orderData) => ({
@@ -61,4 +68,5 @@ export const {
   useCreateOrderMutation,
   useUpdateOrderToPaidMutation,
   useUpdateOrderToDeliveredMutation,
+  useGetSoldOrdersQuery,
 } = orderApiSlice;
