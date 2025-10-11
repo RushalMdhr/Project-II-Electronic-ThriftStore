@@ -286,7 +286,7 @@ const Navbar = () => {
 
               {userInfo ? (
                 <>
-                  <div className="relative" ref={dropdownRef}>
+                  <div className="relative" ref={profileDropdownRef}>
                     <button
                       onClick={() =>
                         setProfileDropdownOpen(!profileDropdownOpen)
