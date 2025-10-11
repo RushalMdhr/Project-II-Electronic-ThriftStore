@@ -1,6 +1,5 @@
 import asyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
-import mongoose from "mongoose";
 import Product from "../models/productModel.js";
 import { Transaction } from "../models/esewaModel.js";
 
@@ -23,9 +22,9 @@ const createOrder = asyncHandler(async (req, res) => {
       return res.status(400).send("invalid method");
     }
     if (method == "esewa") {
-      const esewaPayment = await Transaction.findOne({ProductId : paymentId});
+      const esewaPayment = await Transaction.findOne({ ProductId: paymentId });
       if (!esewaPayment)
-        return res.status(404).send({message : "esewa payment not found !"});
+        return res.status(404).send({ message: "esewa payment not found !" });
       switch (esewaPayment.status) {
         case "COMPLETE":
           status = "paid";
@@ -78,7 +77,7 @@ const createOrder = asyncHandler(async (req, res) => {
     });
 
     const orderCreated = await newOrder.save();
-    
+
     console.timeEnd("createOrder");
 
     res.status(201).json(orderCreated);
@@ -196,13 +195,12 @@ const getSoldOrders = asyncHandler(async (req, res) => {
     const vendorObjectId = req.user._id;
 
     const Ordered = await Order.aggregate([
-      // Step 1: match only orders that include this vendor
+      // Step 1: Match orders that contain this vendor
       { $match: { "orderItems.vendor": vendorObjectId } },
 
-      // Step 2: project only customer + filtered vendor items
+      // Step 2: Filter only vendor’s items
       {
-        $project: {
-          customer: 1,
+        $addFields: {
           orderItems: {
             $filter: {
               input: "$orderItems",
@@ -212,10 +210,87 @@ const getSoldOrders = asyncHandler(async (req, res) => {
           },
         },
       },
-    ]);
-    console.timeEnd("getSoldOrders");
 
-    res.status(200).json(Ordered);
+      // Step 3: Lookup customer details
+      {
+        $lookup: {
+          from: "users",
+          localField: "customer",
+          foreignField: "_id",
+          as: "customerDetails",
+        },
+      },
+
+      // Step 4: Lookup products (all at once)
+      {
+        $lookup: {
+          from: "products",
+          localField: "orderItems.product",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+
+      // Step 5: Map each orderItem with its matching product
+      {
+        $addFields: {
+          orderItems: {
+            $map: {
+              input: "$orderItems",
+              as: "item",
+              in: {
+                quantity: "$$item.quantity",
+                price: "$$item.price",
+                vendor: "$$item.vendor",
+                product: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: "$productDetails",
+                        as: "prod",
+                        cond: { $eq: ["$$prod._id", "$$item.product"] },
+                      },
+                    },
+                    0,
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+
+      // Step 6: Clean final projection
+      {
+        $project: {
+          _id: 1,
+          customer: {
+            $arrayElemAt: ["$customerDetails.username", 0],
+          },
+          customerEmail: {
+            $arrayElemAt: ["$customerDetails.email", 0],
+          },
+          subtotal: 1,
+          shipping: 1,
+          tax: 1,
+          total: 1,
+          status: 1,
+          payment: 1,
+          createdAt: 1,
+          orderItems: {
+            quantity: 1,
+            price: 1,
+            vendor: 1,
+            "product.name": 1,
+            "product.images": 1,
+          },
+        },
+      },
+    ]);
+
+    res.send(Ordered);
+
+    console.timeEnd("getSoldOrders");
   } catch (error) {
     console.error("Error fetching sold orders:", error);
     res.status(500).json({ message: "Server Error" });
