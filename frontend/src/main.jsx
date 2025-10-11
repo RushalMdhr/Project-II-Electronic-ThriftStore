@@ -9,15 +9,11 @@ import { Provider } from "react-redux";
 import store from "./redux/store.js";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 
-
-
-
 import AboutUs from "./pages/User/AboutUs.jsx";
 import ContactUs from "./pages/User/ContactUs.jsx";
 import FAQ from "./pages/User/FAQ.jsx";
 
-import OrderList from "./components/Admin/OrderList.jsx"
-// ____________________ Mailka __________________
+import OrderList from "./components/Admin/OrderList.jsx";
 import UploadPageTest from "./pages/Vendor/UploadPageTest.jsx";
 import Dashboard from "./pages/Vendor/Dashboard.jsx";
 import VendorProducts from "./pages/Vendor/ProductTools/VendorProducts.jsx";
@@ -27,11 +23,9 @@ import UpdateProfile from "./pages/User/UpdateProfile.jsx";
 import VendorRegister from "./pages/Vendor/VendorRegister.jsx";
 import VendorRegisterGuard from "./pages/Vendor/VendorRegisterGuard.jsx";
 
-// ____________ Rushal __________________________
 import ProductOverView from "./pages/Home/ProductTools/ProductOverview.jsx";
 import Home from "./pages/Home/Home.jsx";
 
-// ____________ xenium __________________________
 import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
 import UserUpdate from "./pages/Admin/UserUpdate.jsx";
 import AdminLayout from "./components/Admin/AdminLayout.jsx";
@@ -41,7 +35,6 @@ import Unauthorized from "./pages/User/Unauthorized.jsx";
 import ProductList from "./components/Product/ProductList.jsx";
 import UserList from "./pages/Admin/UserList.jsx";
 
-// ____________ kriti __________________________
 import { UserProvider } from "./components/UserProvider";
 import CartPage from "./pages/User/Cart/CartPage.jsx";
 import Checkout from "./pages/User/Checkout.jsx";
@@ -51,6 +44,11 @@ import MyOrders from "./pages/User/Orders/MyOrders.jsx";
 import CategoryUsers from "./pages/Home/Category.jsx";
 import CategoryManagement from "./components/Admin/CategoryManagement.jsx";
 import VendorLayout from "./components/Vendor/VendorLayout.jsx";
+
+import PaymentComponent from "./pages/Transaction/Payment.jsx";
+import Success from "./pages/Transaction/Success.jsx";
+import Failure from "./pages/Transaction/Failure.jsx"
+import OrderManagement from "./pages/Vendor/OrderManagement.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -89,8 +87,6 @@ const router = createBrowserRouter(
       <Route path="/tester" element={<ProductCard />} />
       <Route path="/categories" element={<CategoryUsers />} />
 
-      
-
       {/* ________________________________ VENDOR ________________________________________*/}
 
       <Route element={<VendorRoutes />}>
@@ -98,6 +94,7 @@ const router = createBrowserRouter(
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="products" element={<VendorProducts />} />
           <Route path="upload" element={<UploadPageTest />} />
+          <Route path="order-management" element={<OrderManagement />} />
         </Route>
       </Route>
 
@@ -122,6 +119,10 @@ const router = createBrowserRouter(
         {/* <Route path="/upload" element={<UploadPageTest />} /> */}
         <Route path="/admin/productcard" element={<ProductList />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
+
+        <Route path="/payment" element={<PaymentComponent />} />
+        <Route path="/payment-success" element={<Success />} />
+        <Route path="/payment-failure" element={<Failure />} />
       </Route>
 
       {/* ________________________________ ADMIN ________________________________________*/}
