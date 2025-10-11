@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import "remixicon/fonts/remixicon.css";
 import { setRole } from "../../redux/features/auth/authSlice";
+import ProfileDropdown from "../ProfileDropdown";
 
 const Navbar = () => {
   const { userInfo, role } = useSelector((state) => state.auth);
@@ -19,6 +20,8 @@ const Navbar = () => {
   const [search, setSearch] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef(null);
 
   useEffect(() => {
     // Redirect to home page on reload/app start
@@ -32,10 +35,17 @@ const Navbar = () => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target)
+      ) {
+        setProfileDropdownOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
 
   const logoutHandler = async () => {
     try {
@@ -276,22 +286,32 @@ const Navbar = () => {
 
               {userInfo ? (
                 <>
-                  <Link
-                    to="/profile"
-                    className="flex items-center gap-2 text-gray-300 hover:text-white"
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-gray-300 hover:text-white"
-                      aria-label="Profile"
+                  <div className="relative" ref={dropdownRef}>
+                    <button
+                      onClick={() =>
+                        setProfileDropdownOpen(!profileDropdownOpen)
+                      }
+                      className="flex items-center gap-2 text-gray-300 hover:text-white focus:outline-none"
                     >
-                      <i className="ri-user-line text-xl" />
-                    </Button>
-                    <span className="hidden sm:inline">
-                      {userInfo.username}
-                    </span>
-                  </Link>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-gray-300 hover:text-white"
+                        aria-label="Profile"
+                      >
+                        <i className="ri-user-line text-xl" />
+                      </Button>
+                      <span className="hidden sm:inline">
+                        {userInfo.username}
+                      </span>
+                    </button>
+                    {/* Dropdown below the button */}
+                    {profileDropdownOpen && (
+                      <div className="absolute right-0 top-12">
+                        <ProfileDropdown />
+                      </div>
+                    )}
+                  </div>
                   <Button
                     variant="ghost"
                     size="icon"
