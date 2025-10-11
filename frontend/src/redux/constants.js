@@ -8,3 +8,4 @@ export const CATEGORY_URL = "/api/categories";
 export const ADMIN_SUMMARY_URL = "/api/admin/summary";
 export const ORDERS_URL = "/api/orders";
 export const CART_URL = "/api/cart";
+export const ESEWA_URL = "/api/esewa"
