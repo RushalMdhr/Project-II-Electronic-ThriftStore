@@ -7,8 +7,10 @@ import AddToCart from "../../User/Cart/AddToCart";
 import { useState } from "react";
 import { set } from "mongoose";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const ProductOverView = () => {
+    const { userInfo } = useSelector((state) => state.auth);
     const param = useParams();
     const { data: product = [] } = useGetProductByIdQuery(param.productId);
     console.log("product from overview",product)
@@ -202,19 +204,23 @@ const ProductOverView = () => {
                             {/* Action Buttons */}
                             <div className="space-y-4">
                                 <div className="flex gap-4">
-                                    <AddToCart 
-                                        productId={product._id} 
-                                        disabled={!product.countInStock}
-                                        className="flex-1"
-                                    />
-                                    <button 
-                                        type="button" 
-                                        onClick={makeOrder} 
-                                        disabled={!product.countInStock}
-                                        className="flex-1 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold shadow-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        Buy Now
-                                    </button>
+                                    {userInfo && !userInfo.isAdmin && (
+                                        <AddToCart
+                                            productId={product._id}
+                                            disabled={!product.countInStock}
+                                            className="flex-1"
+                                        />
+                                    )}
+                                    {userInfo && !userInfo.isAdmin && (
+                                        <button
+                                            type="button"
+                                            onClick={makeOrder}
+                                            disabled={!product.countInStock}
+                                            className="flex-1 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold shadow-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Buy Now
+                                        </button>
+                                    )}
                                 </div>
                                 
                                 <button
