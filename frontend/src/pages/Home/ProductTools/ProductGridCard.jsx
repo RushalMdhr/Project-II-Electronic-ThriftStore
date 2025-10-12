@@ -1,8 +1,10 @@
 import { Heart, Star } from "lucide-react";
 import { Link } from "react-router";
 import AddToCart from "../../User/Cart/AddToCart";
+import { useSelector } from "react-redux";
 
 const ProductGridCard = ({ products }) => {
+  const { userInfo } = useSelector((state) => state.auth);
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
       {products?.map((product) => (
@@ -82,10 +84,13 @@ const ProductGridCard = ({ products }) => {
             </div>
 
             {/* Add to Cart */}
-            <AddToCart
-              productId={product._id}
-              disabled={!product.countInStock}
-            />
+             {/* Add to Cart (Only for non-admin users) */}
+            {userInfo && !userInfo.isAdmin && (
+              <AddToCart
+                productId={product._id}
+                disabled={!product.countInStock}
+              />
+            )}
           </div>
         </div>
       ))}
