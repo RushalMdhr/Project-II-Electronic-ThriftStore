@@ -32,13 +32,13 @@ const AddToCart = ({ productId, disabled }) => {
     <button
       onClick={handleClick}
       disabled={disabled || isLoading}
-      className={`px-4 py-2 rounded w-full mt-2 ${
+      className={`w-full px-4 py-2 rounded-lg mt-2 font-medium transition-all duration-200 ${
         disabled
-          ? "bg-gray-300 cursor-not-allowed"
-          : "bg-emerald-600 text-white hover:bg-emerald-700"
+          ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+          : "bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 shadow hover:shadow-emerald-500/20"
       }`}
     >
-{disabled ? "Out of Stock" : isLoading ? "Adding…" : "Add to Cart"}
+      {disabled ? "Out of Stock" : isLoading ? "Adding…" : "Add to Cart"}
     </button>
   );
 };

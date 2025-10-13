@@ -99,18 +99,14 @@ const ProductGridCard = ({ products }) => {
               </div>
 
               {/* Add to Cart or Edit */}
-              <div className="mt-auto">
-                {userInfo?.isAdmin ? // Admin: No button
-                null : userInfo &&
+              <div className="mt-auto w-full">
+                {userInfo?.isAdmin ? null : userInfo && // Admin: No button
                   (userInfo._id === product.uploadedBy?._id?.toString() ||
                     userInfo._id === product.uploadedBy?.toString()) ? (
                   // Uploader: Edit button
                   <button
                     onClick={() => handleEdit(product)}
-                    className="w-full px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 
-      text-white font-medium rounded-lg border border-emerald-600 
-      hover:from-emerald-600 hover:to-teal-600 hover:shadow-md 
-      hover:shadow-emerald-500/20 transition-all duration-200 text-sm"
+                    className="w-full px-4 py-2 rounded-lg mt-2 font-medium transition-all duration-200 bg-gradient-to-r from-yellow-500 to-orange-400 text-white hover:from-yellow-600 hover:to-orange-500 shadow-md hover:shadow-orange-400/40"
                   >
                     Edit My Product
                   </button>
