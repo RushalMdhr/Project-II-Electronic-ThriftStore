@@ -273,10 +273,15 @@ const ProductOverView = () => {
                 <button
                   type="button"
                   onClick={() => {
+                    console.log("what : ",userInfo._id,", ",product.uploadedBy)
                     if (!userInfo) {
                       toast.error("Login required");
                       navigate("/login");
-                    } else {
+                    }
+                    else if(userInfo._id ===product.uploadedBy._id){
+                      toast.error("reporting your own product brother ?")
+                    } 
+                    else {
                       setShowPopup(true);
                     }
                   }}
