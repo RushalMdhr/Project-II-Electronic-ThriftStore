@@ -13,7 +13,7 @@ const AddToCart = ({ productId, disabled }) => {
 
   const handleClick = async () => {
     if (!userId) {
-      toast.error("Please login first");
+      toast.error("Login Required !");
       navigate("/login")
       return;
     }
