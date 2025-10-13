@@ -8,7 +8,7 @@ const createProduct = asyncHandler(async (req, res) => {
   console.time("createProduct");
   try {
     const images = JSON.parse(req.fields["images"] || "[]");
-    console.log("images : ", images);
+    // console.log("images : ", images);
     const { name, description, price, category, quantity, brand } = req.fields;
     switch (true) {
       case !name:
@@ -65,7 +65,7 @@ const updateProductDetails = asyncHandler(async (req, res) => {
       ...req.fields, // Spread all fields first
       images: JSON.parse(req.fields?.images || "[]"), // Then parse images
     };
-    console.log(formData);
+    // console.log(formData);
     const updates = formData; // dynamic updates from client
 
     const product = await Product.findById(req.params.productId);
@@ -131,18 +131,22 @@ const deleteProductById = asyncHandler(async (req, res) => {
 
 const fetchProducts = asyncHandler(async (req, res) => {
   try {
-    console.log(
-      req.query.productId ? "product filter need" : "product filter no need"
-    );
-    const pageSize = req.query.productId ? 2 : 4;
+    // console.log(
+    //   req.query.productId ? "product filter need" : "product filter no need"
+    // );
+    // if overview related product haru thorei hunxa : navaye shop ko laagi dherei
+    console.log("query", req.query);
+    const pageSize = req.query.productId ? 4 : 12;
     console.log(pageSize);
+
     const page = Number(req.query.page) || 1;
 
     // How to sort
     let sortOption = { createdAt: -1 }; // Default sort
+    const {min,max,category,condition,sort} = req.query
 
     // Handle sorting from frontend
-    if (req.query.sort) {
+    if (sort) {
       switch (req.query.sort) {
         case "price-low":
           sortOption = { price: 1 }; // Ascending
@@ -164,15 +168,19 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
     // Search keyword
     let dbFilter = {};
-    
-    const keyword = req.query.keyword ? decodeURIComponent(req.query.keyword).trim() : "";
+
+    const keyword = req.query.keyword
+      ? decodeURIComponent(req.query.keyword).trim()
+      : "";
     console.log(
       "Keyword:",
       keyword,
       "Length:",
       keyword.length,
       "Truthy:",
-      !!keyword
+      !!keyword,
+      "sortOption: ",
+      sortOption
     );
     if (keyword.length > 0 && keyword.length < 3) {
       return res
@@ -190,11 +198,23 @@ const fetchProducts = asyncHandler(async (req, res) => {
         { description: { $regex: keyword, $options: "i" } },
       ];
     }
-    console.log(keyword, "keyword");
+    // console.log(keyword, "keyword");
 
     // Exclude own products only if logged in as vendor
     if (req.user !== null && req.user.isVendor) {
       dbFilter.uploadedBy = { $ne: req.user._id };
+    }
+    if (min || max) {
+      dbFilter.price = {};
+      if (min) dbFilter.price.$gte = Number(min);
+      if (max) dbFilter.price.$lte = Number(max);
+    }
+    console.log("condtion : ",condition)
+    if(category){
+      dbFilter.category=category
+    }
+    if(condition){
+      dbFilter.condition=condition
     }
 
     const count = await Product.countDocuments(dbFilter);
@@ -218,7 +238,6 @@ const fetchProducts = asyncHandler(async (req, res) => {
       pages: Math.ceil(count / pageSize),
       hasMore: page < Math.ceil(count / pageSize),
     });
-    console.log("products : ", products);
   } catch (error) {
     console.error("error : ", error);
     res.status(500);
@@ -315,7 +334,7 @@ const fetchGroupedProducts = asyncHandler(async (req, res) => {
   try {
     // Get categories sorted by 'used' descending
     const categories = await Category.find({}).sort({ used: -1 }).limit(4);
-    console.log(categories);
+    // console.log(categories);
 
     // Get products grouped by category
     const groupedProducts = await Product.aggregate([

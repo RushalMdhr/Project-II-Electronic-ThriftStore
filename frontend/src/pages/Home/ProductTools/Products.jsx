@@ -1,27 +1,53 @@
-import React, { use, useEffect } from "react";
+import React, { use, useEffect, useState } from "react";
 import ProductGrid from "./ProductGrid";
 import { useGetProductsQuery } from "../../../redux/api/productsApiSlice";
 import { useLocation, useSearchParams } from "react-router";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import FilterSideBar from "../../../components/Product/FilterSideBar";
+import { useListcategoryQuery } from "../../../redux/api/categoryApiSlice";
 
 const Products = () => {
+  // Search
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
   const { state } = useLocation();
   const searched = state?.Search || null; // Handle case where no product is provided
-  console.log(searched);
+  // console.log(searched);
+  // finding user auth
   const { userInfo } = useSelector((state) => state.auth);
-  console.log("userInfo", userInfo?.isAdmin);
+  // console.log("userInfo", userInfo?.isAdmin);
+
+  //filter values :
+  const [filter, setFilter] = useState({
+    min: 0,
+    max: 1000,
+    category: "",
+    sort: "",
+    condition : "",
+  });
+
+  console.log("filter : ",filter)
+  //________________ API SLICES__________________
   const {
     data: productPage = [],
     isLoading,
     isError,
     refetch,
-  } = useGetProductsQuery({ page: currentPage, keyword: searched });
+  } = useGetProductsQuery({
+    page: currentPage,
+    keyword: searched,
+    sort: filter.sort,
+    min: filter.min,
+    max: filter.max,
+    category: filter.category,
+    condition : filter.condition
+  });
+  const { data: categories } = useListcategoryQuery();
   console.log("product page ; ", productPage);
 
+  // refreshing
   useEffect(() => {
     if (isError && error) {
       toast.error(error.data?.message || "Failed to fetch products");
@@ -29,6 +55,7 @@ const Products = () => {
     refetch();
   }, [currentPage, refetch]);
 
+  // shop products navigating buttons
   const GoBack = (pageNum) => {
     if (productPage.page > 1) {
       setSearchParams({ page: pageNum });
@@ -57,6 +84,11 @@ const Products = () => {
         {/* Optional accent line */}
         <div className="w-24 h-1 bg-emerald-500 mt-3 rounded-full"></div>
       </div>
+      <FilterSideBar
+        filter={filter}
+        setFilter={setFilter}
+        categories={categories}
+      />
 
       {/* Count : {productPage.count || 0} */}
       <ProductGrid
