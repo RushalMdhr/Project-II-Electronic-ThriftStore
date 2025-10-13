@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   useGetProductByIdQuery,
   useGetProductsQuery,
@@ -10,7 +10,6 @@ import ProductGrid from "./ProductGrid";
 import { useEffect } from "react";
 import AddToCart from "../../User/Cart/AddToCart";
 import { useState } from "react";
-import { set } from "mongoose";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 
@@ -30,6 +29,7 @@ const ProductOverView = () => {
   const [reason, setReason] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+  const navigate = useNavigate()
 
   // FUNCTIONS _______________
   const [createOrder] = useCreateOrderMutation();
@@ -82,6 +82,10 @@ const ProductOverView = () => {
   return (
     <div className="min-h-screen text-white">
       {/* Report Popup */}
+
+      {/* {
+  userInfo._id !== product.uploadedBy?._id?.toString()
+} */}
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-md bg-black/60 z-50">
           <div className="bg-gray-800 border border-gray-700 p-8 rounded-2xl shadow-2xl w-96 mx-4">
@@ -250,18 +254,12 @@ const ProductOverView = () => {
                         productId={product._id}
                         disabled={!product.countInStock}
                         className="flex-1"
-                        onClick={() => {
-                          if (!userInfo) {
-                            // redirect to login if not logged in
-                            navigate("/login");
-                          }
-                        }}
+                        
                       />
 
                       {/* Buy Now */}
                       <button
                         type="button"
-                        
                         disabled={!product.countInStock}
                         className="flex-1 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold shadow-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -274,7 +272,14 @@ const ProductOverView = () => {
                 {/* Report Product: always visible */}
                 <button
                   type="button"
-                  onClick={() => setShowPopup(true)}
+                  onClick={() => {
+                    if (!userInfo) {
+                      toast.error("Login required");
+                      navigate("/login");
+                    } else {
+                      setShowPopup(true);
+                    }
+                  }}
                   className="w-full px-8 py-3 bg-gray-800 border border-gray-600 text-gray-300 rounded-xl font-medium hover:bg-gray-700 hover:border-gray-500 transition-all duration-200"
                 >
                   Report Product
