@@ -25,7 +25,7 @@ const PriceRange = ({ filter, setFilter }) => {
 
       <Slider
         min={0}
-        max={10000}
+        max={100000}
         value={[filter.min, filter.max]}
         onChange={handleChange}
         className="w-full h-3"
