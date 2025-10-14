@@ -1,6 +1,6 @@
 import React, { use, useEffect, useState } from "react";
 import ProductGrid from "./ProductGrid";
-import { useGetProductsQuery } from "../../../redux/api/productsApiSlice";
+import { useGetPriceRangeQuery, useGetProductsQuery } from "../../../redux/api/productsApiSlice";
 import { useLocation, useSearchParams } from "react-router";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -14,21 +14,24 @@ const Products = () => {
   const currentPage = Number(searchParams.get("page")) || 1;
   const { state } = useLocation();
   const searched = state?.Search || null; // Handle case where no product is provided
-  // console.log(searched);
-  // finding user auth
+
+  //finding userInfo
   const { userInfo } = useSelector((state) => state.auth);
-  // console.log("userInfo", userInfo?.isAdmin);
+
+  //getting priceRange _____________________
+  const {data : priceRange } = useGetPriceRangeQuery();
+  console.log("price range",priceRange)
 
   //filter values :
   const [filter, setFilter] = useState({
-    min: 0,
-    max: 1000,
+    min: priceRange?.minPrice || 0,
+    max: priceRange?.maxPrice||1000,
     category: "",
     sort: "",
-    condition : "",
+    condition: "",
   });
 
-  console.log("filter : ",filter)
+  console.log("filter : ", { page: currentPage, keyword: searched, ...filter });
   //________________ API SLICES__________________
   const {
     data: productPage = [],
@@ -38,11 +41,7 @@ const Products = () => {
   } = useGetProductsQuery({
     page: currentPage,
     keyword: searched,
-    sort: filter.sort,
-    min: filter.min,
-    max: filter.max,
-    category: filter.category,
-    condition : filter.condition
+    ...filter,
   });
   const { data: categories } = useListcategoryQuery();
   console.log("product page ; ", productPage);

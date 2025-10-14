@@ -1,30 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const FilterSideBar = ({ filter, setFilter, categories }) => {
   const [category, setCategory] = useState("");
   const [search, setSearch] = useState("");
-  const sortOptions = ["price-high", "price-low", "newest", "oldest","popular"];
+  const sortOptions = [
+    "price-high",
+    "price-low",
+    "newest",
+    "oldest",
+    "popular",
+  ];
   const condition = ["Brand New", "Like New", "Refurbished", "Good", "Fair"];
-
   return (
     <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
       {/* Price Range Slider */}
       <div>
-        <label className="block font-medium mb-2">Price Range: ${filter.min} - ${filter.max}</label>
+        <label className="block font-medium mb-2">
+          Price Range: ${filter.min} - ${filter.max}
+        </label>
         <div className="flex space-x-2">
           <input
             type="range"
             min="0"
-            max="1000"
-            value={filter.min}
+            max="10000"
+            value={filter.min || 0}
             onChange={(e) => setFilter({ ...filter, min: e.target.value })}
             className="w-full"
           />
           <input
             type="range"
             min="0"
-            max="1000"
-            value={filter.max}
+            max="10000"
+            value={filter.max || 0}
             onChange={(e) => setFilter({ ...filter, max: e.target.value })}
             className="w-full"
           />
@@ -41,7 +48,7 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
           <label className="block text-sm font-medium">Min Price</label>
           <input
             type="number"
-            value={filter.min}
+            value={filter.min || 0}
             onChange={(e) => setFilter({ ...filter, min: e.target.value })}
             className="w-full p-2 border rounded"
           />
@@ -50,7 +57,7 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
           <label className="block text-sm font-medium">Max Price</label>
           <input
             type="number"
-            value={filter.max}
+            value={filter.max || 0}
             onChange={(e) => setFilter({ ...filter, max: e.target.value })}
             className="w-full p-2 border rounded"
           />
@@ -60,13 +67,13 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
       {/* Condition Dropdown */}
       <div>
         <label className="block font-medium mb-2">Condition</label>
-        <select 
+        <select
           value={filter.condition || ""}
           onChange={(e) => setFilter({ ...filter, condition: e.target.value })}
           className="w-full p-2 border rounded"
         >
           <option value="">Any Condition</option>
-          {condition.map((con,idx) => (
+          {condition.map((con, idx) => (
             <option key={idx} value={con}>
               {con}
             </option>
@@ -126,17 +133,18 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
       {/* Sort Dropdown */}
       <div>
         <label className="block font-medium mb-2">Sort By</label>
-        <select 
+        <select
           value={filter.sort || ""}
           onChange={(e) => setFilter({ ...filter, sort: e.target.value })}
           className="w-full p-2 border rounded"
         >
           <option value="">Default</option>
-          {sortOptions.map(sort => (
+          {sortOptions.map((sort) => (
             <option key={sort} value={sort}>
-              {sort.split('-').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-              ).join(' ')}
+              {sort
+                .split("-")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}
             </option>
           ))}
         </select>
@@ -145,7 +153,13 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
       {/* Reset Filters */}
       <button
         onClick={() => {
-          setFilter({ min: 0, max: 1000, category: "", condition: "", sort: "" });
+          setFilter({
+            min: 0,
+            max: 1000,
+            category: "",
+            condition: "",
+            sort: "",
+          });
           setCategory("");
           setSearch("");
         }}
