@@ -267,29 +267,7 @@ const ProductOverView = () => {
               </button>
             </div>
           </div>
-          {/* ===== Specifications ===== */}
-          <div className="bg-[#1a1d24]/70 rounded-2xl p-6 border border-gray-800">
-            <h3 className="text-xl font-semibold mb-4 text-white">
-              Product Details
-            </h3>
-            <div className="divide-y divide-gray-800">
-              <SpecRow label="Brand" value={product.brand} />
-              <SpecRow label="Condition" value={product.condition} />
-              <SpecRow
-                label="Quantity Available"
-                value={product.countInStock}
-              />
-              <SpecRow
-                label="Category"
-                value={product.category?.name || "N/A"}
-              />
-              <SpecRow
-                label="Seller"
-                value={product.uploadedBy?.username}
-                highlight
-              />
-            </div>
-          </div>
+          
         </div>
 
         <Tabs product={product} />
