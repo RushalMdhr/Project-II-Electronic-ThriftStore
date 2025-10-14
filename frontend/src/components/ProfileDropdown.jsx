@@ -18,7 +18,7 @@ const ProfileDropdown = () => {
         </h2>
         <p className="text-slate-400 text-sm">{userInfo?.email}</p>
         <span className="inline-block mt-2 bg-blue-900 text-blue-300 px-3 py-1 rounded-full text-xs">
-          {userInfo?.isVendor ? "Vendor" : "Customer"}
+          {userInfo?.isAdmin ? "Admin" : userInfo?.isVendor ? "Vendor" : "Customer"}
         </span>
       </div>
 
