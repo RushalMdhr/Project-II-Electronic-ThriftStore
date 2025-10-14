@@ -20,9 +20,8 @@ const PriceRange = ({ filter, setFilter }) => {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto p-4 bg-white rounded-lg shadow-md flex flex-col gap-4">
-      <h2 className="text-lg font-semibold">Price Range</h2>
-
+  <div className="w-full max-w-lg mx-auto p-4 bg-white rounded-lg shadow-sm shadow-black/50 flex flex-col gap-4">
+  
       <Slider
         min={0}
         max={100000}

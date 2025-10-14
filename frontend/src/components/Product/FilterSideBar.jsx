@@ -20,9 +20,13 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
 
       {/* Price Range */}
       <div>
-        <label className="block mb-2 font-medium text-gray-700">
-          Price Range: ${filter.min} - ${filter.max}
+        <label className="block mb-2 font-bold text-gray-700">
+          Price Range:{" "}
+          <span className="font-normal">
+            ${filter.min} - ${filter.max}
+          </span>
         </label>
+
         <PriceRange filter={filter} setFilter={setFilter} />
       </div>
 
@@ -73,9 +77,11 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
 
       {/* Category */}
       <div>
-        <label className="block font-medium mb-2 text-gray-700">Categories</label>
+        <label className="block font-medium mb-2 text-gray-700">
+          Categories
+        </label>
 
-        <div className="flex flex-col gap-1 max-h-40 overflow-y-auto border rounded p-2 bg-white">
+        <div className="flex flex-col gap-1 max-h-40 overflow-y-auto shadow-sm shadow-black/50 rounded p-2 bg-white">
           {categories?.map((cat) => (
             <label
               key={cat._id}
