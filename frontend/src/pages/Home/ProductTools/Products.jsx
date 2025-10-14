@@ -25,7 +25,7 @@ const Products = () => {
   //filter values :
   const [filter, setFilter] = useState({
     min: priceRange?.minPrice || 0,
-    max: priceRange?.maxPrice||1000,
+    max: priceRange?.maxPrice||10000,
     category: "",
     sort: "",
     condition: "",

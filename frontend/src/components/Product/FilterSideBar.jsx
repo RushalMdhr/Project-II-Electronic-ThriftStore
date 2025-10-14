@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PriceRange from "./PriceRange.jsx";
 
 const FilterSideBar = ({ filter, setFilter, categories }) => {
   const [category, setCategory] = useState("");
@@ -18,24 +19,7 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
         <label className="block font-medium mb-2">
           Price Range: ${filter.min} - ${filter.max}
         </label>
-        <div className="flex space-x-2">
-          <input
-            type="range"
-            min="0"
-            max="10000"
-            value={filter.min || 0}
-            onChange={(e) => setFilter({ ...filter, min: e.target.value })}
-            className="w-full"
-          />
-          <input
-            type="range"
-            min="0"
-            max="10000"
-            value={filter.max || 0}
-            onChange={(e) => setFilter({ ...filter, max: e.target.value })}
-            className="w-full"
-          />
-        </div>
+        <PriceRange filter={filter} setFilter={setFilter} />
         <div className="flex justify-between text-sm text-gray-600">
           <span>${filter.min}</span>
           <span>${filter.max}</span>
