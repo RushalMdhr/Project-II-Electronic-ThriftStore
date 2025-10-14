@@ -3,10 +3,34 @@ import { PRODUCT_URL, UPLOAD_URL } from "../constants";
 
 export const productApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    getPriceRange: builder.query({
+      query: () => ({
+        url: `${PRODUCT_URL}/getpricerange`,
+      }),
+    }),
+
     getProducts: builder.query({
-      query: ({ page, keyword, productId, sort,min,max,category,condition}) => ({
+      query: ({
+        page,
+        keyword,
+        productId,
+        sort,
+        min,
+        max,
+        category,
+        condition,
+      }) => ({
         url: `${PRODUCT_URL}`,
-        params: { page, keyword, productId,sort,min,max,category,condition},
+        params: {
+          page,
+          keyword,
+          productId,
+          sort,
+          min,
+          max,
+          category,
+          condition,
+        },
       }),
       keepUnusedDataFor: 5,
       providesTags: (result) =>
@@ -118,25 +142,25 @@ export const productApiSlice = apiSlice.injectEndpoints({
           : [{ type: "Product", id: "MY_LIST" }],
     }),
 
-    increaseViewCount : builder.mutation({
-      query : (productId)=>({
-        url : `${PRODUCT_URL}/${productId}/views`,
-        method : "PUT",
-      })
+    increaseViewCount: builder.mutation({
+      query: (productId) => ({
+        url: `${PRODUCT_URL}/${productId}/views`,
+        method: "PUT",
+      }),
     }),
 
-    reportProduct : builder.mutation({
-      query : ({reason,productId})=>({
-        url : `${PRODUCT_URL}/${productId}/reported`,
+    reportProduct: builder.mutation({
+      query: ({ reason, productId }) => ({
+        url: `${PRODUCT_URL}/${productId}/reported`,
         method: "POST",
-        body: {reason},
-      })
-    })
-
+        body: { reason },
+      }),
+    }),
   }),
 });
 
 export const {
+  useGetPriceRangeQuery,
   useGetProductsQuery,
   useGetProductByIdQuery,
   useAllProductsQuery,
@@ -150,5 +174,5 @@ export const {
   useUploadProductImageMutation,
   useGetMyProductsQuery,
   useIncreaseViewCountMutation,
-  useReportProductMutation
+  useReportProductMutation,
 } = productApiSlice;

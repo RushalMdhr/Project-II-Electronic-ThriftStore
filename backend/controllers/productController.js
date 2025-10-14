@@ -129,6 +129,29 @@ const deleteProductById = asyncHandler(async (req, res) => {
   }
 });
 
+const getPriceRange = asyncHandler(async (req, res) => {
+  try {
+    console.log('getting price range for you')
+    const priceRange = await Product.aggregate([
+      {
+        $group: {
+          _id: null,
+          minPrice: { $min: "$price" },
+          maxPrice: { $max: "$price" },
+        },
+      },
+    ]);
+
+    if (!priceRange) {
+      res.status(404).send("no price range found");
+    }
+    res.status(200).send(priceRange?.[0]);
+  } catch (error) {
+    console.error(error)
+    res.status(500).send("internal error")
+  }
+});
+
 const fetchProducts = asyncHandler(async (req, res) => {
   try {
     // console.log(
@@ -140,10 +163,10 @@ const fetchProducts = asyncHandler(async (req, res) => {
     console.log(pageSize);
 
     const page = Number(req.query.page) || 1;
-
+    let priceRange;
     // How to sort
     let sortOption = { createdAt: -1 }; // Default sort
-    const {min,max,category,condition,sort} = req.query
+    const { min, max, category, condition, sort } = req.query;
 
     // Handle sorting from frontend
     if (sort) {
@@ -209,12 +232,13 @@ const fetchProducts = asyncHandler(async (req, res) => {
       if (min) dbFilter.price.$gte = Number(min);
       if (max) dbFilter.price.$lte = Number(max);
     }
-    console.log("condtion : ",condition)
-    if(category){
-      dbFilter.category=category
+    console.log("priceRange : ", priceRange);
+    console.log("condtion : ", condition);
+    if (category) {
+      dbFilter.category = category;
     }
-    if(condition){
-      dbFilter.condition=condition
+    if (condition) {
+      dbFilter.condition = condition;
     }
 
     const count = await Product.countDocuments(dbFilter);
@@ -235,6 +259,7 @@ const fetchProducts = asyncHandler(async (req, res) => {
       // transformedProducts,
       products,
       page,
+      priceRange: priceRange?.[0],
       pages: Math.ceil(count / pageSize),
       hasMore: page < Math.ceil(count / pageSize),
     });
@@ -461,4 +486,5 @@ export {
   increaseViewCount,
   fetchGroupedProducts,
   reportProduct,
+  getPriceRange,
 };

@@ -14,13 +14,16 @@ import {
   getMyProducts,
   increaseViewCount,
   fetchGroupedProducts,
-  reportProduct
+  reportProduct,
+  getPriceRange
 } from "../controllers/productController.js";
 import checkId from "../middlewares/checkId.js";
 import { authenticate, authorizeAdmin, authorizeVendor, authorizeAdminOrVendor, isAuthenticated } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
+
+router.get("/getpricerange",getPriceRange)
 
 router.route("/:productId/reported").post(authenticate, reportProduct);
 
