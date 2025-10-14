@@ -56,13 +56,18 @@ const ProductOverview = () => {
   };
 
   const createReport = async () => {
-    const report = await reportProduct({
+    try {
+      const report = await reportProduct({
       reason,
       productId: param.productId,
     }).unwrap();
+    toast.success("Thanks for giving feed back")
     console.log(report);
     setShowPopup(false);
     setReason("");
+    } catch (error) {
+      toast.error("you have already reported this product")
+    }
   };
 
   if (product.error)
