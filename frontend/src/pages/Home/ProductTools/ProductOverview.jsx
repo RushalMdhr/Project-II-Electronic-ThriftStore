@@ -190,7 +190,7 @@ const ProductOverview = () => {
                   </span>
                 </div>
 
-                {/* Condition badge */ }
+                {/* Condition badge */}
                 <div
                   className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full shadow-sm border
       ${
@@ -225,18 +225,26 @@ const ProductOverview = () => {
                   userInfo._id !== product.uploadedBy?._id?.toString() &&
                   userInfo._id !== product.uploadedBy?.toString())) && (
                 <div className="flex gap-4">
-                  <AddToCart
-                    productId={product._id}
-                    disabled={!product.countInStock}
-                    className="flex-1"
-                  />
-                  <button
-                    type="button"
-                    disabled={!product.countInStock}
-                    className="flex-1 px-8 py-4 bg-green-500 text-white rounded-xl font-semibold shadow hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Buy Now
-                  </button>
+                  {/* Add to Cart Button Wrapper */}
+                  <div className="flex-1">
+                    <AddToCart
+                      productId={product._id}
+                      disabled={!product.countInStock}
+                      quantity={1}
+                    />
+                  </div>
+
+                  {/* Buy Now Button Wrapper */}
+                  <div className="flex-0.3">
+                    <button
+                      type="button"
+                      disabled={!product.countInStock}
+                      className="mt-2 w-full px-4 py-2 rounded-lg font-medium transition-all duration-200 
+                 bg-amber-500 text-white shadow hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Buy Now
+                    </button>
+                  </div>
                 </div>
               )}
 
