@@ -1,7 +1,9 @@
 import { useState } from "react";
 import PriceRange from "./PriceRange.jsx";
+import { useSearchParams } from "react-router";
+import { useEffect } from "react";
 
-const FilterSideBar = ({ filter, setFilter, categories }) => {
+const FilterSideBar = ({ filter, setFilter, categories, searchParams, setSearchParams }) => {
   const [category, setCategory] = useState("");
   const [search, setSearch] = useState("");
 
@@ -13,6 +15,12 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
     "popular",
   ];
   const condition = ["Brand New", "Like New", "Refurbished", "Good", "Fair"];
+
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get("category") || "";
+    setFilter((prev) => ({ ...prev, category: categoryFromUrl }));
+  }, [searchParams]);
+
 
   return (
     <aside className="bg-white p-6 rounded-lg shadow space-y-6 w-full md:w-72">
@@ -90,15 +98,26 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
               <input
                 type="radio"
                 name="category"
-                value={cat._id}
+                value={cat._id} // ✅ using the ID
                 checked={filter.category === cat._id}
-                onChange={() => setFilter({ ...filter, category: cat._id })}
+                onChange={() => {
+                  setFilter({ ...filter, category: cat._id }); // ✅ store ID in filter
+
+                  // Update URL query param
+                  setSearchParams((prev) => {
+                    const params = new URLSearchParams(prev);
+                    params.set("category", cat._id); // ✅ URL stores the ID
+                    params.set("page", 1);
+                    return params;
+                  });
+                }}
                 className="form-radio h-4 w-4 text-emerald-600"
               />
+
               <span className="text-gray-700">{cat.name}</span>
             </label>
           ))}
-
+          
           {/* Optional: None / Default */}
           <label className="inline-flex items-center gap-2 cursor-pointer mt-1">
             <input

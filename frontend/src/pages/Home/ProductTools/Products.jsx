@@ -21,11 +21,13 @@ const Products = () => {
 
   const { data: priceRange } = useGetPriceRangeQuery();
   const { data: categories } = useListcategoryQuery();
+  const categoryQuery = searchParams.get("category") || "";
+
 
   const [filter, setFilter] = useState({
     min: 0,
     max: 10000,
-    category: "",
+    category: categoryQuery,
     sort: "",
     condition: "",
   });
@@ -81,6 +83,8 @@ const Products = () => {
             filter={filter}
             setFilter={setFilter}
             categories={categories}
+            searchParams={searchParams}
+            setSearchParams={setSearchParams}
           />
         </aside>
 
