@@ -93,7 +93,7 @@ const Products = () => {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-              Shop All Products
+              {userInfo?.isAdmin ? "All Products" : "Shop All Products"}
             </h1>
             <p className="text-gray-600 text-lg mt-1">
               {productPage.count || 0} products available
