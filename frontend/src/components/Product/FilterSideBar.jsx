@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import PriceRange from "./PriceRange.jsx";
 
 const FilterSideBar = ({ filter, setFilter, categories }) => {
   const [category, setCategory] = useState("");
   const [search, setSearch] = useState("");
+
   const sortOptions = [
     "price-high",
     "price-low",
@@ -11,68 +13,60 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
     "popular",
   ];
   const condition = ["Brand New", "Like New", "Refurbished", "Good", "Fair"];
+
   return (
-    <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-      {/* Price Range Slider */}
+    <aside className="bg-white p-6 rounded-lg shadow space-y-6 w-full md:w-72">
+      <h2 className="text-xl font-bold mb-2 text-gray-900">Filters</h2>
+
+      {/* Price Range */}
       <div>
-        <label className="block font-medium mb-2">
-          Price Range: ${filter.min} - ${filter.max}
+        <label className="block mb-2 font-bold text-gray-700">
+          Price Range:{" "}
+          <span className="font-normal">
+            ${filter.min} - ${filter.max}
+          </span>
         </label>
-        <div className="flex space-x-2">
-          <input
-            type="range"
-            min="0"
-            max="10000"
-            value={filter.min || 0}
-            onChange={(e) => setFilter({ ...filter, min: e.target.value })}
-            className="w-full"
-          />
-          <input
-            type="range"
-            min="0"
-            max="10000"
-            value={filter.max || 0}
-            onChange={(e) => setFilter({ ...filter, max: e.target.value })}
-            className="w-full"
-          />
-        </div>
-        <div className="flex justify-between text-sm text-gray-600">
-          <span>${filter.min}</span>
-          <span>${filter.max}</span>
-        </div>
+
+        <PriceRange filter={filter} setFilter={setFilter} />
       </div>
 
-      {/* Manual Price Inputs */}
+      {/* Manual price input */}
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="block text-sm font-medium">Min Price</label>
+          <label className="block text-sm font-medium text-gray-700">Min</label>
           <input
             type="number"
             value={filter.min || 0}
-            onChange={(e) => setFilter({ ...filter, min: e.target.value })}
+            onChange={(e) =>
+              setFilter({ ...filter, min: Number(e.target.value) })
+            }
             className="w-full p-2 border rounded"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Max Price</label>
+          <label className="block text-sm font-medium text-gray-700">Max</label>
           <input
             type="number"
             value={filter.max || 0}
-            onChange={(e) => setFilter({ ...filter, max: e.target.value })}
+            onChange={(e) =>
+              setFilter({ ...filter, max: Number(e.target.value) })
+            }
             className="w-full p-2 border rounded"
           />
         </div>
       </div>
 
-      {/* Condition Dropdown */}
+      {/* Condition */}
       <div>
-        <label className="block font-medium mb-2">Condition</label>
+        <label className="block font-medium mb-1 text-gray-700">
+          Condition
+        </label>
         <select
           value={filter.condition || ""}
           onChange={(e) => setFilter({ ...filter, condition: e.target.value })}
           className="w-full p-2 border rounded"
         >
-          <option value="">Any Condition</option>
+          <option value="">Any</option>
           {condition.map((con, idx) => (
             <option key={idx} value={con}>
               {con}
@@ -81,58 +75,48 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
         </select>
       </div>
 
-      {/* Category Search */}
+      {/* Category */}
       <div>
-        <label className="block font-medium mb-2">Category</label>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search category..."
-            value={!category ? search : category}
-            onChange={(e) => setSearch(e.target.value)}
-            readOnly={!!category}
-            className="w-full p-2 border rounded"
-          />
-          {category && (
-            <button
-              onClick={() => {
-                setCategory("");
-                setSearch("");
-                // setFilter({ ...filter, category: "" });
-              }}
-              className="absolute right-2 top-2 text-red-500 hover:text-red-700"
-            >
-              ×
-            </button>
-          )}
-        </div>
+        <label className="block font-medium mb-2 text-gray-700">
+          Categories
+        </label>
 
-        {/* Category Results */}
-        {search.length > 2 && !category && (
-          <div className="mt-2 border rounded max-h-32 overflow-y-auto">
-            {categories
-              ?.filter((cat) =>
-                cat.name.toLowerCase().includes(search.toLowerCase())
-              )
-              .map((cat) => (
-                <div
-                  key={cat._id}
-                  onClick={() => {
-                    setCategory(cat.name);
-                    setFilter({ ...filter, category: cat._id });
-                  }}
-                  className="p-2 hover:bg-blue-50 cursor-pointer border-b"
-                >
-                  {cat.name}
-                </div>
-              ))}
-          </div>
-        )}
+        <div className="flex flex-col gap-1 max-h-40 overflow-y-auto shadow-sm shadow-black/50 rounded p-2 bg-white">
+          {categories?.map((cat) => (
+            <label
+              key={cat._id}
+              className="inline-flex items-center gap-2 cursor-pointer"
+            >
+              <input
+                type="radio"
+                name="category"
+                value={cat._id}
+                checked={filter.category === cat._id}
+                onChange={() => setFilter({ ...filter, category: cat._id })}
+                className="form-radio h-4 w-4 text-emerald-600"
+              />
+              <span className="text-gray-700">{cat.name}</span>
+            </label>
+          ))}
+
+          {/* Optional: None / Default */}
+          <label className="inline-flex items-center gap-2 cursor-pointer mt-1">
+            <input
+              type="radio"
+              name="category"
+              value=""
+              checked={!filter.category}
+              onChange={() => setFilter({ ...filter, category: "" })}
+              className="form-radio h-4 w-4 text-emerald-600"
+            />
+            <span className="text-gray-700">All Categories</span>
+          </label>
+        </div>
       </div>
 
-      {/* Sort Dropdown */}
+      {/* Sort */}
       <div>
-        <label className="block font-medium mb-2">Sort By</label>
+        <label className="block font-medium mb-1 text-gray-700">Sort By</label>
         <select
           value={filter.sort || ""}
           onChange={(e) => setFilter({ ...filter, sort: e.target.value })}
@@ -143,19 +127,19 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
             <option key={sort} value={sort}>
               {sort
                 .split("-")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .map((w) => w[0].toUpperCase() + w.slice(1))
                 .join(" ")}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Reset Filters */}
+      {/* Reset */}
       <button
         onClick={() => {
           setFilter({
             min: 0,
-            max: 1000,
+            max: 10000,
             category: "",
             condition: "",
             sort: "",
@@ -163,11 +147,11 @@ const FilterSideBar = ({ filter, setFilter, categories }) => {
           setCategory("");
           setSearch("");
         }}
-        className="w-full bg-gray-200 hover:bg-gray-300 py-2 rounded font-medium"
+        className="w-full bg-gray-200 hover:bg-gray-300 py-2 rounded font-medium mt-4"
       >
         Reset Filters
       </button>
-    </div>
+    </aside>
   );
 };
 
