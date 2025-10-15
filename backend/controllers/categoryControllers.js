@@ -82,7 +82,7 @@ export const deleteCategory = async (req, res) => {
 
 const getTopCategories = asyncHandler(async(req,res)=>{
   try {
-    const topCategories = await Category.find().sort({ used: -1 }).limit(4);
+    const topCategories = await Category.find().sort({ used: -1 }).limit(10);
     console.log(topCategories);
     res.send(topCategories);
   } catch (error) {
