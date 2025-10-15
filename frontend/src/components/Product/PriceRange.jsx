@@ -23,22 +23,26 @@ const PriceRange = ({ filter, setFilter }) => {
         value={[filter.min, filter.max]}
         onChange={handleChange}
         className="relative h-3"
+
         renderTrack={(props, state) => {
+          const { key, ...rest } = props;
           let trackClass = "absolute h-3 rounded-full";
-          if (state.index === 1) trackClass += " bg-indigo-600"; // filled part
-          else trackClass += " bg-gray-300"; // left/right unfilled
+          if (state.index === 1) trackClass += " bg-indigo-600";
+          else trackClass += " bg-gray-300";
+          // if (state.index === 2) trackClass += " bg-transparent";
 
-          // Make the right track transparent to remove gray patch
-          if (state.index === 2) trackClass += " bg-transparent";
-
-          return <div {...props} className={trackClass} />;
+          return <div key={key} {...rest} className={trackClass} />;
         }}
-        renderThumb={(props) => (
-          <div
-            {...props}
-            className="w-5 h-5 bg-indigo-600 rounded-full shadow-md cursor-pointer -mt-1"
-          />
-        )}
+        renderThumb={(props) => {
+          const { key, ...rest } = props;
+          return (
+            <div
+              key={key}
+              {...rest}
+              className="w-5 h-5 bg-indigo-600 rounded-full shadow-md cursor-pointer -mt-1"
+            />
+          );
+        }}
       />
 
       <div className="flex justify-between text-sm text-gray-700">

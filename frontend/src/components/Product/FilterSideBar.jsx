@@ -89,7 +89,7 @@ const FilterSideBar = ({ filter, setFilter, categories, searchParams, setSearchP
           Categories
         </label>
 
-        <div className="flex flex-col gap-1 max-h-40 overflow-y-auto shadow-sm shadow-black/50 rounded p-2 bg-white">
+        <div className="flex flex-col gap-1 max-h-100 overflow-y-auto shadow-sm shadow-black/50 rounded p-2 bg-white">
           {categories?.map((cat) => (
             <label
               key={cat._id}
