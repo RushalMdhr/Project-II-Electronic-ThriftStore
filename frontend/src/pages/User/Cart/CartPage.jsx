@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   useGetCartItemsQuery,
   useUpdateCartItemMutation,
@@ -19,11 +19,12 @@ const CartPage = () => {
   } = useGetCartItemsQuery(userId, {
     skip: !userId,
   });
-  console.log("cartitems like : ",cartItemsData);
+  console.log("cartitems like : ", cartItemsData);
 
   const [updateCartItem] = useUpdateCartItemMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
   const [cartItems, setCartItems] = useState([]);
+  const [selectedCartItems, setSelectedCartItems] = useState([]);
 
   useEffect(() => {
     setCartItems(cartItemsData);
@@ -77,9 +78,27 @@ const CartPage = () => {
   };
 
   const handleCheckout = () => {
-    console.log("Proceeding to checkout with cartItems:", cartItemsData);
-    navigate("/checkout", { state: { cartItemsData } });
+    console.log("Proceeding to checkout with cartItems:", selectedCartItems);
+    navigate("/checkout", { state: { selectedCartItems } });
   };
+
+  //unnecessary refetch is happenning
+  const toggleCartItem = useCallback((item) => {
+    setSelectedCartItems((prev) =>
+      prev.some((selected) => selected._id === item._id)
+        ? prev.filter((selected) => selected._id !== item._id)
+        : [...prev, item]
+    );
+  }, []);
+  console.log("selected items : ", selectedCartItems);
+
+  // Check if item is selected
+  const isItemSelected = useCallback(
+    (itemId) => {
+      return selectedCartItems.some((item) => item._id === itemId);
+    },
+    [selectedCartItems]
+  );
 
   if (!userId)
     return <p className="p-4 text-center">Please log in to view your cart.</p>;
@@ -124,7 +143,12 @@ const CartPage = () => {
                 key={item._id}
                 className="flex items-center justify-between border-b py-4"
               >
-                <Link to={`/product/${item.product._id}`}>
+                <input
+                  type="checkbox"
+                  checked={isItemSelected(item._id)}
+                  onChange={() => toggleCartItem(item)}
+                />
+                <Link to={`/overview/${item.product._id}`}>
                   <img
                     src={item.product.images?.[0] || "/placeholder.png"}
                     alt={item.product.name}
