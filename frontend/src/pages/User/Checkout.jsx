@@ -7,7 +7,7 @@ import { generateUniqueId } from "esewajs";
 
 const Checkout = () => {
   const { state } = useLocation();
-  const products = state?.cartItemsData || [];
+  const products = state?.selectedCartItems || [];
   const [dropdown, setDropdown] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState("cod");
   const total = products.reduce(
