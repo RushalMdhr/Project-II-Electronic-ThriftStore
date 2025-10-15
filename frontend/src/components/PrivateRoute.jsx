@@ -19,7 +19,7 @@ export default function PrivateRoute() {
 
   return userInfo ? (
     <>
-      <div style={{ padding: "10px", color: "green" }}>✅ Access granted</div>
+      {/* <div style={{ padding: "10px", color: "green" }}>✅ Access granted</div> */}
       <Outlet />
     </>
   ) : (

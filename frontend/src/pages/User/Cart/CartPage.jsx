@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   useGetCartItemsQuery,
   useUpdateCartItemMutation,
   useDeleteCartItemMutation,
 } from "../../../redux/api/cartApiSlice";
 import { useUserId } from "../../../components/UserProvider";
-import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-// cart
+import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+
 const CartPage = () => {
   const userId = useUserId();
   const navigate = useNavigate();
@@ -17,10 +18,7 @@ const CartPage = () => {
     isLoading,
     isError,
     refetch,
-  } = useGetCartItemsQuery(userId, {
-    skip: !userId,
-  });
-  console.log("cartitems like : ", cartItemsData);
+  } = useGetCartItemsQuery(userId, { skip: !userId });
 
   const [updateCartItem] = useUpdateCartItemMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
@@ -29,10 +27,11 @@ const CartPage = () => {
 
   useEffect(() => {
     setCartItems(cartItemsData);
+    setSelectedCartItems([]); // all unselected by default
     refetch();
   }, [cartItemsData]);
 
-  const totalPrice = cartItems.reduce(
+  const totalPrice = selectedCartItems.reduce(
     (acc, item) =>
       acc +
       (item.product.discountedPrice || item.product.price) * item.quantity,
@@ -41,33 +40,23 @@ const CartPage = () => {
 
   const handleQuantityChange = async (itemId, action) => {
     try {
-      const itemwanted = cartItemsData.find((item) => item._id === itemId);
-      if (itemwanted) {
-        console.log("wanted : ", itemwanted);
-        console.log(
-          "quantity : ",
-          itemwanted.quantity,
-          "stock : ",
-          itemwanted.product.countInStock < itemwanted.quantity
-        );
+      const item = cartItemsData.find((i) => i._id === itemId);
+      if (
+        item.product.countInStock < item.quantity + 1 &&
+        action === "increment"
+      ) {
+        toast.warning("Quantity exceeds available stock");
+        return;
       }
-      if (itemwanted.product.countInStock < itemwanted.quantity + 1) {
-        toast.warning("quantity cant be more than stock ");
-      } else {
-        await updateCartItem({ id: itemId, action }).unwrap();
-        refetch();
-      }
+      await updateCartItem({ id: itemId, action }).unwrap();
+      refetch();
     } catch (error) {
       console.error("Failed to update cart:", error);
     }
   };
 
   const handleDelete = async (itemId) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to remove this item?"
-    );
-    if (!confirmed) return;
-
+    if (!window.confirm("Remove this item from your cart?")) return;
     try {
       await deleteCartItem(itemId).unwrap();
       refetch();
@@ -77,11 +66,7 @@ const CartPage = () => {
   };
 
   const handleClearCart = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to clear your entire cart?"
-    );
-    if (!confirmed) return;
-
+    if (!window.confirm("Clear your entire cart?")) return;
     try {
       for (const item of cartItems) {
         await deleteCartItem(item._id).unwrap();
@@ -93,138 +78,228 @@ const CartPage = () => {
   };
 
   const handleCheckout = () => {
-    console.log("Proceeding to checkout with cartItems:", selectedCartItems);
     navigate("/checkout", { state: { selectedCartItems } });
   };
 
-  //unnecessary refetch is happenning
   const toggleCartItem = useCallback((item) => {
     setSelectedCartItems((prev) =>
-      prev.some((selected) => selected._id === item._id)
-        ? prev.filter((selected) => selected._id !== item._id)
+      prev.some((s) => s._id === item._id)
+        ? prev.filter((s) => s._id !== item._id)
         : [...prev, item]
     );
   }, []);
-  console.log("selected items : ", selectedCartItems);
 
-  // Check if item is selected
   const isItemSelected = useCallback(
-    (itemId) => {
-      return selectedCartItems.some((item) => item._id === itemId);
-    },
+    (id) => selectedCartItems.some((i) => i._id === id),
     [selectedCartItems]
   );
 
+  const toggleSelectAll = () => {
+    if (selectedCartItems.length === cartItems.length) {
+      setSelectedCartItems([]); // unselect all
+    } else {
+      setSelectedCartItems(cartItems); // select all
+    }
+  };
+
   if (!userId)
-    return <p className="p-4 text-center">Please log in to view your cart.</p>;
-  if (isLoading) return <p className="p-4 text-center">Loading cart...</p>;
-  if (isError) return <p className="p-4 text-center">Error loading cart.</p>;
+    return (
+      <p className="p-4 text-center text-gray-700">
+        Please log in to view your cart.
+      </p>
+    );
+  if (isLoading)
+    return (
+      <p className="p-4 text-center text-gray-700">Loading your cart...</p>
+    );
+  if (isError)
+    return <p className="p-4 text-center text-red-500">Error loading cart.</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      {/* Go Back Button */}
-      <div className="mb-4">
-        <button
-          onClick={() => navigate("/")}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded shadow"
-        >
-          ← Back to Products
-        </button>
-      </div>
-
-      <h2 className="text-2xl font-bold mb-4">🛒 Your Cart</h2>
-
-      {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
-      ) : (
-        <>
-          <div className="flex justify-end mb-4">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="max-w-6xl mx-auto space-y-3">
+          {/* Top Row: Back Button */}
+          <div className="flex justify-start items-center">
             <button
-              onClick={handleClearCart}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+              onClick={() => navigate("/")}
+              className="flex items-center gap-2 text-gray-700 font-medium px-3 py-2 rounded-lg 
+               bg-white/30 backdrop-blur-sm shadow-sm
+               hover:shadow-lg hover:bg-gray-100/50 hover:text-black
+               active:scale-95 active:shadow-inner transition-all"
             >
-              🧹 Clear Cart
+              <ChevronLeft size={20} />
+              Continue Shopping
             </button>
           </div>
 
-          {cartItems.map((item) => {
-            const price = item.product.discountedPrice || item.product.price;
-            const originalPrice = item.product.discountedPrice
-              ? item.product.price
-              : null;
+          {/* Header */}
+          <div className="text-center">
+            <h2 className="text-4xl font-bold text-gray-900">
+              🛒 My Shopping Cart
+            </h2>
+            <p className="text-gray-500 mt-2 text-lg font-medium opacity-70 transition-opacity duration-300 hover:opacity-90">
+              {cartItems.length} {cartItems.length === 1 ? "item" : "items"}
+            </p>
+          </div>
 
-            return (
-              <div
-                key={item._id}
-                className="flex items-center justify-between border-b py-4"
+          {/* Clear Cart */}
+          {cartItems.length > 0 && (
+            <div className="flex justify-end mt-2">
+              <button
+                onClick={handleClearCart}
+                className="text-sm px-5 py-2.5 bg-rose-500 text-white rounded-xl hover:bg-rose-600 shadow-sm transition"
               >
-                <input
-                  type="checkbox"
-                  checked={isItemSelected(item._id)}
-                  onChange={() => toggleCartItem(item)}
-                />
-                <Link to={`/overview/${item.product._id}`}>
-                  <img
-                    src={item.product.images?.[0] || "/placeholder.png"}
-                    alt={item.product.name}
-                    className="w-20 h-20 object-cover rounded hover:scale-105 transition duration-200"
-                  />
-                </Link>
-                <div className="flex-1 ml-4">
-                  <h4 className="font-semibold">{item.product.name}</h4>
-                  <p className="text-gray-600">
-                    Price: Rs.{" "}
-                    <span className="font-bold text-green-600">{price}</span>
-                    {originalPrice && (
-                      <span className="line-through text-sm text-gray-500 ml-2">
-                        Rs. {originalPrice}
-                      </span>
-                    )}
-                  </p>
-                  <div className="flex items-center space-x-2 mt-2">
+                Clear Cart
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Select All as badge */}
+        {cartItems.length > 0 && (
+          <div className="mb-4">
+            <label
+              htmlFor="selectAll"
+              className="inline-flex items-center gap-2 px-4 py-1 bg-green-100 text-green-800 rounded-full font-medium cursor-pointer shadow-sm hover:bg-green-200 transition"
+            >
+              <input
+                type="checkbox"
+                id="selectAll"
+                checked={
+                  selectedCartItems.length === cartItems.length &&
+                  cartItems.length > 0
+                }
+                onChange={toggleSelectAll}
+                className="w-5 h-8 accent-green-600 cursor-pointer"
+              />
+              Select All Items
+            </label>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {cartItems.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-2xl shadow-md border border-gray-100">
+            <p className="text-lg text-gray-600">Your cart is empty.</p>
+            <button
+              onClick={() => navigate("/")}
+              className="mt-6 bg-gray-800 text-white px-6 py-3 rounded-xl hover:bg-black transition"
+            >
+              Browse Products
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Cart Items */}
+            <div className="space-y-5">
+              {cartItems.map((item) => {
+                const price =
+                  item.product.discountedPrice || item.product.price;
+                const originalPrice = item.product.discountedPrice
+                  ? item.product.price
+                  : null;
+
+                return (
+                  <div
+                    key={item._id}
+                    className="flex flex-col sm:flex-row items-center gap-6 bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-100 p-5 transition-all"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isItemSelected(item._id)}
+                      onChange={() => toggleCartItem(item)}
+                      className="w-5 h-5 accent-green-600 self-start sm:self-center cursor-pointer"
+                    />
+
+                    <Link to={`/overview/${item.product._id}`}>
+                      <img
+                        src={item.product.images?.[0] || "/placeholder.png"}
+                        alt={item.product.name}
+                        className="w-28 h-28 object-cover rounded-xl border border-gray-200 hover:scale-105 transition-transform"
+                      />
+                    </Link>
+
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-lg text-gray-800 truncate">
+                        {item.product.name}
+                      </h4>
+                      <p className="text-gray-600 text-sm mb-3">
+                        Price:{" "}
+                        <span className="text-gray-900 font-semibold">
+                          Rs. {price}
+                        </span>
+                        {originalPrice && (
+                          <span className="line-through text-gray-400 ml-2 text-sm">
+                            Rs. {originalPrice}
+                          </span>
+                        )}
+                      </p>
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          className="w-8 h-8 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition"
+                          onClick={() =>
+                            handleQuantityChange(item._id, "decrement")
+                          }
+                        >
+                          −
+                        </button>
+                        <span className="px-4 py-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 font-medium">
+                          {item.quantity}
+                        </span>
+                        <button
+                          className="w-8 h-8 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition"
+                          onClick={() =>
+                            handleQuantityChange(item._id, "increment")
+                          }
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
                     <button
-                      className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                      onClick={() =>
-                        handleQuantityChange(item._id, "decrement")
-                      }
+                      onClick={() => handleDelete(item._id)}
+                      className="relative flex items-center justify-center self-start sm:self-center transition group"
                     >
-                      -
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button
-                      className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                      onClick={() =>
-                        handleQuantityChange(item._id, "increment")
-                      }
-                    >
-                      +
+                      {/* Subtle red blur circle on hover */}
+                      <span className="absolute w-10 h-10 bg-red-500 rounded-full opacity-0 blur-xl transition-all group-hover:opacity-100 -ml-10.5"></span>
+
+                      {/* Trash icon slightly left by default */}
+                      <Trash2
+                        size={22}
+                        className="relative text-red-500 -ml-10.5" // moves icon slightly left (~6px)
+                      />
                     </button>
                   </div>
-                </div>
-                <button
-                  className="ml-4 text-red-600 hover:underline"
-                  onClick={() => handleDelete(item._id)}
-                >
-                  🗑 Remove
-                </button>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
 
-          <div className="text-right mt-6">
-            <h3 className="text-xl font-bold">Total: Rs. {totalPrice}</h3>
-          </div>
-
-          <div className="text-right mt-6">
-            <button
-              onClick={handleCheckout}
-              className="bg-green-500 w-full py-2 text-white rounded hover:bg-green-600 transition"
-            >
-              Checkout
-            </button>
-          </div>
-        </>
-      )}
+            {/* Checkout Section */}
+            <div className="sticky bottom-0 bg-white/90 backdrop-blur-md border-t border-gray-200 mt-10 p-5 shadow-md rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                Total:{" "}
+                <span className="text-gray-900 font-bold">
+                  Rs. {totalPrice.toFixed(2)}
+                </span>
+              </h3>
+              <button
+                onClick={handleCheckout}
+                disabled={selectedCartItems.length === 0}
+                className={`${
+                  selectedCartItems.length === 0
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                } text-white px-8 py-3 rounded-xl shadow-md flex items-center justify-center gap-2 transition w-full sm:w-auto`}
+              >
+                Proceed to Checkout <ChevronRight size={20} />
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };
