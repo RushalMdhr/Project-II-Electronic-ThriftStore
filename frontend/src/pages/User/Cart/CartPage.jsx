@@ -6,6 +6,7 @@ import {
 } from "../../../redux/api/cartApiSlice";
 import { useUserId } from "../../../components/UserProvider";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 // cart
 const CartPage = () => {
   const userId = useUserId();
@@ -40,8 +41,22 @@ const CartPage = () => {
 
   const handleQuantityChange = async (itemId, action) => {
     try {
-      await updateCartItem({ id: itemId, action }).unwrap();
-      refetch();
+      const itemwanted = cartItemsData.find((item) => item._id === itemId);
+      if (itemwanted) {
+        console.log("wanted : ", itemwanted);
+        console.log(
+          "quantity : ",
+          itemwanted.quantity,
+          "stock : ",
+          itemwanted.product.countInStock < itemwanted.quantity
+        );
+      }
+      if (itemwanted.product.countInStock < itemwanted.quantity + 1) {
+        toast.warning("quantity cant be more than stock ");
+      } else {
+        await updateCartItem({ id: itemId, action }).unwrap();
+        refetch();
+      }
     } catch (error) {
       console.error("Failed to update cart:", error);
     }
