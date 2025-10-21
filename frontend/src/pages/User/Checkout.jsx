@@ -57,14 +57,15 @@ const Checkout = () => {
 
         if (payment?.url) {
           window.location.href = payment.url;
+          console.log('i m here')
         } else {
           console.log("No URL found in response");
         }
       }
       const order = await createOrder({ ...data, paymentId: LinkId });
       if(order.error){
-        toast.error(error.message);
-        console.error(error)
+        toast.error(order.error.message);
+        console.error(order.error)
       }
       toast.success("checkout success, your order is now pending")
       console.log(order);

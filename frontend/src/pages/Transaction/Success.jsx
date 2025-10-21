@@ -1,56 +1,60 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import {base64Decode} from "esewajs"
-import axios from "axios";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom"; // Remove useNavigate
+import { base64Decode } from "esewajs";
+import { useEsewaSuccessMutation } from "../../redux/api/transactionApiSlice";
+import { toast } from "react-toastify";
+
 const Success = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
+  
   const location = useLocation();
-  // Create a new URLSearchParams object using the search string from location
+  const [esewaSuccess] = useEsewaSuccessMutation();
+
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("data");
-  // Decode the JWT without verifying the signature
   const decoded = base64Decode(token);
+
+  console.log("📍 Debug - Token:", token);
+  console.log("📍 Debug - Decoded:", decoded);
+
   const verifyPaymentAndUpdateStatus = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/payment-status",
-        {
-          product_id: decoded.transaction_uuid,
-        }
-      );
-      if (response.status === 200) {
-        setIsLoading(false);
-        setIsSuccess(true);
-      }
-    } catch (error) {
+      console.log("📍 Starting verification...");
+      
+      const response = await esewaSuccess({
+        product_id: decoded.transaction_uuid,
+      }).unwrap();
+
+      console.log('📍 API Response:', response);
+      
       setIsLoading(false);
-      console.error("Error initiating payment:", error);
+      setIsSuccess(true);
+      toast.success('Payment verified successfully!');
+      
+    } catch (error) {
+      console.error("📍 Error details:", error);
+      setIsLoading(false);
+      toast.error("Verification failed");
     }
   };
+
   useEffect(() => {
     verifyPaymentAndUpdateStatus();
   }, []);
-  if (isLoading && !isSuccess) return <>Loading...</>;
-  if (!isLoading && !isSuccess)
-    return (
-      <>
-        <h1>Oops!..Error occurred on confirming payment</h1>
-        <h2>We will resolve it soon.</h2>
-        <button onClick={() => navigate("/")} className="go-home-button">
-          Go to Homepage
-        </button>
-      </>
-    );
+
+  // Simple loading state
+  if (isLoading) return <div>🔄 Processing payment...</div>;
+  
   return (
-    <div>
-      <h1>Payment Successful!</h1>
-      <p>Thank you for your payment. Your transaction was successful.</p>
-      <button onClick={() => navigate("/")} className="go-home-button">
-        Go to Homepage
+    <div style={{ padding: '20px' }}>
+      <h1>Payment Status Page</h1>
+      <p>Check browser console for debug logs</p>
+      <button onClick={() => console.log("Manual check")}>
+        Test Console
       </button>
     </div>
   );
 };
+
 export default Success;
