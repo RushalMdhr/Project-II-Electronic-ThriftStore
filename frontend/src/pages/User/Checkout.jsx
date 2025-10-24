@@ -54,6 +54,7 @@ const Checkout = () => {
           productId: LinkId,
         }).unwrap();
         console.log(payment);
+        toast.success("creating ...");
 
         if (payment?.url) {
           window.location.href = payment.url;
@@ -63,6 +64,7 @@ const Checkout = () => {
         }
       }
       const order = await createOrder({ ...data, paymentId: LinkId });
+      toast.success("created !!")
       if(order.error){
         toast.error(order.error.message);
         console.error(order.error)

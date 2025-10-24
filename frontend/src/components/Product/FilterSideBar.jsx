@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PriceRange from "./PriceRange.jsx";
-import { useSearchParams } from "react-router";
+// import { useSearchParams } from "react-router";
 import { useEffect } from "react";
 
 const FilterSideBar = ({ filter, setFilter, categories, searchParams, setSearchParams }) => {
