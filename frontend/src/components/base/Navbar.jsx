@@ -109,6 +109,13 @@ const Navbar = () => {
               >
                 Home
               </Link>
+              <Link
+                to="/payment"
+                className="text-gray-300 hover:text-white"
+                onClick={() => dispatch(setRole("buyer"))}
+              >
+                PM
+              </Link>
 
               {(role === "buyer" || !userInfo?.isVendor) &&
                 !userInfo?.isAdmin && (

@@ -183,7 +183,7 @@ const CartPage = () => {
           <div className="text-center py-20 bg-white rounded-2xl shadow-md border border-gray-100">
             <p className="text-lg text-gray-600">Your cart is empty.</p>
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/products")}
               className="mt-6 bg-gray-800 text-white px-6 py-3 rounded-xl hover:bg-black transition"
             >
               Browse Products
