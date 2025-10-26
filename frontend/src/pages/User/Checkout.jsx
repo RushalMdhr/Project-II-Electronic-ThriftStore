@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { useCreateOrderMutation } from "../../redux/api/orderApiSlice";
 import { toast } from "react-toastify";
@@ -45,32 +45,61 @@ const Checkout = () => {
     { value: "esewa", label: "eSewa" },
   ];
 
+  // const HandleOrder = async () => {
+  //   try {
+  //     const LinkId = generateUniqueId();
+  //     if (selectedPayment === "esewa") {
+  //       const payment = await esewaPayment({
+  //         amount: total,
+  //         productId: LinkId,
+  //       }).unwrap();
+  //       console.log(payment);
+  //       toast.success("creating ...");
+
+  //       if (payment?.url) {
+  //         localStorage.setItem("esewa", JSON.stringify({...data, paymentId : LinkId}));
+  //         window.location.href = payment.url;
+  //       } else {
+  //         console.log("No URL found in response");
+  //       }
+  //     }
+  //     const order = await createOrder({ ...data, paymentId: LinkId });
+  //     toast.success("created !!")
+  //     if(order.error){
+  //       toast.error(order.error.message);
+  //       console.error(order.error)
+  //     }
+  //     toast.success("checkout success, your order is now pending")
+  //     console.log(order);
+  //   } catch (error) {
+  //     toast.error(error?.message || "order creation failed");
+  //     console.error("order error : ", error);
+  //   }
+  // };
   const HandleOrder = async () => {
     try {
-      const LinkId = generateUniqueId();
-      if (selectedPayment === "esewa") {
-        const payment = await esewaPayment({
-          amount: total,
-          productId: LinkId,
-        }).unwrap();
-        console.log(payment);
-        toast.success("creating ...");
-
-        if (payment?.url) {
-          window.location.href = payment.url;
-          console.log('i m here')
-        } else {
-          console.log("No URL found in response");
-        }
-      }
-      const order = await createOrder({ ...data, paymentId: LinkId });
-      toast.success("created !!")
+      const order = await createOrder(data).unwrap();
       if(order.error){
         toast.error(order.error.message);
         console.error(order.error)
       }
+      toast.success("created !!")
       toast.success("checkout success, your order is now pending")
-      console.log(order);
+      console.log("order res : ",order._id);
+
+      // lets do esewa payment after order creation
+      if (selectedPayment === "esewa") {
+        const payment = await esewaPayment({
+          amount: total,
+          productId: order._id,
+        }).unwrap();
+
+        if (payment?.url) {
+          window.location.href = payment.url;
+        } else {
+          console.log("No URL found in response");
+        }
+      }
     } catch (error) {
       toast.error(error?.message || "order creation failed");
       console.error("order error : ", error);

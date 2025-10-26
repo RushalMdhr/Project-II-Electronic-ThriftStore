@@ -110,7 +110,7 @@ const Navbar = () => {
                 Home
               </Link>
               <Link
-                to="/payment"
+                to="/tester"
                 className="text-gray-300 hover:text-white"
                 onClick={() => dispatch(setRole("buyer"))}
               >

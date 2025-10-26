@@ -6,49 +6,101 @@ import { Transaction } from "../models/esewaModel.js";
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
+// const createOrder = asyncHandler(async (req, res) => {
+//   console.time("createOrder");
+
+//   const { orderItems, method, paymentId } = req.body;
+//   console.log('fine :',req.body.orderItems[0].productId);
+//   if (!orderItems || orderItems.length === 0) {
+//     return res.status(400).json({ error: "No order items" });
+//   }
+
+//   try {
+//     let status;
+
+//     if (!["cod", "esewa"].includes(method)) {
+//       return res.status(400).send("invalid method");
+//     }
+//     if (method == "esewa") {
+//       const esewaPayment = await Transaction.findOne({ ProductId: paymentId });
+//       if (!esewaPayment)
+//         return res.status(404).send({ message: "esewa payment not found !" });
+//       switch (esewaPayment.status) {
+//         case "COMPLETE":
+//           console.log('paid')
+//           status = "paid";
+//           break;
+
+//         case "PENDING":
+//           console.log('pending')
+//           return res.status(400).json({
+//             error: "Payment still processing. Please wait or try again.",
+//           });
+
+//         case "FAILED":
+//           console.log('failed')
+//           return res.status(400).json({
+//             error: "Payment failed. Please try again.",
+//           });
+
+//         case "REFUNDED":
+//           console.log('refunded')
+//           return res.status(400).json({
+//             error: "Payment was refunded. Cannot create order.",
+//           });
+
+//         default:
+//           return res.status(400).json({ error: "Unknown payment status" });
+//       }
+//     }
+//     console.log('status : ',status)
+//     const validatedItems = await Promise.all(
+//       orderItems.map(async (items) => {
+//         const productDoc = await Product.findById(items.productId);
+//         if (!productDoc) {
+//           throw new Error("Product not found");
+//         }
+//         if (productDoc.countInStock < items.quantity) {
+//           throw new Error(`Not enough stock for ${productDoc.name}`);
+//         }
+//         return {
+//           product: productDoc._id,
+//           vendor: productDoc.uploadedBy,
+//           quantity: items.quantity,
+//           price: productDoc.price,
+//         };
+//       })
+//     );
+
+//     const newOrder = new Order({
+//       customer: req.user._id,
+//       orderItems: validatedItems,
+//       payment: {
+//         method: method,
+//         status: status,
+//       },
+//     });
+
+//     const orderCreated = await newOrder.save();
+
+//     console.timeEnd("createOrder");
+
+//     res.status(201).json(orderCreated);
+//   } catch (error) {
+//     console.error("Order creation failed:", error);
+//     res.status(500).json({ error: "Server error creating order" });
+//   }
+// });
+
 const createOrder = asyncHandler(async (req, res) => {
   console.time("createOrder");
-
-  const { orderItems, method, paymentId } = req.body;
-
+  const { orderItems, method } = req.body;
+  console.log("as u can see", req.body);
   if (!orderItems || orderItems.length === 0) {
     return res.status(400).json({ error: "No order items" });
   }
 
   try {
-    let status;
-
-    if (!["cod", "esewa"].includes(method)) {
-      return res.status(400).send("invalid method");
-    }
-    if (method == "esewa") {
-      const esewaPayment = await Transaction.findOne({ ProductId: paymentId });
-      if (!esewaPayment)
-        return res.status(404).send({ message: "esewa payment not found !" });
-      switch (esewaPayment.status) {
-        case "COMPLETE":
-          status = "paid";
-          break;
-
-        case "PENDING":
-          return res.status(400).json({
-            error: "Payment still processing. Please wait or try again.",
-          });
-
-        case "FAILED":
-          return res.status(400).json({
-            error: "Payment failed. Please try again.",
-          });
-
-        case "REFUNDED":
-          return res.status(400).json({
-            error: "Payment was refunded. Cannot create order.",
-          });
-
-        default:
-          return res.status(400).json({ error: "Unknown payment status" });
-      }
-    }
     const validatedItems = await Promise.all(
       orderItems.map(async (items) => {
         const productDoc = await Product.findById(items.productId);
@@ -72,15 +124,15 @@ const createOrder = asyncHandler(async (req, res) => {
       orderItems: validatedItems,
       payment: {
         method: method,
-        status: status,
       },
     });
 
+    console.log("new order : ", newOrder);
     const orderCreated = await newOrder.save();
 
     console.timeEnd("createOrder");
 
-    res.status(201).json(orderCreated);
+    res.status(201).json(newOrder);
   } catch (error) {
     console.error("Order creation failed:", error);
     res.status(500).json({ error: "Server error creating order" });
@@ -131,18 +183,45 @@ const getOrderById = asyncHandler(async (req, res) => {
 // @route   PUT /api/orders/:id/pay
 // @access  Private
 const updateOrderToPaid = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id);
+  console.log("i m here : ", req.body.method);
+  const { method } = req.body;
+  try {
+    if (method === "esewa") {
+      const { id } = req.params;
+      const esewaPayment = await Transaction.findById(id);
+      if (!esewaPayment)
+        return res.status(404).send({ message: "esewa payment not found !" });
+      const order = await Order.findById(esewaPayment.product_id);
+      if (!order) return res.status(404).send({ message: "order not found !" });
 
-  if (order) {
-    order.isPaid = true;
-    order.paidAt = Date.now();
+      switch (esewaPayment.status) {
+        case "COMPLETE":
+          esewaPayment.amount = order.total;
+          console.log("complete payment");
+          order.payment.status = "paid";
+          await order.save();
+          return res.status(200).json({ message: "Order paid successfully" });
 
-    const updatedOrder = await order.save();
-    res.json(updatedOrder);
-  } else {
-    res.status(404);
-    throw new Error("Order not found");
-  }
+        case "FAILED":
+          console.log("failed payment");
+          return res.status(400).json({
+            error: "Payment failed. Please try again.",
+          });
+
+        case "REFUNDED":
+          console.log("refunded payment");
+          return res.status(400).json({
+            error: "Payment was refunded. Cannot update order.",
+          });
+        default:
+          return res.status(400).json({ error: "Unknown payment status" });
+      }
+    } else if (method === "cod") {
+      const order = await Order.findById(req.params.id);
+      if (!order) return res.status(404).send({ message: "order not found !" });
+      res.status(200).json({ message: "Cash on Delivery selected" });
+    }
+  } catch (error) {}
 });
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
