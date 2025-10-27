@@ -49,6 +49,7 @@ import PaymentComponent from "./pages/Transaction/Payment.jsx";
 import Success from "./pages/Transaction/Success.jsx";
 import Failure from "./pages/Transaction/Failure.jsx"
 import OrderManagement from "./pages/Vendor/OrderManagement.jsx";
+import CustomerOrderDashboard from "./TestComponents/TestComponent.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -85,6 +86,7 @@ const router = createBrowserRouter(
       <Route path="/faq" element={<FAQ />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/tester" element={<ProductCard />} />
+      <Route path="/testcomponent" element={<CustomerOrderDashboard />} />
       <Route path="/categories" element={<CategoryUsers />} />
 
       {/* ________________________________ VENDOR ________________________________________*/}

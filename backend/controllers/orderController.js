@@ -188,10 +188,14 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
   try {
     if (method === "esewa") {
       const { id } = req.params;
-      const esewaPayment = await Transaction.findById(id);
+      if(!id){
+        res.status(400).json({error : "Order Id is required"})
+      }
+      const esewaPayment = await Transaction.findOne({ product_id : id });
       if (!esewaPayment)
         return res.status(404).send({ message: "esewa payment not found !" });
-      const order = await Order.findById(esewaPayment.product_id);
+      console.log('esewa payment found : ',esewaPayment);
+      const order = await Order.findById(id);
       if (!order) return res.status(404).send({ message: "order not found !" });
 
       switch (esewaPayment.status) {

@@ -4,7 +4,6 @@ import { base64Decode } from "esewajs";
 import { useEsewaSuccessMutation } from "../../redux/api/transactionApiSlice";
 import { toast } from "react-toastify";
 import {
-  useCreateOrderMutation,
   useUpdateOrderToPaidMutation,
 } from "../../redux/api/orderApiSlice";
 
@@ -26,7 +25,7 @@ const Success = () => {
   const verifyPaymentAndUpdateStatus = async () => {
     try {
       console.log("📍 Starting verification...");
-
+      
       const response = await esewaSuccess({
         product_id: decoded.transaction_uuid,
       }).unwrap();
@@ -37,6 +36,8 @@ const Success = () => {
       setIsSuccess(true);
       toast.success("Payment verified successfully!");
       toast.loading("updating payment ...");
+      toast.error(`transaction id : ${decoded.transaction_uuid}`);
+      console.log(`transaction id : ${decoded.transaction_uuid}`);
       const update = await updateOrder({
         orderId: decoded.transaction_uuid,
         data: { method: "esewa" },

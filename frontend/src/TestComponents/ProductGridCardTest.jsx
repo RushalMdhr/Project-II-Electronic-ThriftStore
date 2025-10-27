@@ -2,6 +2,8 @@ import { useState } from "react";
 import LoadingScreen from "../components/ui/Loading";
 import { useUpdateOrderToPaidMutation } from "../redux/api/orderApiSlice";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
+
 
 const ProductCard = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,9 +14,11 @@ const ProductCard = () => {
     toast.loading("paying ...");
     const update = await updateOrderToPaid({
       data: { method: "esewa" },
-      orderId: "68fde78cefd743fc84e81d8d",
+      orderId: "68ff7001481a5249ad66b4d9",
     }).unwrap();
     toast.dismiss();
+    // 68ff7001481a5249ad66b4d9
+    toast.success("Order Paid Successfully");
     console.log("res",update);
   };
   return (
@@ -37,8 +41,18 @@ const ProductCard = () => {
       <button
         className="p-2 bg-red-200 text-red-700 border-2 rounded-2xl m-4"
         onClick={handleTesting}
+        // disabled={true}
       >
-        To Paid
+        To Paid 
+        {/* /disabled/ */}
+      </button>
+
+      <button
+        className="p-2 bg-red-200 text-red-700 border-2 rounded-2xl m-4"
+      >
+        <Link to="/testcomponent">
+        Test Component
+        </Link>
       </button>
     </>
   );
