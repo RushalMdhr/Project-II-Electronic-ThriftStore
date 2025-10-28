@@ -206,16 +206,18 @@ const Navbar = () => {
 
             {/* Right Side Icons */}
             <div className="flex items-center space-x-4">
-              <Link to="/cart">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-gray-300 hover:text-white"
-                  aria-label="Cart"
-                >
-                  <i className="ri-shopping-cart-line text-xl" />
-                </Button>
-              </Link>
+              {!userInfo?.isAdmin && (
+                <Link to="/cart">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-300 hover:text-white"
+                    aria-label="Cart"
+                  >
+                    <i className="ri-shopping-cart-line text-xl" />
+                  </Button>
+                </Link>
+              )}
 
               {/* Vendor user: Buyer/Seller toggle */}
               {userInfo && userInfo.isVendor && !userInfo.isAdmin && (
