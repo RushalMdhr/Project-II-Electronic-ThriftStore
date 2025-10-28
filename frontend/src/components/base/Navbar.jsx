@@ -296,7 +296,7 @@ const Navbar = () => {
               {userInfo ? (
                 <>
                   <div className="relative" ref={profileDropdownRef}>
-                    <button
+                    <div
                       onClick={() =>
                         setProfileDropdownOpen(!profileDropdownOpen)
                       }
@@ -313,7 +313,7 @@ const Navbar = () => {
                       <span className="hidden sm:inline">
                         {userInfo.username}
                       </span>
-                    </button>
+                    </div>
                     {/* Dropdown below the button */}
                     {profileDropdownOpen && (
                       <div className="absolute right-0 top-12">
