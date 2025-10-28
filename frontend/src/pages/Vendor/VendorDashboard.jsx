@@ -109,9 +109,9 @@ const VendorDashboard = () => {
           <tbody>
             {recentOrders.map((order) => (
               <tr key={order._id} className="hover:bg-gray-700">
-                <td className="p-2">{order._id.slice(-6)}</td>
+                <td className="p-2">{order._id}</td>
                 <td className="p-2 capitalize">{order.status}</td>
-                <td className="p-2">Rs. {order.totalPrice}</td>
+                <td className="p-2">Rs. {order.total}</td>
                 <td className="p-2">
                   {new Date(order.createdAt).toLocaleDateString()}
                 </td>

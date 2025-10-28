@@ -102,6 +102,7 @@ export const getRecentOrders = async (req, res) => {
       total: order.orderItems
         .filter((item) => item.vendor.toString() === vendorId.toString())
         .reduce((acc, item) => acc + item.price * item.quantity, 0),
+      status: order.status || "pending",
     }));
 
     res.json(vendorOrders);
