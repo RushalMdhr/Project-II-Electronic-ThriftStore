@@ -27,6 +27,11 @@ const VendorProducts = () => {
     return <div>Error fetching products.</div>;
   }
 
+  const handleView = (product) => {
+    navigate(`/overview/${product._id}`, { state: { product } });
+  };
+
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <h1 className="text-3xl font-bold text-emerald-400 mb-8 text-left">
@@ -38,6 +43,7 @@ const VendorProducts = () => {
           {myproducts.map((x) => (
             <li
               key={x._id}
+              onClick={() => handleView(x)}
               className="bg-gray-800/80 border border-gray-700 hover:border-emerald-400 
   rounded-xl shadow-md hover:shadow-emerald-400/20 
   p-4 flex flex-col gap-2 transition-all duration-300 min-h-[110px]"
