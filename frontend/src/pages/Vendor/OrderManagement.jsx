@@ -111,7 +111,7 @@ const OrderManagement = () => {
                 Order ID: {orders._id}
               </span>
               <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
-                Pending
+                {orders.status}
               </span>
             </div>
           </div>
