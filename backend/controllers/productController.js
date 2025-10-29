@@ -474,6 +474,39 @@ const reportProduct = asyncHandler(async (req, res) => {
   }
 });
 
+const removeReportFromProduct = asyncHandler(async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.productId);
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const userId = req.user._id.toString();
+
+    // Check if the user has reported this product
+    const reportIndex = product.reported.findIndex(
+      (report) => report.user.toString() === userId
+    );
+
+    if (reportIndex === -1) {
+      return res
+        .status(400)
+        .json({ error: "You haven't reported this product yet." });
+    }
+
+    // Remove that report
+    product.reported.splice(reportIndex, 1);
+
+    await product.save();
+    res.status(200).json({ message: "Report removed successfully." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error while removing report." });
+  }
+});
+
+
 const getBlackListedProducts = asyncHandler(async (req, res) => {
   try {
     const products = await Product.aggregate([
@@ -600,6 +633,7 @@ export {
   increaseViewCount,
   fetchGroupedProducts,
   reportProduct,
+  removeReportFromProduct,
   getPriceRange,
   getBlackListedProducts,
   addToBlackList,
