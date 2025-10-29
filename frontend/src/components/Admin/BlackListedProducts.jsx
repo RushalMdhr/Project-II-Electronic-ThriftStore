@@ -4,6 +4,7 @@ import {
   useGetBlackListedProductsQuery,
 } from "../../redux/api/productsApiSlice";
 import LoadingScreen from "../ui/Loading";
+import { toast } from "react-toastify";
 
 const BlackListedProducts = () => {
   const {
@@ -11,17 +12,28 @@ const BlackListedProducts = () => {
     isLoading,
     isError,
   } = useGetBlackListedProductsQuery();
-  const [addToBlackListSlice, {isLoading : isAdding}] = useAddToBlackListMutation();
+  const [addToBlackListSlice, { isLoading: isAdding }] =
+    useAddToBlackListMutation();
   blacklistedProducts && console.log("black listed : ", blacklistedProducts);
 
-//   const addToBlackList = (id) => {
-//     try {
-//       console.log("id : ", id);
-//       const res = addToBlackListSlice({productId : })
-//     } catch (error) {
-//       console.error("error :", error);
-//     }
-//   };
+  const addToBlackList = async (id) => {
+    // toast.success(id)
+    toast.loading("adding to black list !");
+    try {
+      console.log("id : ", id);
+      const res = await addToBlackListSlice({ productId: id });
+      toast.dismiss();
+      if (res.error) {
+        console.log(res.error?.data?.error);
+        toast.error(res.error?.data?.error || "failed");
+      } else {
+        console.log("res : ", res);
+        toast.success("added success");
+      }
+    } catch (error) {
+      console.error("error :", error);
+    }
+  };
   return (
     <>
       <h1>balck listed here ...</h1>
@@ -37,7 +49,10 @@ const BlackListedProducts = () => {
           <p>Report Percentage : {product.reportPercentage}</p>
           <p>Report Count : {product.reportsCount}</p>
           <p>Views Count :{product.viewsCount}</p>
-          <button onClick={() => addToBlackListSlice({ productId: product._id })}>
+          {product.reported?.map((report) => (
+            <div key={report._id}>reason : {report.reason}</div>
+          ))}
+          <button onClick={() => addToBlackList(product._id)}>
             Add to blacklist ?
           </button>
         </div>
