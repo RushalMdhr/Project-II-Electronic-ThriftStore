@@ -8,27 +8,29 @@ import {
   updateProductDetails,
   fetchProducts,
   getProductById,
-  addProductReview,
   fetchTopProducts,
   fetchNewProducts,
   getMyProducts,
   increaseViewCount,
   fetchGroupedProducts,
   reportProduct,
-  getPriceRange
+  getPriceRange,
+  getBlackListedProducts,
+  addToBlackList
 } from "../controllers/productController.js";
-import checkId from "../middlewares/checkId.js";
 import { authenticate, authorizeAdmin, authorizeVendor, authorizeAdminOrVendor, isAuthenticated } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 
 router.get("/getpricerange",getPriceRange)
+router.get("/getBlackListedProducts",authenticate,authorizeAdmin,getBlackListedProducts)
 
+router.route("/:productId/addToBlackList").post(authenticate,authorizeAdmin,addToBlackList);
 router.route("/:productId/reported").post(authenticate, reportProduct);
 
 // router.route("/getmyproducts/:vendorId").get(authenticate, getMyProducts); 
-router.get("/getmyproducts/:vendorId",authenticate, getMyProducts)
+router.get("/getmyproducts/:vendorId",authenticate, authorizeVendor,getMyProducts)
 
 router.route("/:productId/views").put(isAuthenticated, increaseViewCount);
 

@@ -156,6 +156,21 @@ export const productApiSlice = apiSlice.injectEndpoints({
         body: { reason },
       }),
     }),
+
+    getBlackListedProducts: builder.query({
+      query: () => ({
+        url: `${PRODUCT_URL}/getBlackListedProducts`,
+      }),
+      providesTags: ["BlacklistedProducts"], // ✅ Simple tag
+    }),
+
+    addToBlackList: builder.mutation({
+      query: ({ productId }) => ({
+        url: `${PRODUCT_URL}/${productId}/addToBlackList`,
+        method: "POST",
+      }),
+      invalidatesTags: ['BlacklistedProducts'], // ✅ Invalidates the list
+    }),
   }),
 });
 
@@ -175,4 +190,6 @@ export const {
   useGetMyProductsQuery,
   useIncreaseViewCountMutation,
   useReportProductMutation,
+  useGetBlackListedProductsQuery,
+  useAddToBlackListMutation,
 } = productApiSlice;

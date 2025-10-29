@@ -41,6 +41,14 @@ const userSchema = mongoose.Schema(
       type: String,
       default: null,
     },
+    sales: {
+      type: Number,
+      default: 0,
+    },
+    blackListStreak: {
+      type: Number,
+      default: 0,
+    },
     status: {
       type: String,
       enum: ["active", "inactive", "banned"],
@@ -49,12 +57,13 @@ const userSchema = mongoose.Schema(
     lastLogin: {
       type: Date,
       default: Date.now,
-    },  },
+    },
+  },
   {
     timestamps: true, //when we create or delete a user it will give the specific time
   }
 );
 
-const User = mongoose.model('User',userSchema);
+const User = mongoose.model("User", userSchema);
 
 export default User;

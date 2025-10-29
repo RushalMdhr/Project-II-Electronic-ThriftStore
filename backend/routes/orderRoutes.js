@@ -7,19 +7,25 @@ import {
   updateOrderToPaid,
   updateOrderToDelivered,
   getSoldOrders,
+  updateOrderStatus,
 } from "../controllers/orderController.js";
-import { authenticate, authorizeAdmin, authorizeVendor } from "../middlewares/authMiddleware.js";
+import {
+  authenticate,
+  authorizeAdmin,
+  authorizeVendor,
+} from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 router
   .route("/")
   .post(authenticate, createOrder)
-  .get(authenticate, authorizeVendor, getOrders);
+  // .get(authenticate, authorizeVendor, getOrders);
 router.route("/myorders").get(authenticate, getMyOrders);
-router.route("/soldorders").get(authenticate, authorizeVendor, getSoldOrders)
+router.route("/soldorders").get(authenticate, authorizeVendor, getSoldOrders);
 router.route("/:id").get(authenticate, getOrderById);
 router.route("/:id/pay").put(authenticate, updateOrderToPaid);
+router.route("/:id/status").post(authenticate,authorizeVendor, updateOrderStatus);
 router
   .route("/:id/deliver")
   .put(authenticate, authorizeAdmin, updateOrderToDelivered);
