@@ -50,6 +50,7 @@ import Success from "./pages/Transaction/Success.jsx";
 import Failure from "./pages/Transaction/Failure.jsx"
 import OrderManagement from "./pages/Vendor/OrderManagement.jsx";
 import CustomerOrderDashboard from "./TestComponents/TestComponent.jsx";
+import BlackListedProducts from "./components/Admin/BlackListedProducts.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -133,6 +134,7 @@ const router = createBrowserRouter(
           <Route index element={<AdminDashboard />} />
           <Route path="users" element={<UserList />} />
           <Route path="orders" element={<ManageOrders />} />
+          <Route path="blacklisted-products" element={<BlackListedProducts />} />
           <Route path="users/:id/edit" element={<UserUpdate />} />
           <Route path="categories" element={<CategoryManagement />} />
         </Route>
