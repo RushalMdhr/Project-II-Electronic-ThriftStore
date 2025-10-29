@@ -3,6 +3,7 @@ import Product from "../models/productModel.js";
 import Category from "../models/categoryModel.js";
 import fs from "fs";
 import path from "path";
+import User from "../models/userModel.js";
 
 const createProduct = asyncHandler(async (req, res) => {
   console.time("createProduct");
@@ -131,7 +132,7 @@ const deleteProductById = asyncHandler(async (req, res) => {
 
 const getPriceRange = asyncHandler(async (req, res) => {
   try {
-    console.log('getting price range for you')
+    console.log("getting price range for you");
     const priceRange = await Product.aggregate([
       {
         $group: {
@@ -147,8 +148,8 @@ const getPriceRange = asyncHandler(async (req, res) => {
     }
     res.status(200).send(priceRange?.[0]);
   } catch (error) {
-    console.error(error)
-    res.status(500).send("internal error")
+    console.error(error);
+    res.status(500).send("internal error");
   }
 });
 
@@ -472,6 +473,118 @@ const reportProduct = asyncHandler(async (req, res) => {
   }
 });
 
+const getBlackListedProducts = asyncHandler(async (req, res) => {
+  try {
+    const products = await Product.aggregate([
+      {
+        $addFields: {
+          viewsCount: { $size: "$views" },
+          reportsCount: { $size: "$reported" },
+          reportRatio: {
+            $cond: {
+              if: { $eq: ["$views", []] },
+              then: 0,
+              else: {
+                $divide: [{ $size: "$reported" }, { $size: "$views" }],
+              },
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          viewsCount: { $gt: 0 }, // Only products with views
+          $expr: {
+            $gt: [
+              { $divide: ["$reportsCount", "$viewsCount"] },
+              0.01, // Greater than 1%
+            ],
+          },
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          price: 1,
+          viewsCount: 1,
+          reportsCount: 1,
+          reportRatio: 1,
+          reportPercentage: { $multiply: ["$reportRatio", 100] },
+          // Include other fields you need
+        },
+      },
+      {
+        $sort: { reportRatio: -1 }, // Highest ratio first
+      },
+    ]);
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw error;
+  }
+});
+
+const addToBlackList = asyncHandler(async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    if (product.blackListed) {
+      return res.status(400).json({ error: "Product is already blacklisted" });
+    }
+
+    const user = await User.findById(product.uploadedBy);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    product.blackListed = true;
+    user.status = "banned";
+    await product.save();
+
+    // Update user blacklist streak and check conditions
+    user.blackListStreak = (user.blackListStreak || 0) + 1;
+
+    // Check if user should be blacklisted based on sales to blacklist ratio
+    if (user.sales && user.blackListStreak > 0) {
+      const salesToBlacklistRatio = user.sales / user.blackListStreak;
+      if (salesToBlacklistRatio <= 0.2) {
+        // 20% threshold
+        user.blackListed = true;
+      }
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Product added to blacklist successfully",
+      data: {
+        product: {
+          id: product._id,
+          name: product.name,
+          blackListed: product.blackListed,
+        },
+        user: {
+          id: user._id,
+          blackListStreak: user.blackListStreak,
+          blackListed: user.blackListed,
+          sales: user.sales,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Blacklist error:", error);
+    res.status(500).json({
+      error: "Server Error",
+      message: error.message,
+    });
+  }
+});
+
 export {
   createProduct,
   getAllProducts,
@@ -487,4 +600,6 @@ export {
   fetchGroupedProducts,
   reportProduct,
   getPriceRange,
+  getBlackListedProducts,
+  addToBlackList,
 };
