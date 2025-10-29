@@ -121,6 +121,10 @@ const UploadPageTest = () => {
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-gray-900 text-gray-100 rounded-lg shadow-lg">
+      {/* Page Heading */}
+      <h1 className="text-3xl font-bold text-emerald-400 mb-6 text-center">
+        {product ? "Edit Product" : "Upload New Product"}
+      </h1>
       <form onSubmit={submitHandler} className="space-y-4">
         {/* Existing images */}
         {existingImgs.length > 0 && (
@@ -260,7 +264,7 @@ const UploadPageTest = () => {
           {!product ? (
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl transition"
             >
               Upload
             </button>
@@ -268,14 +272,14 @@ const UploadPageTest = () => {
             <>
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl transition"
               >
                 Update
               </button>
               <button
                 type="button"
                 onClick={handleDeleteProduct}
-                className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded transition"
+                className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-xl transition"
               >
                 Delete
               </button>
