@@ -156,6 +156,13 @@ export const productApiSlice = apiSlice.injectEndpoints({
         body: { reason },
       }),
     }),
+    removeReport: builder.mutation({
+      query: ({ productId, userId }) => ({
+        url: `${PRODUCT_URL}/${productId}/report/${userId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["BlacklistedProducts"],
+    }),
 
     getBlackListedProducts: builder.query({
       query: () => ({
@@ -169,7 +176,7 @@ export const productApiSlice = apiSlice.injectEndpoints({
         url: `${PRODUCT_URL}/${productId}/addToBlackList`,
         method: "POST",
       }),
-      invalidatesTags: ['BlacklistedProducts'], // ✅ Invalidates the list
+      invalidatesTags: ["BlacklistedProducts"], // ✅ Invalidates the list
     }),
   }),
 });
@@ -190,6 +197,7 @@ export const {
   useGetMyProductsQuery,
   useIncreaseViewCountMutation,
   useReportProductMutation,
+  useRemoveReportMutation,
   useGetBlackListedProductsQuery,
   useAddToBlackListMutation,
 } = productApiSlice;
