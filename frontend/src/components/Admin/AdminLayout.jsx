@@ -71,7 +71,7 @@ const AdminLayout = () => {
           </Link>
 
           <Link
-            to="/admin/products"
+            to="/admin/blacklisted-products"
             className={`flex items-center px-3 py-3 transition
       hover:bg-[#1de9b6] hover:text-[#0a1120] rounded-sm
       ${collapsed ? "justify-center w-12 h-12" : "space-x-3 rounded-lg"}
