@@ -18,7 +18,11 @@ const ProfileDropdown = () => {
         </h2>
         <p className="text-slate-400 text-sm">{userInfo?.email}</p>
         <span className="inline-block mt-2 bg-blue-900 text-blue-300 px-3 py-1 rounded-full text-xs">
-          {userInfo?.isAdmin ? "Admin" : userInfo?.isVendor ? "Vendor" : "Customer"}
+          {userInfo?.isAdmin
+            ? "Admin"
+            : userInfo?.isVendor
+            ? "Vendor"
+            : "Customer"}
         </span>
       </div>
 
@@ -31,50 +35,36 @@ const ProfileDropdown = () => {
           Edit Profile
         </Link>
 
-        {userInfo?.isVendor ? (
+        {/* Only show the rest if not admin */}
+        {!userInfo?.isAdmin && (
           <>
+            {userInfo?.isVendor ? (
+              <Link
+                to="/vendor/dashboard"
+                className="px-4 py-2 text-gray-300 hover:bg-slate-800 transition"
+              >
+                Vendor Dashboard
+              </Link>
+            ) : (
+              <Link
+                to="/vendor/register"
+                className="px-4 py-2 text-gray-300 hover:bg-slate-800 transition"
+              >
+                Become a Vendor
+              </Link>
+            )}
+
+            <hr className="border-slate-700" />
+
             <Link
-              to="/vendor/dashboard"
+              to="/myorders"
               className="px-4 py-2 text-gray-300 hover:bg-slate-800 transition"
             >
-              Vendor Dashboard
+              My Orders
             </Link>
-            <Link
-              to="/portfolio"
-              className="px-4 py-2 text-gray-300 hover:bg-slate-800 transition"
-            >
-              Reviews & Ratings
-            </Link>
+            
           </>
-        ) : (
-          <Link
-            to="/vendor/register"
-            className="px-4 py-2 text-gray-300 hover:bg-slate-800 transition"
-          >
-            Become a Vendor
-          </Link>
         )}
-
-        <hr className="border-slate-700" />
-
-        <Link
-          to="/myorders"
-          className="px-4 py-2 text-gray-300 hover:bg-slate-800 transition"
-        >
-          My Orders
-        </Link>
-        <Link
-          to="/orderHistory"
-          className="px-4 py-2 text-gray-300 hover:bg-slate-800 transition"
-        >
-          Order History
-        </Link>
-        <Link
-          to="/wishlist"
-          className="px-4 py-2  text-gray-300 hover:bg-slate-800 transition"
-        >
-          Wishlist
-        </Link>
       </div>
     </div>
   );

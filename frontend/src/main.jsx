@@ -15,7 +15,6 @@ import FAQ from "./pages/User/FAQ.jsx";
 
 import OrderList from "./components/Admin/OrderList.jsx";
 import UploadPageTest from "./pages/Vendor/UploadPageTest.jsx";
-import Dashboard from "./pages/Vendor/Dashboard.jsx";
 import VendorProducts from "./pages/Vendor/ProductTools/VendorProducts.jsx";
 import VendorRoutes from "./components/Vendor/VendorRoutes.jsx";
 import Profile from "./pages/User/Profile.jsx";
@@ -51,6 +50,7 @@ import Failure from "./pages/Transaction/Failure.jsx"
 import OrderManagement from "./pages/Vendor/OrderManagement.jsx";
 import CustomerOrderDashboard from "./TestComponents/TestComponent.jsx";
 import BlackListedProducts from "./components/Admin/BlackListedProducts.jsx";
+import VendorDashboard from "./pages/Vendor/VendorDashboard.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -94,7 +94,7 @@ const router = createBrowserRouter(
 
       <Route element={<VendorRoutes />}>
         <Route path="/vendor" element={<VendorLayout />}>
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="dashboard" element={<VendorDashboard/>} />
           <Route path="products" element={<VendorProducts />} />
           <Route path="upload" element={<UploadPageTest />} />
           <Route path="order-management" element={<OrderManagement />} />

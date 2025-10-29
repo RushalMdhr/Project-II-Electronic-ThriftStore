@@ -56,7 +56,7 @@ const getAdminSummary = async (req, res) => {
       userGrowthData,
     });
   } catch (error) {
-    console.error("Admin summary error:", error);
+    console.error("Admin summary error:", error );
     res.status(500).json({
       message: "Admin summary failed",
       error: error.message,
