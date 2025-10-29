@@ -63,11 +63,14 @@ const VendorProducts = () => {
                 </div>
 
                 <button
-                  onClick={() => handleEdit(x)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevent li click
+                    handleEdit(x); // call edit
+                  }}
                   className="bg-gradient-to-r from-emerald-500 to-teal-500 
-      text-white font-medium rounded-lg px-4 py-1 border border-emerald-600 
-      hover:from-emerald-600 hover:to-teal-600 hover:shadow-md hover:shadow-emerald-500/20 
-      transition-all duration-200 text-sm ml-3"
+    text-white font-medium rounded-lg px-4 py-1 border border-emerald-600 
+    hover:from-emerald-600 hover:to-teal-600 hover:shadow-md hover:shadow-emerald-500/20 
+    transition-all duration-200 text-sm ml-3"
                 >
                   Edit
                 </button>
