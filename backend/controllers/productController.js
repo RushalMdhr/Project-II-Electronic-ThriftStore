@@ -4,6 +4,7 @@ import Category from "../models/categoryModel.js";
 import fs from "fs";
 import path from "path";
 import User from "../models/userModel.js";
+import { report } from "process";
 
 const createProduct = asyncHandler(async (req, res) => {
   console.time("createProduct");
@@ -510,6 +511,7 @@ const getBlackListedProducts = asyncHandler(async (req, res) => {
           reportsCount: 1,
           reportRatio: 1,
           reportPercentage: { $multiply: ["$reportRatio", 100] },
+          reported : 1,
           // Include other fields you need
         },
       },
@@ -517,7 +519,6 @@ const getBlackListedProducts = asyncHandler(async (req, res) => {
         $sort: { reportRatio: -1 }, // Highest ratio first
       },
     ]);
-
     res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
