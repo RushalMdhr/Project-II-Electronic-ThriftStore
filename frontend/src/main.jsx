@@ -40,7 +40,6 @@ import Checkout from "./pages/User/Checkout.jsx";
 import Products from "./pages/Home/ProductTools/Products.jsx";
 import ProductCard from "./TestComponents/ProductGridCardTest.jsx";
 import MyOrders from "./pages/User/Orders/MyOrders.jsx";
-import CategoryUsers from "./pages/Home/Category.jsx";
 import CategoryManagement from "./components/Admin/CategoryManagement.jsx";
 import VendorLayout from "./components/Vendor/VendorLayout.jsx";
 
@@ -51,6 +50,7 @@ import OrderManagement from "./pages/Vendor/OrderManagement.jsx";
 import CustomerOrderDashboard from "./TestComponents/TestComponent.jsx";
 import BlackListedProducts from "./components/Admin/BlackListedProducts.jsx";
 import VendorDashboard from "./pages/Vendor/VendorDashboard.jsx";
+import Category from "./pages/Home/Category.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -88,7 +88,7 @@ const router = createBrowserRouter(
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/tester" element={<ProductCard />} />
       <Route path="/testcomponent" element={<CustomerOrderDashboard />} />
-      <Route path="/categories" element={<CategoryUsers />} />
+      <Route path="/categories" element={<Category />} />
 
       {/* ________________________________ VENDOR ________________________________________*/}
 
