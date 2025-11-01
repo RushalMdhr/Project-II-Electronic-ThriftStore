@@ -18,20 +18,44 @@ import {
   getBlackListedProducts,
   addToBlackList,
   removeReport
+  removeReportFromProduct,
 } from "../controllers/productController.js";
-import { authenticate, authorizeAdmin, authorizeVendor, authorizeAdminOrVendor, isAuthenticated } from "../middlewares/authMiddleware.js";
+import {
+  authenticate,
+  authorizeAdmin,
+  authorizeVendor,
+  authorizeAdminOrVendor,
+  isAuthenticated,
+} from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
+router.get("/getpricerange", getPriceRange);
+router.get(
+  "/getBlackListedProducts",
+  authenticate,
+  authorizeAdmin,
+  getBlackListedProducts
+);
 
-router.get("/getpricerange",getPriceRange)
-router.get("/getBlackListedProducts",authenticate,authorizeAdmin,getBlackListedProducts)
-
-router.route("/:productId/addToBlackList").post(authenticate,authorizeAdmin,addToBlackList);
+router
+  .route("/:productId/addToBlackList")
+  .post(authenticate, authorizeAdmin, addToBlackList);
 router.route("/:productId/reported").post(authenticate, reportProduct);
+// routes/productRoutes.js
+router.delete(
+  "/:productId/report/:userId",
+  authenticate,
+  removeReportFromProduct
+);
 
-// router.route("/getmyproducts/:vendorId").get(authenticate, getMyProducts); 
-router.get("/getmyproducts/:vendorId",authenticate, authorizeVendor,getMyProducts)
+// router.route("/getmyproducts/:vendorId").get(authenticate, getMyProducts);
+router.get(
+  "/getmyproducts/:vendorId",
+  authenticate,
+  authorizeVendor,
+  getMyProducts
+);
 
 router.route("/remove-report/:reportId").delete(isAuthenticated,authorizeAdmin,removeReport);
 router.route("/:productId/views").put(isAuthenticated, increaseViewCount);
@@ -53,11 +77,8 @@ router
   .put(authenticate, authorizeAdminOrVendor, formidable(), updateProductDetails)
   .delete(authenticate, authorizeAdminOrVendor, deleteProductById);
 
-
-
 // router
 //   .route("/:productId/reviews")
 //   .post(authenticate, authorizeAdmin, checkId, addProductReview);
-
 
 export default router;

@@ -53,7 +53,9 @@ const MyOrders = () => {
         <div className="text-center text-gray-500 py-8">Loading orders...</div>
       )}
       {isError && (
-        <div className="text-center text-red-500 py-8">Failed to load orders.</div>
+        <div className="text-center text-red-500 py-8">
+          Failed to load orders.
+        </div>
       )}
 
       {!isLoading && !isError && filteredOrders.length === 0 && (
@@ -61,47 +63,73 @@ const MyOrders = () => {
       )}
 
       <div className="space-y-8">
-        {filteredOrders.map(order => (
+        {filteredOrders.map((order) => (
           <div
             key={order._id}
-            className="border rounded-xl shadow-sm p-6 bg-white"
+            className="border border-gray-200 rounded-xl shadow-md p-6 bg-white hover:shadow-lg transition-shadow duration-300"
           >
-            <div className="flex justify-between items-center mb-2">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4">
               <span className="text-sm text-gray-500">
                 {new Date(order?.createdAt).toLocaleDateString()}
               </span>
               <span
-                className={`px-3 py-1 rounded-full text-xs font-bold ${
+                className={`px-3 py-1 rounded-full text-xs font-semibold ${
                   order.completed
                     ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
+                    : "bg-yellow-100 text-yellow-700"
                 }`}
               >
                 {order.completed ? "Delivered" : "In Progress"}
               </span>
             </div>
-            <div className="mb-4">
-              {order?.orderItems?.map(orderItem => (
+
+            {/* Order Items */}
+            <div className="divide-y divide-gray-100">
+              {order?.orderItems?.map((orderItem) => (
                 <div
                   key={orderItem._id}
-                  className="flex justify-between items-center py-2 border-b last:border-b-0"
+                  className="flex justify-between items-center py-4"
                 >
-                  <div>
-                    <span className="font-medium">{orderItem.product.name}</span>
-                    <span className="ml-2 text-gray-500">x{orderItem.quantity}</span>
+                  {/* Left side: product image + name */}
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={orderItem.product.images?.[0] || "/placeholder.png"}
+                      alt={orderItem.product.name}
+                      className="w-14 h-14 object-cover rounded-md border"
+                    />
+                    <div>
+                      <div className="font-medium text-gray-900">
+                        {orderItem.product.name}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Qty: {orderItem.quantity}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-right text-gray-700 font-semibold">
-                    ₹{orderItem.product.price}
+
+                  {/* Right side: price */}
+                  <div className="text-right">
+                    <div className="font-semibold text-gray-800">
+                      Rs. {orderItem.price}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Tax (13%): Rs.{" "}
+                      {(orderItem.price * orderItem.quantity * 0.13).toFixed(2)}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="flex justify-between items-center mt-4">
+
+            {/* Footer */}
+            <div className="flex justify-between items-center mt-6 border-t pt-4">
               <span className="font-bold text-lg text-yellow-700">
-                Total: ₹{order?.total_price}
+                Total: Rs.{order?.total?.toFixed(2)}
               </span>
+
               {order.completed && (
-                <button className="bg-yellow-300 hover:bg-yellow-400 border-2 rounded-xl px-4 py-1 font-semibold transition">
+                <button className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 border-none rounded-lg px-4 py-2 font-semibold transition-all duration-200 shadow-sm hover:shadow-md">
                   Give Review
                 </button>
               )}

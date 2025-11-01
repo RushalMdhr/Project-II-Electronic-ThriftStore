@@ -15,7 +15,6 @@ import FAQ from "./pages/User/FAQ.jsx";
 
 import OrderList from "./components/Admin/OrderList.jsx";
 import UploadPageTest from "./pages/Vendor/UploadPageTest.jsx";
-import Dashboard from "./pages/Vendor/Dashboard.jsx";
 import VendorProducts from "./pages/Vendor/ProductTools/VendorProducts.jsx";
 import VendorRoutes from "./components/Vendor/VendorRoutes.jsx";
 import Profile from "./pages/User/Profile.jsx";
@@ -41,7 +40,6 @@ import Checkout from "./pages/User/Checkout.jsx";
 import Products from "./pages/Home/ProductTools/Products.jsx";
 import ProductCard from "./TestComponents/ProductGridCardTest.jsx";
 import MyOrders from "./pages/User/Orders/MyOrders.jsx";
-import CategoryUsers from "./pages/Home/Category.jsx";
 import CategoryManagement from "./components/Admin/CategoryManagement.jsx";
 import VendorLayout from "./components/Vendor/VendorLayout.jsx";
 
@@ -51,6 +49,8 @@ import Failure from "./pages/Transaction/Failure.jsx"
 import OrderManagement from "./pages/Vendor/OrderManagement.jsx";
 import CustomerOrderDashboard from "./TestComponents/TestComponent.jsx";
 import BlackListedProducts from "./components/Admin/BlackListedProducts.jsx";
+import VendorDashboard from "./pages/Vendor/VendorDashboard.jsx";
+import Category from "./pages/Home/Category.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -88,13 +88,13 @@ const router = createBrowserRouter(
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/tester" element={<ProductCard />} />
       <Route path="/testcomponent" element={<CustomerOrderDashboard />} />
-      <Route path="/categories" element={<CategoryUsers />} />
+      <Route path="/categories" element={<Category />} />
 
       {/* ________________________________ VENDOR ________________________________________*/}
 
       <Route element={<VendorRoutes />}>
         <Route path="/vendor" element={<VendorLayout />}>
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="dashboard" element={<VendorDashboard/>} />
           <Route path="products" element={<VendorProducts />} />
           <Route path="upload" element={<UploadPageTest />} />
           <Route path="order-management" element={<OrderManagement />} />

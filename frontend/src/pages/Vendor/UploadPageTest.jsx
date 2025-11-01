@@ -8,27 +8,21 @@ import {
 } from "../../redux/api/productsApiSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-// import ProductOverView from "../Home/ProductTools/ProductOverview";
 
 const UploadPageTest = () => {
   const { state } = useLocation();
-  const product = state?.product || null; // Handle case where no product is provided
+  const product = state?.product || null;
 
-  const [imgs, setImgs] = useState(product ? product.images : []); // Use existing images if editing
-  console.log("imgs : ", imgs);
-  const [images, setImages] = useState([]);
-  console.log("url.set images : ", images);
-  const [name, setName] = useState(product ? product.name : "");
-  const [brand, setBrand] = useState(product ? product.brand : "");
-  const [price, setPrice] = useState(product ? product.price : "");
-  const [condition, setCondition] = useState(product ? product.condition : "");
-  const [description, setDescription] = useState(
-    product ? product.description : ""
-  );
-  const [category, setCategory] = useState(product ? product.category._id : "");
-  const [quantity, setQuantity] = useState(product ? product.countInStock : "");
+  const [existingImgs, setExistingImgs] = useState(product?.images || []);
+  const [newImgs, setNewImgs] = useState([]);
+  const [name, setName] = useState(product?.name || "");
+  const [brand, setBrand] = useState(product?.brand || "");
+  const [price, setPrice] = useState(product?.price || "");
+  const [condition, setCondition] = useState(product?.condition || "");
+  const [description, setDescription] = useState(product?.description || "");
+  const [category, setCategory] = useState(product?.category?._id || "");
+  const [quantity, setQuantity] = useState(product?.countInStock || "");
 
-  // Reset form when switching to upload mode (no product)
   useEffect(() => {
     if (!product) {
       setName("");
@@ -38,7 +32,8 @@ const UploadPageTest = () => {
       setDescription("");
       setCategory("");
       setQuantity("");
-      setImages([]);
+      setExistingImgs([]);
+      setNewImgs([]);
     }
   }, [product]);
 
@@ -48,13 +43,12 @@ const UploadPageTest = () => {
   const [deleteProduct] = useDeleteProductMutation();
 
   const navigate = useNavigate();
-
-  const { data: categories = [], isLoading, isError } = useListcategoryQuery();
+  const { data: categories = [] } = useListcategoryQuery();
 
   const submitHandler = async (e) => {
     e.preventDefault();
+
     if (
-      !images ||
       !name ||
       !brand ||
       !price ||
@@ -67,7 +61,11 @@ const UploadPageTest = () => {
       return;
     }
 
-    // Prepare FormData
+    if (price < 0 || quantity < 0) {
+      toast.error("Price and Quantity cannot be negative");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("brand", brand);
@@ -77,107 +75,76 @@ const UploadPageTest = () => {
     formData.append("countInStock", quantity);
     formData.append("condition", condition);
 
-    // Upload all images in one request
     let imagePaths = [];
-    if (images && images.length > 0) {
+    if (newImgs.length > 0) {
       const imgFormData = new FormData();
-      images.forEach((img) => imgFormData.append("images", img));
+      newImgs.forEach((img) => imgFormData.append("images", img));
       try {
         const response = await uploadProductImage(imgFormData).unwrap();
-        if (response && response.paths) {
-          imagePaths = response.paths;
-          console.log("Image paths:", imagePaths);
-          // img?.imagePaths.push(img); // Optional chaining + push
-        }
+        if (response?.paths) imagePaths = response.paths;
       } catch (err) {
         toast.error("Failed to upload images");
         return;
       }
     }
-    if (imgs) {
-      console.log("theres img : ", imgs);
-      imagePaths = [...imgs, ...imagePaths];
-      console.log("image path with imgs", imagePaths);
-    } else {
-      console.log("no img");
-    }
-    // Add image paths as a comma-separated string
-    // console.log(JSON.stringify(imagePaths))
-    // formData.append("images", JSON.stringify(imagePaths));
+
+    imagePaths = [...existingImgs, ...imagePaths];
     formData.append("images", JSON.stringify(imagePaths));
-    console.log(formData.get("images"));
 
     try {
-      let createdProduct;
-      if (!product || !product._id) {
-        createdProduct = await createProduct(formData).unwrap();
-        console.log("Created product:", createdProduct);
-
-        if (!createdProduct.ok) {
-          toast.error(createdProduct.error);
-        }
+      if (!product?._id) {
+        const createdProduct = await createProduct(formData).unwrap();
         toast.success(`${createdProduct.name} created successfully!`);
       } else {
-        toast.info("Updating product details...");
-        console.log("Updating product with ID:", product._id);
-        console.log("Form data being sent:", formData);
-
-        const updatedProduct = await updateProductDetails({
+        await updateProductDetails({
           productId: product._id,
           data: formData,
         }).unwrap();
-        toast.info("WORKING");
-
-        console.log("Updated product:", updatedProduct);
+        toast.success("Product updated successfully!");
       }
-
-      // Optionally reset form or navigate
     } catch (err) {
-      console.log("Error creating product:", err);
       toast.error(err.message || "Product operation failed");
     }
   };
 
   const handleDeleteProduct = async () => {
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
     try {
-      let answer = window.confirm(
-        "Are you sure you want to delete this product?"
-      );
-      if (!answer) return;
-
       const deletedProduct = await deleteProduct(product._id).unwrap();
-      console.log("Deleted product:", deletedProduct);
       toast.success(`${deletedProduct?.name} deleted successfully!`);
-      navigate("/vendor/products"); // Redirect to products list after deletion
-    } catch (error) {
+      navigate("/vendor/products");
+    } catch (err) {
       toast.error("Failed to delete product");
-      console.error("Delete error:", error);
     }
   };
 
   return (
-    <div className="p-6 max-w-lg mx-auto">
+    <div className="max-w-lg mx-auto p-6 bg-gray-900 text-gray-100 rounded-lg shadow-lg">
+      {/* Page Heading */}
+      <h1 className="text-3xl font-bold text-emerald-400 mb-6 text-center">
+        {product ? "Edit Product" : "Upload New Product"}
+      </h1>
       <form onSubmit={submitHandler} className="space-y-4">
-        {/* Show existing product images if editing */}
-        {product && product._id && imgs &&(
-          <div className="flex gap-2 mb-2">
-            {imgs?.map((image, idx) => (
-              <div key={`existing-${idx}`} className="relative">
-                {" "}
-                {console.log("idx : ", idx)}
-                {/* Add relative */}
+        {/* Existing images */}
+        {existingImgs.length > 0 && (
+          <div className="flex gap-2 flex-wrap">
+            {existingImgs.map((img, idx) => (
+              <div
+                key={idx}
+                className="relative w-16 h-16 border border-gray-700 rounded overflow-hidden"
+              >
                 <img
-                  src={image}
+                  src={img}
                   alt="product"
-                  className="w-14 h-14 object-cover rounded border"
+                  className="w-full h-full object-cover"
                 />
                 <button
-                  type="button" // ← MUST ADD THIS!
-                  onClick={() => {
-                    setImgs(imgs.filter((_, i) => i !== idx));
-                    console.log("imgs", imgs);
-                  }}
-                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 text-xs"
+                  type="button"
+                  onClick={() =>
+                    setExistingImgs(existingImgs.filter((_, i) => i !== idx))
+                  }
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
                 >
                   ×
                 </button>
@@ -186,12 +153,12 @@ const UploadPageTest = () => {
           </div>
         )}
 
-        {/* Image preview cards for newly selected images */}
-        <div className="flex gap-2 mb-2">
-          {images.map((img, idx) => (
+        {/* New images preview */}
+        <div className="flex gap-2 flex-wrap">
+          {newImgs.map((img, idx) => (
             <div
-              key={img.name + idx}
-              className="relative w-14 h-14 border rounded overflow-hidden flex items-center justify-center bg-gray-100"
+              key={idx}
+              className="relative w-16 h-16 border border-gray-700 rounded overflow-hidden"
             >
               <img
                 src={URL.createObjectURL(img)}
@@ -200,13 +167,11 @@ const UploadPageTest = () => {
               />
               <button
                 type="button"
-                onClick={() => setImages(images.filter((_, i) => i !== idx))}
-                className="absolute top-1 right-1 bg-white bg-opacity-80 border-none rounded-full w-5 h-5 flex items-center justify-center text-gray-700 font-bold hover:bg-red-100"
-                aria-label="Remove image"
+                onClick={() => setNewImgs(newImgs.filter((_, i) => i !== idx))}
+                className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
               >
                 ×
-              </button>{" "}
-              {/* //so much work to do on this one for sure */}
+              </button>
             </div>
           ))}
         </div>
@@ -216,61 +181,76 @@ const UploadPageTest = () => {
           accept="image/*"
           multiple
           onChange={(e) =>
-            setImages((prev) => [...prev, ...Array.from(e.target.files)])
+            setNewImgs((prev) => [...prev, ...Array.from(e.target.files)])
           }
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          className="block w-full text-sm text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-gray-200 hover:file:bg-gray-600"
         />
+
         <input
           type="text"
           placeholder="Product Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full border rounded px-3 py-2"
+          className="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
         <input
           type="text"
           placeholder="Brand"
           value={brand}
           onChange={(e) => setBrand(e.target.value)}
-          className="w-full border rounded px-3 py-2"
+          className="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
         <input
           type="number"
           placeholder="Price"
+          min="0"
           value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          className="w-full border rounded px-3 py-2"
+          onChange={(e) => setPrice(e.target.value >= 0 ? e.target.value : 0)}
+          className="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
+        <input
+          type="number"
+          placeholder="Quantity"
+          min="0"
+          value={quantity}
+          onChange={(e) =>
+            setQuantity(e.target.value >= 0 ? e.target.value : 0)
+          }
+          className="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
         <input
           type="text"
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full border rounded px-3 py-2"
+          className="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="w-full border rounded px-3 py-2 bg-gray-700"
+          className="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select Category</option>
-          {categories.map((category) => (
-            <option key={category._id} value={category._id}>
-              {category.name}
+          {categories.map((cat) => (
+            <option
+              key={cat._id}
+              value={cat._id}
+              className="bg-gray-800 text-gray-100"
+            >
+              {cat.name}
             </option>
           ))}
         </select>
-        <input
-          type="number"
-          placeholder="In Stock"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          className="w-full border rounded px-3 py-2"
-        />
+
         <select
           value={condition}
           onChange={(e) => setCondition(e.target.value)}
-          className="w-full border rounded px-3 py-2 bg-gray-700"
+          className="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select Condition</option>
           <option value="Brand New">Brand New</option>
@@ -279,30 +259,33 @@ const UploadPageTest = () => {
           <option value="Good">Good</option>
           <option value="Fair">Fair</option>
         </select>
-        {!product ? (
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-          >
-            Upload
-          </button>
-        ) : (
-          <>
+
+        <div className="space-y-2">
+          {!product ? (
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl transition"
             >
-              Update
+              Upload
             </button>
-            <button
-              type="button"
-              onClick={handleDeleteProduct}
-              className="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition"
-            >
-              Delete
-            </button>
-          </>
-        )}
+          ) : (
+            <>
+              <button
+                type="submit"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl transition"
+              >
+                Update
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteProduct}
+                className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-xl transition"
+              >
+                Delete
+              </button>
+            </>
+          )}
+        </div>
       </form>
     </div>
   );

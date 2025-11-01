@@ -27,6 +27,11 @@ const VendorProducts = () => {
     return <div>Error fetching products.</div>;
   }
 
+  const handleView = (product) => {
+    navigate(`/overview/${product._id}`, { state: { product } });
+  };
+
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <h1 className="text-3xl font-bold text-emerald-400 mb-8 text-left">
@@ -38,6 +43,7 @@ const VendorProducts = () => {
           {myproducts.map((x) => (
             <li
               key={x._id}
+              onClick={() => handleView(x)}
               className="bg-gray-800/80 border border-gray-700 hover:border-emerald-400 
   rounded-xl shadow-md hover:shadow-emerald-400/20 
   p-4 flex flex-col gap-2 transition-all duration-300 min-h-[110px]"
@@ -57,11 +63,14 @@ const VendorProducts = () => {
                 </div>
 
                 <button
-                  onClick={() => handleEdit(x)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevent li click
+                    handleEdit(x); // call edit
+                  }}
                   className="bg-gradient-to-r from-emerald-500 to-teal-500 
-      text-white font-medium rounded-lg px-4 py-1 border border-emerald-600 
-      hover:from-emerald-600 hover:to-teal-600 hover:shadow-md hover:shadow-emerald-500/20 
-      transition-all duration-200 text-sm ml-3"
+    text-white font-medium rounded-lg px-4 py-1 border border-emerald-600 
+    hover:from-emerald-600 hover:to-teal-600 hover:shadow-md hover:shadow-emerald-500/20 
+    transition-all duration-200 text-sm ml-3"
                 >
                   Edit
                 </button>
