@@ -16,7 +16,8 @@ import {
   reportProduct,
   getPriceRange,
   getBlackListedProducts,
-  addToBlackList
+  addToBlackList,
+  removeReport
 } from "../controllers/productController.js";
 import { authenticate, authorizeAdmin, authorizeVendor, authorizeAdminOrVendor, isAuthenticated } from "../middlewares/authMiddleware.js";
 
@@ -32,6 +33,7 @@ router.route("/:productId/reported").post(authenticate, reportProduct);
 // router.route("/getmyproducts/:vendorId").get(authenticate, getMyProducts); 
 router.get("/getmyproducts/:vendorId",authenticate, authorizeVendor,getMyProducts)
 
+router.route("/remove-report/:reportId").delete(isAuthenticated,authorizeAdmin,removeReport);
 router.route("/:productId/views").put(isAuthenticated, increaseViewCount);
 
 router.route("/allproducts").get(getAllProducts);

@@ -25,11 +25,20 @@ const createProduct = asyncHandler(async (req, res) => {
         return res.json({ error: "category is required" });
     }
 
+    // console.log("req.specifications", req.fields.specifications);
+    // const specifications = req.fields.specifications
+    //   ? JSON.parse(req.fields.specifications)
+    //   : {};
+    // console.log("specification", specifications);
     const product = new Product({
       ...req.fields,
       images,
       uploadedBy: req.user._id,
+      specifications: req.fields.specifications
+        ? JSON.parse(req.fields.specifications)
+        : {},
     });
+    console.log("product here : ", product);
     await product.save();
     // Increment the used count for the category
     await Category.findByIdAndUpdate(product.category, { $inc: { used: 1 } });
@@ -442,6 +451,7 @@ const increaseViewCount = asyncHandler(async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 });
+
 const reportProduct = asyncHandler(async (req, res) => {
   try {
     const product = await Product.findById(req.params.productId);
@@ -471,6 +481,25 @@ const reportProduct = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server Error" });
+  }
+});
+
+const removeReport = asyncHandler(async (req, res) => {
+  try {
+    const product = await Product.findOneAndUpdate(
+      { "reported._id": req.params.reportId },
+      { $pull: { reported: { _id: req.params.reportId } } },
+      { new: true } // Return updated document
+    );
+
+    if (!product) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+
+    console.log(product);
+    res.send({ product: product });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -511,7 +540,7 @@ const getBlackListedProducts = asyncHandler(async (req, res) => {
           reportsCount: 1,
           reportRatio: 1,
           reportPercentage: { $multiply: ["$reportRatio", 100] },
-          reported : 1,
+          reported: 1,
           // Include other fields you need
         },
       },
@@ -543,7 +572,6 @@ const addToBlackList = asyncHandler(async (req, res) => {
     }
 
     product.blackListed = true;
-    user.status = "banned";
     await product.save();
 
     // Update user blacklist streak and check conditions
@@ -553,8 +581,8 @@ const addToBlackList = asyncHandler(async (req, res) => {
     if (user.sales && user.blackListStreak > 0) {
       const salesToBlacklistRatio = user.sales / user.blackListStreak;
       if (salesToBlacklistRatio <= 0.2) {
+        user.status = "banned";
         // 20% threshold
-        user.blackListed = true;
       }
     }
 
@@ -603,4 +631,5 @@ export {
   getPriceRange,
   getBlackListedProducts,
   addToBlackList,
+  removeReport,
 };
