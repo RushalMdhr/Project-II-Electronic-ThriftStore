@@ -17,6 +17,7 @@ import {
   getPriceRange,
   getBlackListedProducts,
   addToBlackList,
+  removeReport
   removeReportFromProduct,
 } from "../controllers/productController.js";
 import {
@@ -56,6 +57,7 @@ router.get(
   getMyProducts
 );
 
+router.route("/remove-report/:reportId").delete(isAuthenticated,authorizeAdmin,removeReport);
 router.route("/:productId/views").put(isAuthenticated, increaseViewCount);
 
 router.route("/allproducts").get(getAllProducts);
