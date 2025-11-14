@@ -4,7 +4,6 @@ import Category from "../models/categoryModel.js";
 import fs from "fs";
 import path from "path";
 import User from "../models/userModel.js";
-import { report } from "process";
 
 const createProduct = asyncHandler(async (req, res) => {
   console.time("createProduct");
@@ -564,6 +563,7 @@ const getBlackListedProducts = asyncHandler(async (req, res) => {
           reportRatio: 1,
           reportPercentage: { $multiply: ["$reportRatio", 100] },
           reported: 1,
+          blackListed : 1,
           // Include other fields you need
         },
       },
