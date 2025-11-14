@@ -114,7 +114,7 @@ const router = createBrowserRouter(
       {/* ________________________________ LOGGED IN ________________________________________*/}
 
       <Route path="/" element={<PrivateRoute />}>
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:name" element={<Profile />} />
         <Route path="/myorders" element={<MyOrders />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<Checkout />} />
