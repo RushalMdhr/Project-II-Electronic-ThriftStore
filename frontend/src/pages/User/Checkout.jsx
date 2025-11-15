@@ -3,20 +3,26 @@ import { useLocation } from "react-router";
 import { useCreateOrderMutation } from "../../redux/api/orderApiSlice";
 import { toast } from "react-toastify";
 import { useEsewaPaymentMutation } from "../../redux/api/transactionApiSlice";
-import { generateUniqueId } from "esewajs";
+import { useDispatch } from "react-redux";
+// import { generateUniqueId } from "esewajs";
 
 const Checkout = () => {
   const { state } = useLocation();
   const products = state?.selectedCartItems || [];
+
   const [dropdown, setDropdown] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState("cod");
+  const dropdownRef = useRef();
+
   const total = products.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
     0
   );
+
+  const dispatch = useDispatch();
+
   const [createOrder] = useCreateOrderMutation();
   const [esewaPayment] = useEsewaPaymentMutation();
-  const dropdownRef = useRef();
 
   const data = {
     orderItems: products?.map((e) => {
@@ -79,13 +85,13 @@ const Checkout = () => {
   const HandleOrder = async () => {
     try {
       const order = await createOrder(data).unwrap();
-      if(order.error){
+      if (order.error) {
         toast.error(order.error.message);
-        console.error(order.error)
+        console.error(order.error);
       }
-      toast.success("created !!")
-      toast.success("checkout success, your order is now pending")
-      console.log("order res : ",order._id);
+      toast.success("created !!");
+      toast.success("checkout success, your order is now pending");
+      console.log("order res : ", order._id);
 
       // lets do esewa payment after order creation
       if (selectedPayment === "esewa") {
@@ -93,6 +99,7 @@ const Checkout = () => {
           amount: total,
           productId: order._id,
         }).unwrap();
+        // localStorage.setItem("checkingOrder", order._id);
 
         if (payment?.url) {
           window.location.href = payment.url;

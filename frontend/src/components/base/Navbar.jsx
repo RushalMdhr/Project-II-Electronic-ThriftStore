@@ -110,7 +110,10 @@ const Navbar = () => {
                 Home
               </Link>
               <Link
-                to="/tester"
+                to="/vendor/order-management"
+                // to={`/profile/${userInfo.username}`}
+                // to="/tester"
+                // to="/testcomponent"
                 className="text-gray-300 hover:text-white"
                 onClick={() => dispatch(setRole("buyer"))}
               >
