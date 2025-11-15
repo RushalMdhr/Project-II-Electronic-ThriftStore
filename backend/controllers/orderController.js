@@ -44,10 +44,11 @@ const createOrder = asyncHandler(async (req, res) => {
       payment: {
         method: method,
       },
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 15 minutes
     });
 
     console.log("new order : ", newOrder);
-    const orderCreated = await newOrder.save();
+    await newOrder.save();
 
     console.timeEnd("createOrder");
 
@@ -57,6 +58,7 @@ const createOrder = asyncHandler(async (req, res) => {
     res.status(500).json({ error: "Server error creating order" });
   }
 });
+
 // const createOrder = asyncHandler(async (req, res) => {
 //   console.time("createOrder");
 //   const { orderItems, method } = req.body;
@@ -153,17 +155,6 @@ const getMyOrders = asyncHandler(async (req, res) => {
   res.json(orders);
 });
 
-// @desc    Get all orders (admin)
-// @route   GET /api/orders
-// @access  Private/Admin
-const getOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({}).populate("user", "email");
-
-  console.log(`Found ${orders.length} total orders (admin)`); // DEBUG
-
-  res.json(orders);
-});
-
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
 // @access  Private
@@ -230,53 +221,51 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
   } catch (error) {}
 });
 
-const updateOrderStatus = asyncHandler(async (req, res) => {
+const updateVendorOrderStatus = asyncHandler(async (req, res) => {
   try {
-    console.log("updating status ....");
-    console.log("getting status ....", req.body);
-    console.log("fetching id ...", req.params.orderId);
-    const { status } = req.body;
-    if (
-      ![
-        "pending",
-        "confirmed",
-        "processing",
-        "shipped",
-        // "delivered",
-        "cancelled",
-        // "refunded",
-      ].includes(status) |
-      (order.status === status)
-    ) {
-      return res.status(400).json({ error: "Invalid status" });
-    }
-    const { orderId } = req.params;
-    const order = await Order.findById(orderId);
-    if (!order) return res.status(404).send("order not found");
-    console.log(order);
-    switch (status) {
-      case "confirmed":
-        Promise.all(
-          order.orderItems.map(async (orderItem) => {
-            const product = await Product.findById(orderItem.product);
-            if (product) {
-              product.countInStock -= 1;
-              console.log(product.countInStock);
-              product.save();
-            } else {
-              return res.status(404).send("product not found");
-            }
-          })
-        );
-        break;
+    const { orderId, items } = req.body; // ✅ Fixed
+    console.log(req.body)
 
-      // case "processing"
+    if (orderId) {
+      const order = await Order.findById(orderId);
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      // Update each order item status
+      order.orderItems?.forEach((orderItem) => {
+        const matchingItem = items.find(
+          (item) => item.id === orderItem._id.toString()
+        );
+        if (matchingItem) {
+          if (matchingItem.confirmed) {
+            orderItem.status = "confirmed";
+          } else {
+            (orderItem.status = "cancelled"),
+              (orderItem.reasonForCancel = matchingItem.reason);
+          }
+        }
+
+        const allActioned = order.orderItems.every(
+          (item) => item.status !== "pending"
+        );
+        if (allActioned) {
+          const allConfirmed = order.orderItems.every(
+            (item) => item.status === "confirmed"
+          );
+          if (allConfirmed) {
+            order.status = "confirmed";
+            order.expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 15 minutes
+          } else if (order.payment.method === "esewa") {
+            order.status = "refunded";
+          }
+        }
+      });
+
+      await order.save();
+      res.json({ message: "Order updated successfully", order });
     }
-    order.status = status;
-    order.save();
-    res
-      .status(200)
-      .send({ message: `order ${order._id} status updated to ${status}` });
+    console.log("i m here bro3");
   } catch (error) {
     res.status(500).send("error", error);
   }
@@ -354,9 +343,10 @@ const getSoldOrders = asyncHandler(async (req, res) => {
               input: "$orderItems",
               as: "item",
               in: {
+                _id: "$$item._id",
                 quantity: "$$item.quantity",
                 price: "$$item.price",
-                // vendor: "$$item.vendor",
+                status: "$$item.status",
                 product: {
                   $arrayElemAt: [
                     {
@@ -385,20 +375,20 @@ const getSoldOrders = asyncHandler(async (req, res) => {
           customerEmail: {
             $arrayElemAt: ["$customerDetails.email", 0],
           },
-          subtotal: 1,
-          shipping: 1,
-          tax: 1,
-          total: 1,
+          // subtotal: 1,
+          // shipping: 1,
+          // tax: 1,
+          // total: 1,
           status: 1,
           payment: 1,
           createdAt: 1,
           orderItems: {
+            _id: 1,
+            status: 1,
             quantity: 1,
             price: 1,
-            vendor: 1,
             "product.name": 1,
             "product._id": 1,
-            // "product.images": 1,
           },
         },
       },
@@ -414,24 +404,33 @@ const getSoldOrders = asyncHandler(async (req, res) => {
 });
 
 const deleteErrorOrder = asyncHandler(async (req, res) => {
-  const { orderId } = req.params;
-  if (orderId) {
-    const order = await Order.findOneAndDelete({ _id: orderId });
-    if (order) {
-      res.status(200).send({ message: "order deleted", order_id: order._id });
-    } else {
-      return res.status(404).send("order not found");
+  console.log("deleting the broken orders");
+  await Order.deleteMany({
+    payment: {
+      method: "esewa",
+      status: "pending",
+      // status: { $ne: "paid" },
+    },
+    expiresAt: { $lt: new Date() },
+  });
+
+  await Order.updateMany(
+    {
+      status: "confirmed",
+      expiresAt: { $lt: new Date() },
+    },
+    {
+      $set: { status: "processing" }, // ✅ Add this - what to update
     }
-  }
+  );
 });
 
 export {
   createOrder,
   getMyOrders,
-  getOrders,
   getOrderById,
   updateOrderToPaid,
-  updateOrderStatus,
+  updateVendorOrderStatus,
   updateOrderToDelivered,
   getSoldOrders,
   deleteErrorOrder,

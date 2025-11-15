@@ -60,6 +60,8 @@ const ProductSchema = mongoose.Schema(
       of: String,
       default: {},
     },
+    // sold: { type: Boolean, default: false },
+
     blackListed: { type: Boolean, default: false },
   },
   { timestamps: true }

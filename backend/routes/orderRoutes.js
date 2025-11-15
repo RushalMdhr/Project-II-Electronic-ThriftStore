@@ -2,12 +2,11 @@ import express from "express";
 import {
   createOrder,
   getMyOrders,
-  getOrders,
   getOrderById,
   updateOrderToPaid,
   updateOrderToDelivered,
   getSoldOrders,
-  updateOrderStatus,
+  updateVendorOrderStatus,
   deleteErrorOrder,
 } from "../controllers/orderController.js";
 import {
@@ -28,8 +27,8 @@ router
   .delete(authenticate, deleteErrorOrder);
 router.route("/:id/pay").put(authenticate, updateOrderToPaid);
 router
-  .route("/:orderId/status")
-  .patch(authenticate, authorizeVendor, updateOrderStatus);
+  .route("/update-vendororder-status")
+  .patch(authenticate, authorizeVendor, updateVendorOrderStatus);
 router
   .route("/:id/deliver")
   .put(authenticate, authorizeAdmin, updateOrderToDelivered);
