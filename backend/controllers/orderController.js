@@ -144,10 +144,77 @@ const createOrder = asyncHandler(async (req, res) => {
 // @route   GET /api/orders/myorders
 // @access  Private
 const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ customer: req.user._id }).populate({
-    path: "orderItems.product",
-    model: "Product",
-  });
+  // const orders = await Order.find({ customer: req.user._id }).populate({
+  //   path: "orderItems.product",
+  //   model: "Product",
+  // });
+
+  const customerObjectId = req.user._id;
+  const orders = await Order.aggregate([
+    { $match: { customer: customerObjectId } },
+
+    {
+      $lookup: {
+        from: "products",
+        localField: "orderItems.product",
+        foreignField: "_id",
+        as: "productDetails",
+      },
+    },
+
+    {
+      $addFields: {
+        orderItems: {
+          $map: {
+            input: "$orderItems",
+            as: "item",
+            in: {
+              _id: "$$item._id",
+              quantity: "$$item.quantity",
+              price: "$$item.price",
+              status: "$$item.status",
+              reasonForCancel: "$$item.reasonForCancel",
+              product: {
+                $arrayElemAt: [
+                  {
+                    $filter: {
+                      input: "$productDetails",
+                      as: "prod",
+                      cond: { $eq: ["$$prod._id", "$$item.product"] },
+                    },
+                  },
+                  0,
+                ],
+              },
+            },
+          },
+        },
+      },
+    },
+
+    // Step 6: Clean final projection
+    {
+      $project: {
+        _id: 1,
+        subtotal: 1,
+        shipping: 1,
+        tax: 1,
+        total: 1,
+        status: 1,
+        payment: 1,
+        createdAt: 1,
+        orderItems: {
+          _id: 1,
+          status: 1,
+          quantity: 1,
+          price: 1,
+          "product.name": 1,
+          "product._id": 1,
+          reasonForCancel: 1,
+        },
+      },
+    },
+  ]);
 
   console.log(`Found ${orders.length} orders for user ${req.user._id}`); // DEBUG
   console.log(orders.orderItems);
@@ -221,53 +288,113 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
   } catch (error) {}
 });
 
+// @desc    Update order status by vendor
+// @route   PATCH /api/orders/update-vendororder-status
+// @access  Private/Vendor
 const updateVendorOrderStatus = asyncHandler(async (req, res) => {
   try {
-    const { orderId, items } = req.body; // ✅ Fixed
-    console.log(req.body)
+    const { orderId, items } = req.body;
+    console.log("Received update:", req.body);
 
-    if (orderId) {
-      const order = await Order.findById(orderId);
-      if (!order) {
-        return res.status(404).json({ message: "Order not found" });
-      }
-
-      // Update each order item status
-      order.orderItems?.forEach((orderItem) => {
-        const matchingItem = items.find(
-          (item) => item.id === orderItem._id.toString()
-        );
-        if (matchingItem) {
-          if (matchingItem.confirmed) {
-            orderItem.status = "confirmed";
-          } else {
-            (orderItem.status = "cancelled"),
-              (orderItem.reasonForCancel = matchingItem.reason);
-          }
-        }
-
-        const allActioned = order.orderItems.every(
-          (item) => item.status !== "pending"
-        );
-        if (allActioned) {
-          const allConfirmed = order.orderItems.every(
-            (item) => item.status === "confirmed"
-          );
-          if (allConfirmed) {
-            order.status = "confirmed";
-            order.expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 15 minutes
-          } else if (order.payment.method === "esewa") {
-            order.status = "refunded";
-          }
-        }
-      });
-
-      await order.save();
-      res.json({ message: "Order updated successfully", order });
+    if (!orderId || !items) {
+      return res
+        .status(400)
+        .json({ message: "Order ID and items are required" });
     }
-    console.log("i m here bro3");
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Update each order item status
+    order.orderItems?.forEach((orderItem) => {
+      const matchingItem = items.find(
+        (item) => item.id === orderItem._id.toString()
+      );
+
+      if (matchingItem) {
+        if (matchingItem.confirmed) {
+          orderItem.status = "confirmed";
+        } else {
+          orderItem.status = "cancelled";
+          orderItem.reasonForCancel = matchingItem.reason;
+        }
+      }
+    });
+
+    // Check if all items have been actioned
+    const allActioned = order.orderItems.every(
+      (item) => item.status !== "pending"
+    );
+
+    if (allActioned) {
+      const allConfirmed = order.orderItems.every(
+        (item) => item.status === "confirmed"
+      );
+
+      if (allConfirmed) {
+        try {
+          // Check stock and deduct for CONFIRMED items only
+          for (let item of order.orderItems) {
+            if (item.status === "confirmed") {
+              const product = await Product.findById(item.product);
+              if (!product) {
+                throw new Error(`Product ${item.product} not found`);
+              }
+              if (product.countInStock < item.quantity) {
+                throw new Error(
+                  `Not enough stock for ${product.name}. Available: ${product.countInStock}, Requested: ${item.quantity}`
+                );
+              }
+
+              // Deduct stock
+              product.countInStock -= item.quantity;
+              if (product.countInStock === 0) {
+                product.sold = true;
+              }
+              await product.save();
+            }
+          }
+
+          // Update order status
+          order.status = "confirmed";
+          order.expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+        } catch (error) {
+          // If stock check fails, revert item statuses to pending
+          order.orderItems.forEach((item) => {
+            if (item.status === "confirmed") {
+              item.status = "pending";
+            }
+          });
+          await order.save();
+          return res.status(400).json({
+            message: "Order confirmation failed",
+            error: error.message,
+          });
+        }
+      } else if (order.payment.method === "esewa") {
+        // If any item cancelled and payment was eSewa, refund
+        order.status = "refunded";
+      } else {
+        // If COD and some items cancelled
+        order.status = "cancelled";
+      }
+    }
+
+    await order.save();
+    console.log("Order updated successfully");
+    res.json({
+      message: "Order updated successfully",
+      order,
+      status: order.status,
+    });
   } catch (error) {
-    res.status(500).send("error", error);
+    console.error("Error updating order:", error);
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 });
 
@@ -403,6 +530,7 @@ const getSoldOrders = asyncHandler(async (req, res) => {
   }
 });
 
+//regularly checking if theres any error orders or confirmed one
 const deleteErrorOrder = asyncHandler(async (req, res) => {
   console.log("deleting the broken orders");
   await Order.deleteMany({
@@ -425,7 +553,94 @@ const deleteErrorOrder = asyncHandler(async (req, res) => {
   );
 });
 
+const getOrder = asyncHandler(async (req, res) => {
+  const {
+    status,
+    paymentStatus,
+    dateFrom,
+    dateTo,
+    page = 1,
+    pageSize = 10,
+  } = req.query;
+
+  // Build filter object
+  const filter = {};
+
+  // Status filter
+  if (status && status !== "all") {
+    switch (status) {
+      case "active":
+        // All active orders (confirmed + processing are same)
+        filter.status = {
+          $in: ["pending", "confirmed", "processing", "shipped"],
+        };
+        break;
+      case "in_progress":
+        // Confirmed + Processing (grouped together)
+        filter.status = { $in: ["confirmed", "processing"] };
+        break;
+      case "pending":
+        filter.status = "pending";
+        break;
+      case "shipped":
+        filter.status = "shipped";
+        break;
+      case "delivered":
+        filter.status = "delivered";
+        break;
+      case "cancelled":
+        filter.status = { $in: ["cancelled", "refunded"] };
+        break;
+      default:
+        filter.status = status;
+    }
+  }
+
+  // Payment status filter
+  if (paymentStatus && paymentStatus !== "all") {
+    filter["payment.status"] = paymentStatus;
+  }
+
+  // Date range filter
+  if (dateFrom || dateTo) {
+    filter.createdAt = {};
+    if (dateFrom) filter.createdAt.$gte = new Date(dateFrom);
+    if (dateTo) filter.createdAt.$lte = new Date(dateTo);
+  }
+
+  const orders = await Order.find(filter)
+    .populate("customer", "username email")
+    .populate("orderItems.product", "name images")
+    .limit(parseInt(pageSize))
+    .skip(parseInt(pageSize) * (parseInt(page) - 1))
+    .select("-__v -orderItems.vendor")
+    .sort({ createdAt: -1 }) // Newest first
+    .lean();
+
+  const totalOrders = await Order.countDocuments(filter);
+
+  res.json({
+    orders,
+    totalPages: Math.ceil(totalOrders / pageSize),
+    currentPage: parseInt(page),
+    totalOrders,
+  });
+});
+const updateAdminOrderStatus = asyncHandler(async (req, res) => {
+  console.log(req.body);
+  const { orderId, action } = req.body;
+  const order = await Order.findById(orderId);
+  if (!order) {
+    res.status(404).send("order not found !!");
+  }
+  order.status = action;
+  order.save();
+  res.send({ "order status updated to : ": order.status });
+  // res.send("updating...")
+});
+
 export {
+  getOrder,
   createOrder,
   getMyOrders,
   getOrderById,
@@ -434,4 +649,5 @@ export {
   updateOrderToDelivered,
   getSoldOrders,
   deleteErrorOrder,
+  updateAdminOrderStatus,
 };
