@@ -200,13 +200,13 @@ export default function OrderManagement() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Orders</h1>
         <div className="flex items-center gap-3">
-          <div className="badge-pending">Pending</div>
+          {/* <div className="badge-pending">Pending</div>
           <button
             className="px-4 py-2 rounded-md font-semibold"
             style={{ background: COLORS.emerald, color: "#061114" }}
           >
             + New
-          </button>
+          </button> */}
         </div>
       </div>
 

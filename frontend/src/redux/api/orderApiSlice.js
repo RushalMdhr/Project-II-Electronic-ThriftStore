@@ -6,7 +6,11 @@ export const orderApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Get all orders (admin)
     getOrders: builder.query({
-      query: () => ORDERS_URL, // "/api/orders"
+      query: ({ status = "all", page = 1, pageSize = 10 }) => ({
+        // "/api/orders"
+        url: `${ORDERS_URL}`,
+        params: { status, page, pageSize },
+      }),
       providesTags: ["Order"],
       keepUnusedDataFor: 5,
     }),
@@ -71,8 +75,18 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 
     //updating order Status
     updateOrderStatus: builder.mutation({
-      query: ({payload}) => ({
+      query: ({ payload }) => ({
         url: `${ORDERS_URL}/update-vendorOrder-status`,
+        method: "PATCH",
+        body: payload,
+      }),
+      invalidatesTags: ["Order"],
+    }),
+
+    //updating order Status From Admin
+    updateAdminOrderStatus: builder.mutation({
+      query: ({ payload }) => ({
+        url: `${ORDERS_URL}/update-adminorder-status`,
         method: "PATCH",
         body: payload,
       }),
@@ -90,5 +104,6 @@ export const {
   useUpdateOrderToDeliveredMutation,
   useGetSoldOrdersQuery,
   useDeleteErrorOrderMutation,
-  useUpdateOrderStatusMutation
+  useUpdateOrderStatusMutation,
+  useUpdateAdminOrderStatusMutation,
 } = orderApiSlice;
