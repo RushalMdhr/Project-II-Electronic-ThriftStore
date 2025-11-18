@@ -249,50 +249,6 @@ const UploadPageTest = () => {
           onChange={(e) => setDescription(e.target.value)}
           className="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        {/* Specifications */}
-        <h3>Specifications</h3>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Key (e.g. RAM)"
-            value={tempKey}
-            onChange={(e) => setTempKey(e.target.value)}
-            className="flex-1 border border-gray-700 rounded px-2 py-1 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none"
-          />
-          <input
-            type="text"
-            placeholder="Value (e.g. 8GB)"
-            value={tempValue}
-            onChange={(e) => setTempValue(e.target.value)}
-            className="flex-1 border border-gray-700 rounded px-2 py-1 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none"
-          />
-          <button type="button"
-            onClick={addSpecification}
-            className="bg-emerald-600 px-3 py-1 rounded text-white hover:bg-emerald-700"
-          >
-            Add
-          </button>
-        </div>
-
-        <div className="mt-2 space-y-1">
-          {Object.entries(specifications).map(([key, value]) => (
-            <div
-              key={key}
-              className="flex justify-between bg-gray-800 p-1 px-2 rounded"
-            >
-              <span>
-                <strong>{key}</strong>: {value}
-              </span>
-              <button
-                type="button"
-                onClick={() => removeSpecification(key)}
-                className="text-red-500 font-bold"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
 
         <select
           value={category}
@@ -323,6 +279,54 @@ const UploadPageTest = () => {
           <option value="Good">Good</option>
           <option value="Fair">Fair</option>
         </select>
+
+        {/* Specifications */}
+        <h3 className="mx-2 text-md font-semibold text-emerald-300 mb-2">
+          Specifications
+        </h3>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Key (e.g. RAM)"
+            value={tempKey}
+            onChange={(e) => setTempKey(e.target.value)}
+            className="flex-1 border border-gray-700 rounded px-2 py-1 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none"
+          />
+          <input
+            type="text"
+            placeholder="Value (e.g. 8GB)"
+            value={tempValue}
+            onChange={(e) => setTempValue(e.target.value)}
+            className="flex-1 border border-gray-700 rounded px-2 py-1 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={addSpecification}
+            className="bg-emerald-600 px-3 py-1 rounded text-white hover:bg-emerald-700"
+          >
+            Add
+          </button>
+        </div>
+
+        <div className="mt-2 space-y-1">
+          {Object.entries(specifications).map(([key, value]) => (
+            <div
+              key={key}
+              className="flex justify-between bg-gray-800 p-1 px-2 rounded"
+            >
+              <span>
+                <strong>{key}</strong>: {value}
+              </span>
+              <button
+                type="button"
+                onClick={() => removeSpecification(key)}
+                className="text-red-500 font-bold"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
 
         <div className="space-y-2">
           {!product ? (
