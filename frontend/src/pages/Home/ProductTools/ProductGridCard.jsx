@@ -1,4 +1,4 @@
-import { Heart, Star } from "lucide-react";
+// import { Heart, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AddToCart from "../../User/Cart/AddToCart";
 import { useSelector } from "react-redux";
@@ -49,9 +49,9 @@ const ProductGridCard = ({ products }) => {
               )}
 
               {/* Wishlist Button */}
-              <button className="absolute top-3 right-3 p-2 bg-gray-100 rounded-full shadow hover:bg-emerald-100 transition-all opacity-0 group-hover:opacity-100">
+              {/* <button className="absolute top-3 right-3 p-2 bg-gray-100 rounded-full shadow hover:bg-emerald-100 transition-all opacity-0 group-hover:opacity-100">
                 <Heart className="h-4 w-4 text-gray-600 group-hover:text-emerald-600" />
-              </button>
+              </button> */}
 
               {/* Condition Badge */}
               <div className="absolute bottom-3 left-3 bg-emerald-500 text-white px-2 py-1 rounded-full text-xs font-medium shadow-md">
@@ -86,12 +86,12 @@ const ProductGridCard = ({ products }) => {
 
               {/* Rating & Views */}
               <div className="flex justify-between items-center text-sm mb-3">
-                <div className="flex items-center space-x-1">
+                {/* <div className="flex items-center space-x-1">
                   <Star className="h-4 w-4 text-yellow-400 fill-current" />
                   <span className="text-gray-600">
                     {product.rating || "N/A"}
                   </span>
-                </div>
+                </div> */}
                 <div className="flex items-center gap-1 text-gray-500">
                   <i className="ri-eye-line" />
                   {product.views?.length || 0}
