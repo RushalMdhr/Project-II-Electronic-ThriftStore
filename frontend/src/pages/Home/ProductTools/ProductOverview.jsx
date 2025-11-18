@@ -291,7 +291,7 @@ const ProductOverview = () => {
 
 // clean key-value display
 const SpecRow = ({ label, value, highlight }) => (
-  <div className="flex justify-between items-center py-2">
+  <div className="flex justify-between items-center py-1">
     <span className="text-gray-600 font-medium">{label}</span>
     <span
       className={`font-semibold ${
@@ -302,5 +302,6 @@ const SpecRow = ({ label, value, highlight }) => (
     </span>
   </div>
 );
+
 
 export default ProductOverview;

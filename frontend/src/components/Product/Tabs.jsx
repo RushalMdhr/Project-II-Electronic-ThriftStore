@@ -34,42 +34,18 @@ const Tabs = ({ product }) => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <tbody>
-                <tr className="border-b border-gray-200">
-                  <th className="py-2 pr-4 font-medium text-gray-700">Name</th>
-                  <td className="py-2">{product.name}</td>
-                  <th className="py-2 pr-4 font-medium text-gray-700">Brand</th>
-                  <td className="py-2">{product.brand || "N/A"}</td>
-                </tr>
-                <tr className="border-b border-gray-200">
-                  <th className="py-2 pr-4 font-medium text-gray-700">
-                    Condition
-                  </th>
-                  <td className="py-2">{product.condition}</td>
-                  <th className="py-2 pr-4 font-medium text-gray-700">
-                    Category
-                  </th>
-                  <td className="py-2">{product.category?.name || "N/A"}</td>
-                </tr>
-                <tr className="border-b border-gray-200">
-                  <th className="py-2 pr-4 font-medium text-gray-700">Price</th>
-                  <td className="py-2">${product.price}</td>
-                </tr>
-                <tr className="border-b border-gray-200">
-                  <th className="py-2 pr-4 font-medium text-gray-700">
-                    In Stock
-                  </th>
-                  <td className="py-2" colSpan={3}>
-                    {product.countInStock}
-                  </td>
-                </tr>
-                <tr className="border-b border-gray-200">
-                  <th className="py-2 pr-4 font-medium text-gray-700">
-                    Uploaded By
-                  </th>
-                  <td className="py-2" colSpan={3}>
-                    {product.uploadedBy?.username || "Unknown"}
-                  </td>
-                </tr>
+                
+                {product.specifications &&
+                  Object.entries(product.specifications).map(([key, value]) => (
+                    <tr key={key} className="border-b border-gray-200">
+                      <th className="py-2 pr-4 font-medium text-gray-700">
+                        {key}
+                      </th>
+                      <td className="py-2" colSpan={3}>
+                        {value || "-"}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
