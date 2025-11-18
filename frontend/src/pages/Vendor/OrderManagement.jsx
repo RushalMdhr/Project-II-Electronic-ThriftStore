@@ -41,12 +41,24 @@ export default function OrderManagement() {
   const [itemMap, setItemMap] = useState({}); // { itemId: boolean }
   const [rejectReasons, setRejectReasons] = useState({}); // { itemId: reason }
   rejectReasons && console.log("reject reason : ", rejectReasons);
+  const isEditable = selected?.status === "pending";
+
 
   // modals
   const [showRejectAllModal, setShowRejectAllModal] = useState(false);
   const [rejectAllDraft, setRejectAllDraft] = useState("");
   const [showItemModalFor, setShowItemModalFor] = useState(null); // itemId
   const [itemDraft, setItemDraft] = useState("");
+
+  const statusColors = {
+    pending: "#FFD580", // Soft Yellow
+    confirmed: "#4CAF50", // Green
+    processing: "#4DA6FF", // Blue
+    shipped: "#0284C7", // Darker Blue
+    delivered: "#B980F0", // Purple
+    cancelled: "#FF6B6B", // Red
+    refunded: "#FF9F1C", // Orange
+  };
 
   useEffect(() => {
     if (!selected) return;
@@ -243,25 +255,24 @@ export default function OrderManagement() {
                   </div>
                 </td>
                 <td className="cell">
-                  {o.status === "pending" ? (
-                    <span
-                      style={{
-                        padding: "6px 10px",
-                        borderRadius: 999,
-                        border: "1px solid rgba(255,255,255,0.04)",
-                        background: "rgba(255,255,255,0.02)",
-                      }}
-                      className="text-xs font-semibold"
-                    >
-                      PENDING
-                    </span>
-                  ) : (
-                    <span className="text-sm">{o.status}</span>
-                  )}
+                  <span
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: 999,
+                      border: "1px solid rgba(255,255,255,0.04)",
+                      background: statusColors[o.status] || "#777",
+                      color: "#061114",
+                      fontWeight: 700,
+                    }}
+                    className="text-xs"
+                  >
+                    {o.status.toUpperCase()}
+                  </span>
                 </td>
+
                 <td className="cell">Rs. {sum(o.orderItems)}</td>
                 <td className="cell">
-                  {o.checked ? (<>checked</>): (
+                  {
                     <button
                       onClick={() => {
                         setSelected(o);
@@ -271,7 +282,7 @@ export default function OrderManagement() {
                     >
                       Details
                     </button>
-                  )}
+                  }
                 </td>
               </tr>
             ))}
@@ -308,8 +319,10 @@ export default function OrderManagement() {
 
                 <div
                   role="button"
-                  className={`glass-switch ${mainConfirmAll ? "on" : "off"}`}
-                  onClick={handleMainToggle}
+                  className={`glass-switch ${mainConfirmAll ? "on" : "off"} ${
+                    !isEditable && "opacity-50 cursor-not-allowed"
+                  }`}
+                  onClick={isEditable ? handleMainToggle : undefined}
                 >
                   <div className="glass-thumb" />
                 </div>
@@ -342,11 +355,14 @@ export default function OrderManagement() {
                         role="button"
                         className={`glass-switch ${
                           itemMap[it._id] ? "on" : "off"
-                        }`}
-                        onClick={() =>
-                          itemMap[it._id]
-                            ? attemptRejectItem(it._id)
-                            : acceptItem(it._id)
+                        } ${!isEditable && "opacity-50 cursor-not-allowed"}`}
+                        onClick={
+                          isEditable
+                            ? () =>
+                                itemMap[it._id]
+                                  ? attemptRejectItem(it._id)
+                                  : acceptItem(it._id)
+                            : undefined
                         }
                       >
                         <div className="glass-thumb" />
@@ -392,13 +408,15 @@ export default function OrderManagement() {
               >
                 Cancel
               </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 rounded-md font-semibold"
-                style={{ background: COLORS.emerald, color: "#061114" }}
-              >
-                Save
-              </button>
+              {isEditable && (
+                <button
+                  onClick={handleSave}
+                  className="px-4 py-2 rounded-md font-semibold"
+                  style={{ background: COLORS.emerald, color: "#061114" }}
+                >
+                  Save
+                </button>
+              )}
             </div>
           </div>
         </div>
