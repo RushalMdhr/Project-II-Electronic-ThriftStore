@@ -313,6 +313,7 @@ const updateVendorOrderStatus = asyncHandler(async (req, res) => {
         (item) => item.id === orderItem._id.toString()
       );
 
+      //just to confirm or reject each orderItems
       if (matchingItem) {
         if (matchingItem.confirmed) {
           orderItem.status = "confirmed";
@@ -378,7 +379,7 @@ const updateVendorOrderStatus = asyncHandler(async (req, res) => {
         order.status = "refunded";
       } else {
         // If COD and some items cancelled
-        order.status = "cancelled";
+        order.status = "pending";
       }
     }
 
