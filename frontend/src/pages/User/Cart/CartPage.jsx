@@ -23,11 +23,16 @@ const CartPage = () => {
   const [updateCartItem] = useUpdateCartItemMutation();
   const [deleteCartItem] = useDeleteCartItemMutation();
   const [cartItems, setCartItems] = useState([]);
+  const [Error, setError] = useState(false);
   const [selectedCartItems, setSelectedCartItems] = useState([]);
 
   useEffect(() => {
     setCartItems(cartItemsData);
-    setSelectedCartItems([]); // all unselected by default
+    if (cartItemsData.length == 1) {
+      setSelectedCartItems(cartItemsData);
+    } else {
+      setSelectedCartItems([]); // all unselected by default
+    }
     refetch();
   }, [cartItemsData]);
 
@@ -122,7 +127,7 @@ const CartPage = () => {
           {/* Top Row: Back Button */}
           <div className="flex justify-start items-center">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/products")}
               className="flex items-center gap-2 text-gray-700 font-medium px-3 py-2 rounded-lg 
                bg-white/30 backdrop-blur-sm shadow-sm
                hover:shadow-lg hover:bg-gray-100/50 hover:text-black
@@ -171,6 +176,7 @@ const CartPage = () => {
                   cartItems.length > 0
                 }
                 onChange={toggleSelectAll}
+                disabled={Error}
                 className="w-5 h-8 accent-green-600 cursor-pointer"
               />
               Select All Items
@@ -209,9 +215,9 @@ const CartPage = () => {
                       type="checkbox"
                       checked={isItemSelected(item._id)}
                       onChange={() => toggleCartItem(item)}
+                      disabled={item.quantity > item.product.countInStock}
                       className="w-5 h-5 accent-green-600 self-start sm:self-center cursor-pointer"
                     />
-
                     <Link to={`/overview/${item.product._id}`}>
                       <img
                         src={item.product.images?.[0] || "/placeholder.png"}
@@ -256,6 +262,17 @@ const CartPage = () => {
                         >
                           +
                         </button>
+                        <div
+                          className={`px-10 font-bold ${
+                            item.quantity == item.product.countInStock
+                              ? `text-yellow-500`
+                              : item.quantity < item.product.countInStock
+                              ? `text-green-500`
+                              : `text-red-500`
+                          }`}
+                        >
+                          In stock : {item.product.countInStock}
+                        </div>
                       </div>
                     </div>
 

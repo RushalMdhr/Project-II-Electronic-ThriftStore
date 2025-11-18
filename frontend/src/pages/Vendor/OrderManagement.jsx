@@ -1,221 +1,480 @@
+import { useState, useEffect } from "react";
 import {
   useGetSoldOrdersQuery,
   useUpdateOrderStatusMutation,
 } from "../../redux/api/orderApiSlice";
-import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const statusColors = {
-  pending: "bg-yellow-500/30 text-yellow-400",
-  confirmed: "bg-emerald-500/30 text-emerald-400",
-  processing: "bg-blue-500/30 text-blue-400",
-  shipped: "bg-indigo-500/30 text-indigo-400",
-  delivered: "bg-green-500/30 text-green-400",
-  cancelled: "bg-red-500/30 text-red-400",
-  refunded: "bg-gray-500/30 text-gray-300",
+// Dark, premium emerald palette
+const COLORS = {
+  emerald: "#009966",
+  teal: "#23605C",
+  slate: "#1E2939",
+  black: "#101828",
+  surface: "rgba(255,255,255,0.03)",
 };
 
-const OrderManagement = () => {
-  const [expanded, setExpanded] = useState(null);
+function fmtDate(d) {
+  try {
+    return new Date(d).toLocaleString();
+  } catch (e) {
+    return d;
+  }
+}
 
-  
-  const { data: soldOrders, isLoading, isError } = useGetSoldOrdersQuery();
-  soldOrders && console.log("soldOrders : ", soldOrders);
-  const [updateOrderStatus] = useUpdateOrderStatusMutation();
+function sum(items = []) {
+  return items.reduce((s, it) => s + (it.price || 0), 0);
+}
 
-  const toggleExpand = (id) => {
-    setExpanded(expanded === id ? null : id);
-  };
+export default function OrderManagement() {
+  const { data } = useGetSoldOrdersQuery();
+  const [updateOrder] = useUpdateOrderStatusMutation();
+  const soldOrders = data?.map((order) => ({
+    ...order,
+    checked: order.orderItems?.every((item) => item.status !== "pending"),
+  }));
+  console.log("data : ", soldOrders);
 
-  if (isLoading)
-    return (
-      <div className="text-white text-center py-10">Loading orders...</div>
+  const [selected, setSelected] = useState(null);
+  const [mainConfirmAll, setMainConfirmAll] = useState(true);
+  const [itemMap, setItemMap] = useState({}); // { itemId: boolean }
+  const [rejectReasons, setRejectReasons] = useState({}); // { itemId: reason }
+  rejectReasons && console.log("reject reason : ", rejectReasons);
+
+  // modals
+  const [showRejectAllModal, setShowRejectAllModal] = useState(false);
+  const [rejectAllDraft, setRejectAllDraft] = useState("");
+  const [showItemModalFor, setShowItemModalFor] = useState(null); // itemId
+  const [itemDraft, setItemDraft] = useState("");
+
+  useEffect(() => {
+    if (!selected) return;
+    const map = {};
+    selected.orderItems?.forEach((it) => (map[it._id] = true));
+    setItemMap(map);
+    setMainConfirmAll(true);
+    setRejectReasons({});
+    setRejectAllDraft("");
+  }, [selected]);
+
+  // logic: when accepting any (single or all) remove their reason
+  function acceptItem(id) {
+    setItemMap((p) => ({ ...p, [id]: true }));
+    setRejectReasons((p) => {
+      const c = { ...p };
+      delete c[id];
+      return c;
+    });
+    // if all items true -> main true
+    setMainConfirmAll((prev) => {
+      const next = { ...itemMap, [id]: true };
+      return Object.values(next).every(Boolean);
+    });
+  }
+
+  function attemptRejectItem(id) {
+    // open modal to write reason then confirm
+    setShowItemModalFor(id);
+    setItemDraft("");
+  }
+
+  function confirmRejectItem() {
+    if (!showItemModalFor) return;
+    const id = showItemModalFor;
+    setItemMap((p) => ({ ...p, [id]: false }));
+    setRejectReasons((p) => ({
+      ...p,
+      [id]: itemDraft || "No reason provided",
+    }));
+    setShowItemModalFor(null);
+    setItemDraft("");
+    setMainConfirmAll(false);
+  }
+
+  function cancelRejectItem() {
+    setShowItemModalFor(null);
+    setItemDraft("");
+  }
+
+  function attemptRejectAll() {
+    setShowRejectAllModal(true);
+    setRejectAllDraft("");
+  }
+
+  function confirmRejectAll() {
+    const newMap = {};
+    Object.keys(itemMap).forEach((k) => (newMap[k] = false));
+    setItemMap(newMap);
+    const reasons = {};
+    Object.keys(itemMap).forEach(
+      (k) => (reasons[k] = rejectAllDraft || "No reason")
     );
-  if (isError)
-    return (
-      <div className="text-red-400 text-center py-10">
-        Failed to load orders.
-      </div>
-    );
+    setRejectReasons(reasons);
+    setShowRejectAllModal(false);
+    setMainConfirmAll(false);
+  }
 
-  const updateStatus = async (status,orderId) => {
-    console.log('changing status',orderId)
-    const updatedStatus = await updateOrderStatus({ status: status, orderId : orderId }).unwrap();
-    if (updatedStatus) {
-      toast.success(`order updated to ${status}`);
-      console.log(updatedStatus)
+  function cancelRejectAll() {
+    setShowRejectAllModal(false);
+    setRejectAllDraft("");
+  }
+
+  function handleMainToggle() {
+    // if turning from true -> false, open modal
+    if (mainConfirmAll) {
+      attemptRejectAll();
+      return;
     }
-    else{
-      toast.error("error changing status")
+    // turning from false -> true: clear all reasons and set all true
+    const newMap = {};
+    Object.keys(itemMap).forEach((k) => (newMap[k] = true));
+    setItemMap(newMap);
+    setRejectReasons({});
+    setMainConfirmAll(true);
+  }
+
+  async function handleSave() {
+    if (!selected) return;
+    const items = Object.keys(itemMap).map((id) => ({
+      id,
+      confirmed: !!itemMap[id],
+      reason: itemMap[id] ? "" : rejectReasons[id] || "",
+    }));
+    const payload = {
+      orderId: selected._id,
+      items,
+      overallStatus: Object.values(itemMap).every(Boolean)
+        ? "confirmed"
+        : "partial",
+    };
+
+    try {
+      console.log("payload : ", payload);
+      const updateRes = await updateOrder({ payload }).unwrap();
+      console.log("cameback");
+      if (!updateRes) {
+        toast.error("no res");
+      } else if (updateRes.error) {
+        console.log("error", updateRes.error);
+        toast.error("error");
+      }
+      toast.success("update success");
+      // after success, clear local
+      setSelected(null);
+    } catch (e) {
+      console.error(e);
+      // alert("Save failed — check console");
+      toast.error("Save failed — check console");
     }
-  };
+  }
+
+  function handleDiscard() {
+    setSelected(null);
+  }
+
+  // UI helpers
+  const headStyle = { background: COLORS.surface, color: "#E6F8F2" };
 
   return (
-    <div className="min-h-screen bg-[#1E2939] text-gray-200 p-8">
-      <h1 className="text-2xl font-semibold text-white mb-6">
-        Vendor Order Management
-      </h1>
+    <div
+      style={{ background: COLORS.black }}
+      className="min-h-screen p-6 text-white font-sans"
+    >
+      <style>{`
+        .card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.04); }
+        .row:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(2,6,23,0.6); }
+        .glass-switch { --w:52px; --h:30px; width:var(--w); height:var(--h); border-radius:calc(var(--h)/2); display:inline-flex; padding:4px; align-items:center; cursor:pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,0.02); backdrop-filter: blur(6px) saturate(120%); }
+        .glass-thumb { width:22px; height:22px; border-radius:50%; background: linear-gradient(180deg, #fff, #f6f6f6); box-shadow: 0 2px 8px rgba(2,6,23,0.6); transition: transform .22s cubic-bezier(.2,.9,.3,1); }
+        .glass-switch.on { background: linear-gradient(90deg, rgba(0,153,102,0.12), rgba(35,96,92,0.06)); border: 1px solid rgba(0,153,102,0.18); }
+        .glass-switch.off { background: linear-gradient(90deg, rgba(220,38,38,0.06), rgba(30,41,59,0.04)); border: 1px solid rgba(220,38,38,0.12); }
+        .glass-switch.on .glass-thumb { transform: translateX(22px); }
 
-      <div className="overflow-x-auto bg-[#101828] rounded-2xl shadow-lg">
-        <table className="w-full border-collapse">
-          <thead className="bg-[#23605C] text-white">
+        .badge-pending { background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.06); color: ${COLORS.emerald}; padding:6px 10px; border-radius:999px; font-weight:700; display:inline-block; }
+
+        .head-cell { padding:14px 12px; text-align:left; font-weight:700; letter-spacing:0.6px; color:#DFF6EE; }
+        .cell { padding:12px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+
+      `}</style>
+
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Orders</h1>
+        <div className="flex items-center gap-3">
+          {/* <div className="badge-pending">Pending</div>
+          <button
+            className="px-4 py-2 rounded-md font-semibold"
+            style={{ background: COLORS.emerald, color: "#061114" }}
+          >
+            + New
+          </button> */}
+        </div>
+      </div>
+
+      <div className="card rounded-xl overflow-hidden">
+        <table className="w-full table-auto">
+          <thead style={headStyle}>
             <tr>
-              <th className="p-4 text-left">Order ID</th>
-              <th className="p-4 text-left">Created</th>
-              <th className="p-4 text-left">Customer</th>
-              <th className="p-4 text-left">Total</th>
-              <th colSpan="2" className="p-4 text-center">
-                Payment
-              </th>
-              <th className="p-4 text-left">Order Status</th>
-              <th className="p-4 text-center">Action</th>
-            </tr>
-            <tr className="bg-[#1b4644] text-sm">
-              <th colSpan="4"></th>
-              <th className="p-3 text-center font-normal">Method</th>
-              <th className="p-3 text-center font-normal">Status</th>
-              <th colSpan="2"></th>
+              <th className="head-cell">Order</th>
+              <th className="head-cell">Date</th>
+              <th className="head-cell">Customer</th>
+              <th className="head-cell">Payment</th>
+              <th className="head-cell">Status</th>
+              <th className="head-cell">Total</th>
+              <th className="head-cell">Action</th>
             </tr>
           </thead>
 
           <tbody>
-            {soldOrders?.map((order) => (
-              <>
-                <tr
-                  key={order._id}
-                  className="border-b border-[#2D3748] hover:bg-[#23605C]/20 transition-all"
-                >
-                  <td className="p-4 font-medium text-[#00c68e]">
-                    {order._id.slice(-6)}
-                  </td>
-                  <td className="p-4">
-                    {new Date(order.createdAt).toLocaleString()}
-                  </td>
-                  <td className="p-4">{order.customer}</td>
-                  <td className="p-4 font-semibold">${order.total}</td>
-                  <td className="p-4 text-center capitalize">
-                    {order.payment?.method}
-                  </td>
-                  <td className="p-4 text-center">
+            {soldOrders?.map((o) => (
+              <tr
+                key={o._id}
+                className="row"
+                style={{ transition: "all .12s" }}
+              >
+                <td className="cell">{o._id?.slice(0, 8)}...</td>
+                <td className="cell">{fmtDate(o.createdAt)}</td>
+                <td className="cell">{o.customer}</td>
+                <td className="cell">
+                  <div className="text-sm">
+                    <div>{o.payment?.method}</div>
+                    <div style={{ color: "#FFD580", fontWeight: 700 }}>
+                      {o.payment?.status}
+                    </div>
+                  </div>
+                </td>
+                <td className="cell">
+                  {o.status === "pending" ? (
                     <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        statusColors[order.payment?.status] ||
-                        "bg-gray-700 text-gray-300"
-                      }`}
+                      style={{
+                        padding: "6px 10px",
+                        borderRadius: 999,
+                        border: "1px solid rgba(255,255,255,0.04)",
+                        background: "rgba(255,255,255,0.02)",
+                      }}
+                      className="text-xs font-semibold"
                     >
-                      {order.payment?.status}
+                      PENDING
                     </span>
-                  </td>
-                  <td className="p-4">
-                    <select
-                      // className="bg-[#1E2939] text-gray-200 border border-gray-700 rounded-md p-2 text-sm"
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        statusColors[order.status] ||
-                        "bg-gray-700 text-gray-300"
-                      }`}
-                      value={order.status}
-                      onChange={(e) => updateStatus(e.target.value, order._id)}
-                    >
-                      {[
-                        "pending",
-                        "confirmed",
-                        "processing",
-                        "shipped",
-                        "delivered",
-                        "cancelled",
-                        "refunded",
-                      ].map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="p-4 text-center">
+                  ) : (
+                    <span className="text-sm">{o.status}</span>
+                  )}
+                </td>
+                <td className="cell">Rs. {sum(o.orderItems)}</td>
+                <td className="cell">
+                  {o.checked ? (<>checked</>): (
                     <button
-                      onClick={() => toggleExpand(order._id)}
-                      className="text-[#00c68e] hover:text-[#009966]"
+                      onClick={() => {
+                        setSelected(o);
+                      }}
+                      className="px-3 py-1 rounded-md font-semibold"
+                      style={{ background: COLORS.emerald, color: "#061114" }}
                     >
-                      {expanded === order._id ? <ChevronUp /> : <ChevronDown />}
+                      Details
                     </button>
-                  </td>
-                </tr>
-
-                {expanded === order._id && (
-                  <tr className="bg-[#1b1f2a]">
-                    <td colSpan="8" className="p-6">
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-white">
-                          Order Details
-                        </h3>
-
-                        <div className="overflow-x-auto">
-                          <table className="w-full border border-gray-700 rounded-md">
-                            <thead>
-                              <tr className="bg-[#23605C]/30 text-gray-200">
-                                <th className="p-3 text-left">Product</th>
-                                <th className="p-3 text-left">Quantity</th>
-                                <th className="p-3 text-left">Price</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {order.orderItems.map((item) => (
-                                <tr
-                                  key={item.product._id}
-                                  className="border-t border-gray-700"
-                                >
-                                  <td className="p-3">
-                                    <Link to={`/overview/${item.product._id}`}>
-                                      {item.product.name}
-                                    </Link>
-                                  </td>
-                                  <td className="p-3">{item.quantity}</td>
-                                  <td className="p-3">${item.price}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-
-                        <div className="text-sm text-gray-300 mt-4 space-y-1">
-                          <p>
-                            Subtotal:{" "}
-                            <span className="text-white font-medium">
-                              ${order.subtotal}
-                            </span>
-                          </p>
-                          <p>
-                            Shipping:{" "}
-                            <span className="text-white font-medium">
-                              ${order.shipping}
-                            </span>
-                          </p>
-                          <p>
-                            Tax:{" "}
-                            <span className="text-white font-medium">
-                              ${order.tax}
-                            </span>
-                          </p>
-                          <p>
-                            Total:{" "}
-                            <span className="text-emerald-400 font-semibold">
-                              ${order.total}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </>
+                  )}
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* DETAILS MODAL - DARK CLEAN */}
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={handleDiscard}
+          />
+
+          <div className="relative w-full max-w-3xl p-6 rounded-2xl card">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-bold">
+                  Order {selected._id?.slice(0, 8)}...
+                </h2>
+                <div className="text-sm opacity-80">
+                  {fmtDate(selected.createdAt)}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div style={{ textAlign: "right" }}>
+                  <div className="text-xs opacity-80">Overall</div>
+                  <div className="font-semibold">
+                    {mainConfirmAll ? "All confirmed" : "Has rejection"}
+                  </div>
+                </div>
+
+                <div
+                  role="button"
+                  className={`glass-switch ${mainConfirmAll ? "on" : "off"}`}
+                  onClick={handleMainToggle}
+                >
+                  <div className="glass-thumb" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3 max-h-96 overflow-auto pr-3">
+              {selected.orderItems.map((it) => (
+                <div
+                  key={it._id}
+                  className="flex items-center justify-between p-3 rounded-lg"
+                  style={{
+                    background: COLORS.black,
+                    border: "1px solid rgba(255,255,255,0.02)",
+                  }}
+                >
+                  <div>
+                    <div className="font-semibold">{it.product.name}</div>
+                    <div className="text-sm opacity-70">
+                      qty: {it.quantity} • Rs. {it.price}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div
+                      style={{ minWidth: 150 }}
+                      className="flex items-center gap-3"
+                    >
+                      <div
+                        role="button"
+                        className={`glass-switch ${
+                          itemMap[it._id] ? "on" : "off"
+                        }`}
+                        onClick={() =>
+                          itemMap[it._id]
+                            ? attemptRejectItem(it._id)
+                            : acceptItem(it._id)
+                        }
+                      >
+                        <div className="glass-thumb" />
+                      </div>
+
+                      <div
+                        className={
+                          itemMap[it._id]
+                            ? "text-green-300 font-semibold"
+                            : "text-red-300 font-semibold"
+                        }
+                      >
+                        {itemMap[it._id] ? "Confirmed" : "Rejected"}
+                      </div>
+                    </div>
+
+                    {/* show reason pill if rejected */}
+                    {!itemMap[it._id] && (
+                      <div
+                        style={{
+                          background: "rgba(255,255,255,0.02)",
+                          padding: "6px 10px",
+                          borderRadius: 10,
+                          border: "1px solid rgba(255,255,255,0.03)",
+                        }}
+                      >
+                        <div className="text-xs opacity-70">Reason</div>
+                        <div className="text-sm font-medium">
+                          {rejectReasons[it._id]}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={handleDiscard}
+                className="px-4 py-2 rounded-md"
+                style={{ background: COLORS.black }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 rounded-md font-semibold"
+                style={{ background: COLORS.emerald, color: "#061114" }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject All Modal */}
+      {showRejectAllModal && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={cancelRejectAll}
+          />
+          <div className="relative w-full max-w-md p-6 rounded-xl card">
+            <h3 className="text-lg font-bold mb-2">
+              Reject All — Provide reason
+            </h3>
+            <textarea
+              value={rejectAllDraft}
+              onChange={(e) => setRejectAllDraft(e.target.value)}
+              placeholder="Reason for rejecting all items"
+              className="w-full p-3 rounded-md text-black"
+            />
+            <div className="flex justify-end gap-3 mt-3">
+              <button
+                onClick={cancelRejectAll}
+                className="px-3 py-1 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmRejectAll}
+                className="px-3 py-1 rounded-md font-semibold"
+                style={{ background: COLORS.emerald, color: "#061114" }}
+              >
+                Confirm Reject All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Individual Item Modal */}
+      {showItemModalFor && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={cancelRejectItem}
+          />
+          <div className="relative w-full max-w-md p-6 rounded-xl card">
+            <h3 className="text-lg font-bold mb-2">
+              Reject Item — Provide reason
+            </h3>
+            <textarea
+              value={itemDraft}
+              onChange={(e) => setItemDraft(e.target.value)}
+              placeholder="Reason for rejecting this item"
+              className="w-full p-3 rounded-md text-black"
+            />
+            <div className="flex justify-end gap-3 mt-3">
+              <button
+                onClick={cancelRejectItem}
+                className="px-3 py-1 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmRejectItem}
+                className="px-3 py-1 rounded-md font-semibold"
+                style={{ background: COLORS.emerald, color: "#061114" }}
+              >
+                Reject Item
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
-export default OrderManagement;
+}

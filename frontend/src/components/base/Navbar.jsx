@@ -28,7 +28,6 @@ const Navbar = () => {
     navigate("/");
   }, [navigate]);
 
-
   // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -45,7 +44,6 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
 
   const logoutHandler = async () => {
     try {
@@ -110,7 +108,12 @@ const Navbar = () => {
                 Home
               </Link>
               <Link
-                to="/tester"
+                to={
+                  userInfo?.isVendor ? `/vendor/order-management` : userInfo?.isAdmin ? `/admin/orders`: `/myorders`
+                }
+                // to={`/profile/${userInfo.username}`}
+                // to="/tester"
+                // to="/testcomponent"
                 className="text-gray-300 hover:text-white"
                 onClick={() => dispatch(setRole("buyer"))}
               >
