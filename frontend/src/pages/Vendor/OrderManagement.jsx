@@ -43,7 +43,6 @@ export default function OrderManagement() {
   rejectReasons && console.log("reject reason : ", rejectReasons);
   const isEditable = selected?.status === "pending";
 
-
   // modals
   const [showRejectAllModal, setShowRejectAllModal] = useState(false);
   const [rejectAllDraft, setRejectAllDraft] = useState("");
@@ -294,7 +293,7 @@ export default function OrderManagement() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
-            className="absolute inset-0 bg-black/60"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={handleDiscard}
           />
 
@@ -390,7 +389,7 @@ export default function OrderManagement() {
                         }}
                       >
                         <div className="text-xs opacity-70">Reason</div>
-                        <div className="text-sm font-medium">
+                        <div className="text-sm font-medium text-white ">
                           {rejectReasons[it._id]}
                         </div>
                       </div>
@@ -437,7 +436,7 @@ export default function OrderManagement() {
               value={rejectAllDraft}
               onChange={(e) => setRejectAllDraft(e.target.value)}
               placeholder="Reason for rejecting all items"
-              className="w-full p-3 rounded-md text-black"
+              className="w-full p-3 rounded-md text-white"
             />
             <div className="flex justify-end gap-3 mt-3">
               <button
@@ -473,7 +472,7 @@ export default function OrderManagement() {
               value={itemDraft}
               onChange={(e) => setItemDraft(e.target.value)}
               placeholder="Reason for rejecting this item"
-              className="w-full p-3 rounded-md text-black"
+              className="w-full p-3 rounded-md text-white"
             />
             <div className="flex justify-end gap-3 mt-3">
               <button
