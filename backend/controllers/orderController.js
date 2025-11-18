@@ -360,7 +360,7 @@ const updateVendorOrderStatus = asyncHandler(async (req, res) => {
 
           // Update order status
           order.status = "confirmed";
-          order.expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+          order.expiresAt = new Date(Date.now() + 1 * 60 * 1000); // 10 minutes
         } catch (error) {
           // If stock check fails, revert item statuses to pending
           order.orderItems.forEach((item) => {
