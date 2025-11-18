@@ -1,4 +1,6 @@
 import React from "react";
+import { shortIds } from "../../components/IdShorter";
+import { formatDate } from "../../components/IdShorter";
 import { useState, useEffect } from "react";
 import {
   ChevronDown,
@@ -83,33 +85,6 @@ const ManageOrders = () => {
       newExpanded.add(orderId);
     }
     setExpandedOrders(newExpanded);
-  };
-
-  const formatOrderId = (id) => {
-    return id?.substring(0, 6).toUpperCase() || "N/A";
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    return `${monthNames[date.getMonth()]}-${String(date.getDate()).padStart(
-      2,
-      "0"
-    )},${date.getFullYear()}`;
   };
 
   const getStatusBadge = (status) => {
@@ -387,7 +362,7 @@ const ManageOrders = () => {
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-white">
-                        {formatOrderId(order._id)}
+                        {shortIds(order._id)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

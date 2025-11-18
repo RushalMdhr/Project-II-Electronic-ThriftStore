@@ -3,6 +3,7 @@ import {
   useGetSoldOrdersQuery,
   useUpdateOrderStatusMutation,
 } from "../../redux/api/orderApiSlice";
+import { formatDate, shortIds } from "../../components/IdShorter";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -14,14 +15,6 @@ const COLORS = {
   black: "#101828",
   surface: "rgba(255,255,255,0.03)",
 };
-
-function fmtDate(d) {
-  try {
-    return new Date(d).toLocaleString();
-  } catch (e) {
-    return d;
-  }
-}
 
 function sum(items = []) {
   return items.reduce((s, it) => s + (it.price || 0), 0);
@@ -242,8 +235,8 @@ export default function OrderManagement() {
                 className="row"
                 style={{ transition: "all .12s" }}
               >
-                <td className="cell">{o._id?.slice(0, 8)}...</td>
-                <td className="cell">{fmtDate(o.createdAt)}</td>
+                <td className="cell">{shortIds(o._id)}</td>
+                <td className="cell">{formatDate(o.createdAt)}</td>
                 <td className="cell">{o.customer}</td>
                 <td className="cell">
                   <div className="text-sm">
@@ -304,7 +297,7 @@ export default function OrderManagement() {
                   Order {selected._id?.slice(0, 8)}...
                 </h2>
                 <div className="text-sm opacity-80">
-                  {fmtDate(selected.createdAt)}
+                  {formatDate(selected.createdAt)}
                 </div>
               </div>
 
@@ -369,12 +362,12 @@ export default function OrderManagement() {
 
                       <div
                         className={
-                          itemMap[it._id]
+                          it.status==="confirmed"
                             ? "text-green-300 font-semibold"
                             : "text-red-300 font-semibold"
                         }
                       >
-                        {itemMap[it._id] ? "Confirmed" : "Rejected"}
+                        {it.status==="confirmed" ? "Confirmed" : "Rejected"}
                       </div>
                     </div>
 

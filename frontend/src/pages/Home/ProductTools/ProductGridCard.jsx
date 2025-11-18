@@ -37,10 +37,10 @@ const ProductGridCard = ({ products }) => {
               </Link>
 
               {/* Discount Badge */}
-              {product.price > product.discountedPrice && (
+              {product.discountedPrice && (
                 <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
                   {Math.round(
-                    ((product.price - product.discountedPrice) /
+                    ((product.discountedPrice) /
                       product.price) *
                       100
                   )}
