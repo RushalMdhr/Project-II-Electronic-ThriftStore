@@ -9,6 +9,11 @@ const ProductCard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [updateOrderToPaid] = useUpdateOrderToPaidMutation();
   const [uploadProduct] = useCreateProductMutation();
+  const [specifications, setSpecification] = useState({});
+  const [dict, setDict] = useState({
+    head: "",
+    description: "",
+  });
 
   const handleTesting = async () => {
     console.log("okay...");
@@ -24,6 +29,7 @@ const ProductCard = () => {
   };
 
   const uploadDummyProduct = async () => {
+    toast.loading("creating dummy product..");
     const formData = new FormData();
     console.log("i m here");
 
@@ -48,9 +54,26 @@ const ProductCard = () => {
     try {
       const res = uploadProduct(formData).unwrap();
       console.log("res : ", res);
+      toast.dismiss();
+      toast.success("dummy product created...");
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const displayData = () => {
+    console.log("specifications : ", specifications);
+    console.log("dict : ", dict);
+  };
+
+  const setData = () => {
+    // setDict({
+    //   head : "",
+    //   description : ""
+    // })
+    setSpecification({ ...specifications, ...dict });
+    console.log("specifications : ", specifications);
+    console.log("dict : ", { ...dict });
   };
   return (
     <>
@@ -87,6 +110,32 @@ const ProductCard = () => {
       >
         Upload Dummy Product
       </button>
+      <hr />
+
+      <div>creating the data type</div>
+      <input
+        type="text"
+        className="border-1 m-2"
+        value={dict.head}
+        onChange={(e) => {
+          setDict({ ...dict, head: e.target.value });
+        }}
+        placeholder="title"
+      />
+      <input
+        type="text"
+        className="border-1 m-2"
+        value={dict.description}
+        onChange={(e) => {
+          setDict({ ...dict, description: e.target.value });
+        }}
+        placeholder="description"
+      />
+      <br />
+      <button className="mx-5 px-40 border-1 bg-green-300" onClick={setData}>
+        +
+      </button>
+      <div>display : </div>
     </>
   );
 };

@@ -17,7 +17,7 @@ import {
   getPriceRange,
   getBlackListedProducts,
   addToBlackList,
-  removeReport
+  removeReport,
   removeReportFromProduct,
 } from "../controllers/productController.js";
 import {

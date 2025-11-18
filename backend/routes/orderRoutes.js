@@ -8,6 +8,7 @@ import {
   updateOrderToDelivered,
   getSoldOrders,
   updateOrderStatus,
+  deleteErrorOrder,
 } from "../controllers/orderController.js";
 import {
   authenticate,
@@ -17,15 +18,18 @@ import {
 
 const router = express.Router();
 
-router
-  .route("/")
-  .post(authenticate, createOrder)
-  // .get(authenticate, authorizeVendor, getOrders);
+router.route("/").post(authenticate, createOrder);
+// .get(authenticate, authorizeVendor, getOrders);
 router.route("/myorders").get(authenticate, getMyOrders);
 router.route("/soldorders").get(authenticate, authorizeVendor, getSoldOrders);
-router.route("/:id").get(authenticate, getOrderById);
+router
+  .route("/:orderId")
+  .get(authenticate, getOrderById)
+  .delete(authenticate, deleteErrorOrder);
 router.route("/:id/pay").put(authenticate, updateOrderToPaid);
-router.route("/:id/status").post(authenticate,authorizeVendor, updateOrderStatus);
+router
+  .route("/:orderId/status")
+  .patch(authenticate, authorizeVendor, updateOrderStatus);
 router
   .route("/:id/deliver")
   .put(authenticate, authorizeAdmin, updateOrderToDelivered);

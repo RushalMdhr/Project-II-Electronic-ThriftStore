@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import {
   useGetProductByIdQuery,
   useGetProductsQuery,
@@ -191,7 +191,7 @@ const ProductOverview = () => {
                 {/* Uploader badge with gradient */}
                 <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border border-orange-300 shadow-sm bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-200">
                   <span className="text-black text-sm font-medium leading-none">
-                    by {product.uploadedBy?.username || "Uploader"}
+                    by <Link to={`/profile/${product.uploadedBy?.username}`}>{product.uploadedBy?.username || "Uploader"}</Link>
                   </span>
                 </div>
 

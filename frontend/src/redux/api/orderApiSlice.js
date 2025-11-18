@@ -38,9 +38,18 @@ export const orderApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Order"],
     }),
+
+    //deleting Errored Order
+    deleteErrorOrder: builder.mutation({
+      query: (orderId) => ({
+        url: `${ORDERS_URL}/${orderId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Order"],
+    }),
     // Update order to paid
     updateOrderToPaid: builder.mutation({
-      query: ({orderId, data}) => ({
+      query: ({ orderId, data }) => ({
         url: `${ORDERS_URL}/${orderId}/pay`,
         method: "PUT",
         body: data,
@@ -59,6 +68,16 @@ export const orderApiSlice = apiSlice.injectEndpoints({
         { type: "Order", id: orderId },
       ],
     }),
+
+    //updating order Status
+    updateOrderStatus: builder.mutation({
+      query: ({status, orderId}) => ({
+        url: `${ORDERS_URL}/${orderId}/status`,
+        method: "PATCH",
+        body: {status},
+      }),
+      invalidatesTags: ["Order"],
+    }),
   }),
 });
 
@@ -70,4 +89,6 @@ export const {
   useUpdateOrderToPaidMutation,
   useUpdateOrderToDeliveredMutation,
   useGetSoldOrdersQuery,
+  useDeleteErrorOrderMutation,
+  useUpdateOrderStatusMutation
 } = orderApiSlice;
