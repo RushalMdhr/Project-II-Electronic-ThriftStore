@@ -22,6 +22,9 @@ const UploadPageTest = () => {
   const [description, setDescription] = useState(product?.description || "");
   const [category, setCategory] = useState(product?.category?._id || "");
   const [quantity, setQuantity] = useState(product?.countInStock || "");
+  const [specifications, setSpecifications] = useState({});
+  const [tempKey, setTempKey] = useState("");
+  const [tempValue, setTempValue] = useState("");
 
   useEffect(() => {
     if (!product) {
@@ -45,6 +48,22 @@ const UploadPageTest = () => {
   const navigate = useNavigate();
   const { data: categories = [] } = useListcategoryQuery();
 
+  const addSpecification = () => {
+    if (!tempKey || !tempValue) return;
+    setSpecifications((prev) => ({
+      ...prev,
+      [tempKey]: tempValue,
+    }));
+    setTempKey("");
+    setTempValue("");
+  };
+
+  // Remove specification
+  const removeSpecification = (key) => {
+    const newSpecs = { ...specifications };
+    delete newSpecs[key];
+    setSpecifications(newSpecs);
+  };
   const submitHandler = async (e) => {
     e.preventDefault();
 
@@ -74,6 +93,7 @@ const UploadPageTest = () => {
     formData.append("category", category);
     formData.append("countInStock", quantity);
     formData.append("condition", condition);
+    formData.append("specifications", JSON.stringify(specifications)); // 👈 send as JSON string
 
     let imagePaths = [];
     if (newImgs.length > 0) {
@@ -259,6 +279,54 @@ const UploadPageTest = () => {
           <option value="Good">Good</option>
           <option value="Fair">Fair</option>
         </select>
+
+        {/* Specifications */}
+        <h3 className="mx-2 text-md font-semibold text-emerald-300 mb-2">
+          Specifications
+        </h3>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Key (e.g. RAM)"
+            value={tempKey}
+            onChange={(e) => setTempKey(e.target.value)}
+            className="flex-1 border border-gray-700 rounded px-2 py-1 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none"
+          />
+          <input
+            type="text"
+            placeholder="Value (e.g. 8GB)"
+            value={tempValue}
+            onChange={(e) => setTempValue(e.target.value)}
+            className="flex-1 border border-gray-700 rounded px-2 py-1 bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={addSpecification}
+            className="bg-emerald-600 px-3 py-1 rounded text-white hover:bg-emerald-700"
+          >
+            Add
+          </button>
+        </div>
+
+        <div className="mt-2 space-y-1">
+          {Object.entries(specifications).map(([key, value]) => (
+            <div
+              key={key}
+              className="flex justify-between bg-gray-800 p-1 px-2 rounded"
+            >
+              <span>
+                <strong>{key}</strong>: {value}
+              </span>
+              <button
+                type="button"
+                onClick={() => removeSpecification(key)}
+                className="text-red-500 font-bold"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
 
         <div className="space-y-2">
           {!product ? (
