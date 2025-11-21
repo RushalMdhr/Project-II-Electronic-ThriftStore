@@ -46,8 +46,9 @@ const FilterSideBar = ({ filter, setFilter, categories, searchParams, setSearchP
             type="number"
             value={filter.min || 0}
             onChange={(e) =>
-              setFilter({ ...filter, min: Number(e.target.value) })
-            }
+              {const v = Math.max(0, Number(e.target.value));
+    setFilter({ ...filter, min: Math.min(v, filter.max) }); // never > max
+            }}
             className="w-full p-2 border rounded"
           />
         </div>
@@ -56,9 +57,10 @@ const FilterSideBar = ({ filter, setFilter, categories, searchParams, setSearchP
           <input
             type="number"
             value={filter.max || 0}
-            onChange={(e) =>
-              setFilter({ ...filter, max: Number(e.target.value) })
-            }
+            onChange={(e) =>{
+              const v = Math.max(0, Number(e.target.value));
+              setFilter({ ...filter, max: Math.max(v, filter.min) }); // never < min
+            }}
             className="w-full p-2 border rounded"
           />
         </div>

@@ -6,11 +6,16 @@ const PriceRange = ({ filter, setFilter }) => {
 
   const handleChange = (values) => {
     let [min, max] = values;
+    /* never below zero */
+    min = Math.max(0, min);
+    max = Math.max(0, max);
 
     if (max - min < GAP) {
       if (min === filter.min) min = max - GAP;
       else max = min + GAP;
     }
+     min = Math.max(0, min);
+     max = Math.max(0, max);
 
     setFilter({ ...filter, min, max });
   };
