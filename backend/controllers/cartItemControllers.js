@@ -1,13 +1,16 @@
-import asyncHandler from "../middlewares/asyncHandler.js"
-import CartItem from '../models/cartitemModel.js';
+import asyncHandler from "../middlewares/asyncHandler.js";
+import CartItem from "../models/cartitemModel.js";
 // Add a product to cart
-import Product from "../models/productModel.js"; 
+import Product from "../models/productModel.js";
 
 export const addToCart = async (req, res) => {
   try {
     const { userId, productId, quantity } = req.body;
 
-    const existing = await CartItem.findOne({ user: userId, product: productId });
+    const existing = await CartItem.findOne({
+      user: userId,
+      product: productId,
+    });
 
     if (existing) {
       existing.quantity += quantity || 1;
@@ -26,16 +29,17 @@ export const addToCart = async (req, res) => {
       user: userId,
       product: productId,
       quantity: quantity || 1,
-      price: product.price, 
+      price: product.price,
     });
 
     res.status(201).json(cartItem);
   } catch (error) {
     console.error("❌ Error in addToCart:", error);
-    res.status(500).json({ message: "Internal Server Error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
-
 
 // Get all cart items for a user
 export const getCartItems = async (req, res) => {
@@ -47,14 +51,21 @@ export const getCartItems = async (req, res) => {
   }
 
   try {
-    const cartItems = await CartItem.find({ user: userId }).populate("product");
+    const cartItems = await CartItem.find({ user: userId }).populate({
+      path: "product",
+      select: "name price countInStock uploadedBy images",
+      populate: {
+        path: "uploadedBy",
+        select: "name email shippingAddress.city", // ✅ Nested population
+      },
+    });
     res.status(200).json(cartItems);
+    // res.status(200).json({_id : cartItems._id, product :});
   } catch (error) {
     console.error("Error fetching cart items:", error);
     res.status(500).json({ message: "Failed to get cart items" });
   }
 };
-
 
 // Update quantity (increment/decrement)
 export const updateCartItem = asyncHandler(async (req, res) => {
