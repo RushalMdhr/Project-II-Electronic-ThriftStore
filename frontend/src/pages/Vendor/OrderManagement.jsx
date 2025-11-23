@@ -332,7 +332,7 @@ export default function OrderManagement() {
                   }}
                 >
                   <div>
-                    <div className="font-semibold">{it.product.name}</div>
+                    <div className="font-semibold"><Link to={`/overview/${it.product._id}`}>{it.product.name}</Link></div>
                     <div className="text-sm opacity-70">
                       qty: {it.quantity} • Rs. {it.price}
                     </div>
@@ -362,12 +362,12 @@ export default function OrderManagement() {
 
                       <div
                         className={
-                          it.status==="confirmed"
+                          it.status==="confirmed" | it.status==="pending"
                             ? "text-green-300 font-semibold"
                             : "text-red-300 font-semibold"
                         }
                       >
-                        {it.status==="confirmed" ? "Confirmed" : "Rejected"}
+                        {it.status==="confirmed" | it.status==="pending" ? "Confirmed" : "Rejected"}
                       </div>
                     </div>
 

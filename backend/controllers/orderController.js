@@ -8,7 +8,7 @@ import { Transaction } from "../models/esewaModel.js";
 // @access  Private
 const createOrder = asyncHandler(async (req, res) => {
   console.time("createOrder");
-  const { orderItems, method } = req.body;
+  const { orderItems, method, address } = req.body;
   console.log("as u can see", req.body);
   if (!orderItems || orderItems.length === 0) {
     return res.status(400).json({ error: "No order items" });
@@ -44,7 +44,11 @@ const createOrder = asyncHandler(async (req, res) => {
       payment: {
         method: method,
       },
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 15 minutes
+      shippingAddress: {
+        city: address.city,
+        street: address.street,
+      },
+      expiresAt: new Date(Date.now() + 1 * 60 * 1000), // 15 minutes
     });
 
     console.log("new order : ", newOrder);
@@ -226,17 +230,27 @@ const getMyOrders = asyncHandler(async (req, res) => {
 // @route   GET /api/orders/:id
 // @access  Private
 const getOrderById = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.orderId).populate(
-    "user",
-    "email"
+  const { OrderId } = req.params;
+  console.log("order Id : ", OrderId.toString());
+  const order = await Order.findById(OrderId).populate(
+    "customer",
+    "username email"
   );
 
-  if (order) {
-    res.json(order);
-  } else {
-    res.status(404);
-    throw new Error("Order not found");
+  if (!order) {
+    return res.status(404).json({ message: "Order not found" });
   }
+
+  console.log("order : ", order._id);
+  res.json({
+    order: {
+      payment: order.payment,
+      customer: order.customer,
+      total: order.total,
+      status: order.status,
+      date: order.createdAt, //only those things that a delivery guy need no unnecessary
+    },
+  });
 });
 
 // @desc    Update order to paid
@@ -534,14 +548,18 @@ const getSoldOrders = asyncHandler(async (req, res) => {
 //regularly checking if theres any error orders or confirmed one
 const deleteErrorOrder = asyncHandler(async (req, res) => {
   console.log("deleting the broken orders");
+  // 2. Then delete
+  // const orderEsewaPending =
   await Order.deleteMany({
-    payment: {
-      method: "esewa",
-      status: "pending",
-      // status: { $ne: "paid" },
-    },
+    "payment.method": "esewa",
+    "payment.status": "pending",
     expiresAt: { $lt: new Date() },
   });
+  // if (!orderEsewaPending) {
+  //   console.log("sorry orderEsewa not found");
+  // } else {
+  //   console.log("Deleted:", orderEsewaPending.deletedCount);
+  // }
 
   await Order.updateMany(
     {
