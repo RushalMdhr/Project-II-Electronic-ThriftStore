@@ -23,8 +23,8 @@ const Checkout = () => {
   const [esewaPayment] = useEsewaPaymentMutation();
   const userId = useUserId();
   const [userData, setUserData] = useState(null);
-
-  const vendorGroups = groupProductsByVendor(products);
+const customerCity = userData?.shippingAddress?.city; 
+ const vendorGroups = groupProductsByVendor(products, customerCity);
   const totalShipping = Object.values(vendorGroups).reduce(
     (sum, g) => sum + g.shipping,
     0
@@ -313,8 +313,9 @@ const Checkout = () => {
                   placeholder="Phone"
                   value={address.phone}
                   onChange={(e) =>
-                    setAddress({ ...address, phone: e.target.value })
-                  }
+                    setAddress({ ...address, phone: e.target.value }) 
+                    }
+                    required
                 />
 
                 {/* Save Button */}
