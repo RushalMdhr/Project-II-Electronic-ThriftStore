@@ -30,8 +30,8 @@ const CartPage = () => {
     setCartItems(cartItemsData);
     if (cartItemsData.length == 1) {
       setSelectedCartItems(cartItemsData);
-    } else {
-      setSelectedCartItems([]); // all unselected by default
+     } else {
+      // setSelectedCartItems([]); // all unselected by default
     }
     refetch();
   }, [cartItemsData]);
