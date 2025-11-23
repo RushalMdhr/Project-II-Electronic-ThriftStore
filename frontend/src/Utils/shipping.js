@@ -17,14 +17,9 @@ export const groupProductsByVendor = (products, customerCity) => {
     vendorGroups[vendor._id].items.push(item);
   });
 
-  // Calculate shipping for each vendor based on vendor city vs customer city
+  // Calculate shipping per vendor (single city per vendor)
   Object.values(vendorGroups).forEach((group) => {
-    const vendorCities = group.items.map(
-      (i) => i.product.uploadedBy?.shippingAddress?.city
-    );
-    const uniqueVendorCities = [...new Set(vendorCities)];
-    const vendorCity = uniqueVendorCities[0]; // assuming single vendor city
-
+    const vendorCity = group.vendorInfo.shippingAddress?.city;
     group.shipping = vendorCity === customerCity ? 50 : 150;
   });
 
