@@ -22,10 +22,16 @@ export const orderApiSlice = apiSlice.injectEndpoints({
     }),
     // Get order by ID
     getOrderById: builder.query({
-      query: (id) => `${ORDERS_URL}/${id}`, // "/api/orders/:id"
+      query: (orderId) => `${ORDERS_URL}/${orderId}`, // "/api/orders/:id"
       providesTags: (result, error, id) => [{ type: "Order", id }],
       keepUnusedDataFor: 5,
     }),
+    // // Get order by ID
+    // getOrderById: builder.query({
+    //   query: (id) => `${ORDERS_URL}/${id}`, // "/api/orders/:id"
+    //   providesTags: (result, error, id) => [{ type: "Order", id }],
+    //   keepUnusedDataFor: 5,
+    // }),
 
     //get sold orders
     getSoldOrders: builder.query({
@@ -99,6 +105,7 @@ export const {
   useGetOrdersQuery,
   useGetMyOrdersQuery,
   useGetOrderByIdQuery,
+  useLazyGetOrderByIdQuery,
   useCreateOrderMutation,
   useUpdateOrderToPaidMutation,
   useUpdateOrderToDeliveredMutation,
