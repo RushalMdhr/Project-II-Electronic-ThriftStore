@@ -37,7 +37,21 @@ const createOrder = asyncHandler(async (req, res) => {
           price: productDoc.price,
         };
       })
+    ); // Calculate subtotal
+    const subTotal = validatedItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
     );
+
+    // Calculate tax
+    const tax = subTotal * 0.13;
+
+    // Calculate total shipping (sum of all vendor shipping charges or default)
+    const shipping = req.body.shipping || 100; // or calculate from vendorGroups if passed
+
+    // Total
+    const total = subTotal + tax + shipping;
+
     const newOrder = new Order({
       customer: req.user._id,
       orderItems: validatedItems,
@@ -48,7 +62,10 @@ const createOrder = asyncHandler(async (req, res) => {
         city: address.city,
         street: address.street,
       },
-      expiresAt: new Date(Date.now() + 1 * 60 * 1000), // 15 minutes
+      shipping, // include shipping
+      tax, // include tax
+      total, // include total
+      expiresAt: new Date(Date.now() + 1 * 60 * 1000),
     });
 
     console.log("new order : ", newOrder);
