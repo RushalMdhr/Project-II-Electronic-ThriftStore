@@ -6,17 +6,16 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-
     email: {
       type: String,
       required: true,
       unique: true,
     },
-
     password: {
       type: String,
       required: true,
     },
+
     isUser: {
       type: Boolean,
       required: true,
@@ -27,12 +26,23 @@ const userSchema = mongoose.Schema(
       required: true,
       default: false,
     },
-
     isAdmin: {
       type: Boolean,
       required: true,
       default: false,
     },
+
+    shippingAddress: {
+      name: String,
+      street: String,
+      city: String,
+      district: String,
+      province: String,
+      zipCode: String,
+      // country: String,
+      phone: String,
+    },
+
     shopName: {
       type: String,
       default: null,
@@ -44,6 +54,20 @@ const userSchema = mongoose.Schema(
     sales: {
       type: Number,
       default: 0,
+    },
+    income: {
+      total: Number, // 120 + 200
+      received: Number, // Already paid
+      pending: Number, // To be paid
+      // currency: {
+      //   type: String,
+      //   enum: ["USD", "EUR", "GBP", "NPR"],
+      //   default: "NPR",
+      // },
+      // currency : {
+      //   type : String,
+      //   default : "Rs."
+      // }
     },
     blackListStreak: {
       type: Number,
