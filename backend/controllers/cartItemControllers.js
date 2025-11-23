@@ -44,7 +44,6 @@ export const addToCart = async (req, res) => {
 // Get all cart items for a user
 export const getCartItems = async (req, res) => {
   const userId = req.params.userId;
-  console.log("Incoming userId:", userId); // debug log
 
   if (!userId || userId === "undefined") {
     return res.status(400).json({ message: "User ID is required" });
@@ -53,14 +52,21 @@ export const getCartItems = async (req, res) => {
   try {
     const cartItems = await CartItem.find({ user: userId }).populate({
       path: "product",
-      select: "name price countInStock uploadedBy images",
-      populate: {
-        path: "uploadedBy",
-        select: "name email shippingAddress.city", // ✅ Nested population
-      },
+      select: "name price countInStock uploadedBy images category", // Include category
+      populate: [
+        {
+          path: "uploadedBy",
+          select: "username shippingAddress", // select entire shippingAddress
+        },
+        {
+          path: "category",
+          select: "name",
+        },
+      ],
     });
+    console.log(cartItems.map((item) => item.product.uploadedBy));
+
     res.status(200).json(cartItems);
-    // res.status(200).json({_id : cartItems._id, product :});
   } catch (error) {
     console.error("Error fetching cart items:", error);
     res.status(500).json({ message: "Failed to get cart items" });

@@ -115,6 +115,16 @@ const UploadPageTest = () => {
       if (!product?._id) {
         const createdProduct = await createProduct(formData).unwrap();
         toast.success(`${createdProduct.name} created successfully!`);
+        setName("");
+        setBrand("");
+        setPrice("");
+        setCondition("");
+        setDescription("");
+        setCategory("");
+        setQuantity("");
+        setExistingImgs([]);
+        setNewImgs([]);
+        setSpecifications({});
       } else {
         await updateProductDetails({
           productId: product._id,

@@ -35,12 +35,51 @@ const userSchema = mongoose.Schema(
     shippingAddress: {
       name: String,
       street: String,
-      city: String,
+      city: {
+        type: String,
+        enum: [
+          "Kathmandu",
+          "Lalitpur",
+          "Bhaktapur",
+          "Kirtipur",
+          "Madhyapur Thimi",
+          "Tokha",
+          "Budhanilkantha",
+          "Gokarneshwar",
+          "Sankharapur",
+          "Chandragiri",
+          "Godawari",
+          "Suryabinayak",
+
+          // Surrounding cities
+          "Banepa",
+          "Dhulikhel",
+          "Panauti",
+        ],
+        default: "Bhaktapur",
+        // required: true,
+      },
       district: String,
-      province: String,
+      province: {
+        type: String,
+        enum: [
+          "Koshi",
+          "Madhesh",
+          "Bagmati",
+          "Gandaki",
+          "Lumbini",
+          "Karnali",
+          "Sudurpashchim",
+        ],
+        default: "Bagmati",
+        // required: true,
+      },
       zipCode: String,
       // country: String,
-      phone: String,
+      phone: {
+        type: String,
+        // required: true
+      },
     },
 
     shopName: {

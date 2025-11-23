@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useCreateOrderMutation } from "../../redux/api/orderApiSlice";
 import { toast } from "react-toastify";
 import { useEsewaPaymentMutation } from "../../redux/api/transactionApiSlice";
 import { useDispatch } from "react-redux";
 import OrderSummary from "./OrderSummary";
+import { useUserId } from "../../components/UserProvider";
+import { groupProductsByVendor } from "../../Utils/shipping.js";
+import VendorProducts from "./VendorProducts.jsx";
 
 const Checkout = () => {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const products = state?.selectedCartItems || [];
 
   const [dropdown, setDropdown] = useState(false);
@@ -17,6 +21,40 @@ const Checkout = () => {
   const dispatch = useDispatch();
   const [createOrder] = useCreateOrderMutation();
   const [esewaPayment] = useEsewaPaymentMutation();
+  const userId = useUserId();
+  const [userData, setUserData] = useState(null);
+const customerCity = userData?.shippingAddress?.city; 
+ const vendorGroups = groupProductsByVendor(products, customerCity);
+  const totalShipping = Object.values(vendorGroups).reduce(
+    (sum, g) => sum + g.shipping,
+    0
+  );
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchUser = async () => {
+      try {
+        const res = await fetch(`/api/users/${userId}`);
+        const data = await res.json();
+        setUserData(data);
+      } catch (error) {
+        console.error("Failed to load user data", error);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
+
+  const [address, setAddress] = useState({
+    street: "",
+    district: "",
+    city: "",
+    province: "",
+    phone: "",
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
 
   /* ------- prices -------- */
   const subTotal = products.reduce(
@@ -25,18 +63,61 @@ const Checkout = () => {
   );
   const shipping = 100;
   const tax = subTotal * 0.13;
-  const total = subTotal + shipping + tax;
+  const total = subTotal + totalShipping + tax;
+
+  // 🔧 FIXED — schema-compliant cities and provinces
+  const provincesEnum = [
+    "Koshi",
+    "Madhesh",
+    "Bagmati",
+    "Gandaki",
+    "Lumbini",
+    "Karnali",
+    "Sudurpashchim",
+  ];
+
+  const provinceDistricts = {
+    Koshi: ["Morang", "Sunsari", "Jhapa"],
+    Madhesh: ["Dhanusha", "Mahottari"],
+    Bagmati: ["Kathmandu", "Lalitpur", "Bhaktapur"],
+    Gandaki: ["Kaski", "Lamjung"],
+    Lumbini: ["Rupandehi", "Kapilvastu"],
+    Karnali: ["Surkhet"],
+    Sudurpashchim: ["Kanchanpur", "Kailali"],
+  };
+
+  const districtCities = {
+    Kathmandu: ["Kathmandu", "Tokha", "Budhanilkantha", "Gokarneshwar"],
+    Lalitpur: ["Lalitpur", "Godawari", "Sankharapur"],
+    Bhaktapur: ["Bhaktapur", "Madhyapur Thimi", "Banepa"],
+    Kirtipur: ["Kirtipur"],
+    Chandragiri: ["Chandragiri"],
+    Suryabinayak: ["Suryabinayak"],
+    Dhulikhel: ["Dhulikhel", "Panauti"],
+  };
+
+  useEffect(() => {
+    if (userData?.shippingAddress) {
+      const { name, ...rest } = userData.shippingAddress; // remove name
+      setAddress(rest);
+    }
+  }, [userData]);
 
   /* ---------- store order details after placing order ---------- */
   const [orderData, setOrderData] = useState(null);
 
   const data = {
-    orderItems: products?.map((e) => ({
+    orderItems: products.map((e) => ({
       productId: e.product._id,
       quantity: e.quantity,
     })),
     method: selectedPayment,
+    address, // include the address state
+    shipping: totalShipping, // keep as number
+    tax, // number
+    total, // number
   };
+
 
   useEffect(() => {
     const handle = (e) => {
@@ -90,36 +171,8 @@ const Checkout = () => {
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto pr-2 space-y-6">
-              {products.map((item) => (
-                <div
-                  key={item.product._id}
-                  className="flex items-center gap-6 bg-slate-50 hover:bg-emerald-50 rounded-2xl p-6 transition"
-                >
-                  <img
-                    src={
-                      item.product.images[0] || "https://via.placeholder.com/80"
-                    }
-                    alt={item.product.name}
-                    className="w-24 h-24 rounded-xl object-cover border border-slate-200"
-                  />
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-slate-800">
-                      {item.product.name}
-                    </h3>
-                    <p className="text-slate-500">
-                      {item.product.category?.name}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-slate-800">
-                      Rs.{" "}
-                      {(item.product.price * item.quantity).toLocaleString()}
-                    </p>
-                    <p className="text-sm text-slate-400">
-                      Qty: {item.quantity}
-                    </p>
-                  </div>
-                </div>
+              {Object.values(vendorGroups).map((group) => (
+                <VendorProducts key={group.vendorInfo._id} group={group} />
               ))}
             </div>
           )}
@@ -141,7 +194,9 @@ const Checkout = () => {
               </div>
               <div className="flex justify-between text-lg">
                 <span>Shipping</span>
-                <span className="font-semibold">Rs. {shipping}</span>
+                <span className="font-semibold">
+                  Rs. {totalShipping.toLocaleString()}
+                </span>
               </div>
               <div className="flex justify-between text-lg">
                 <span>Tax (13%)</span>
@@ -153,6 +208,127 @@ const Checkout = () => {
                 <span>Rs. {total.toLocaleString()}</span>
               </div>
             </div>
+          </section>
+
+          {/* ===== Saved Shipping Address ===== */}
+          <section className="mt-8">
+            <h3 className="text-xl font-bold text-emerald-700 mb-2">
+              Shipping Address
+            </h3>
+
+            {!isEditing ? (
+              <div className="space-y-1 text-slate-600">
+                <p>{address.street}</p>
+                <p>
+                  {address.city}, {address.district}
+                </p>
+                <p>{address.province}</p>
+                <p className="font-semibold">📞 {address.phone}</p>
+
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="mt-2 text-emerald-600 font-medium underline"
+                >
+                  Change
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {/* Street */}
+                <input
+                  type="text"
+                  className="w-full border p-2 rounded-lg"
+                  placeholder="Street / Ward"
+                  value={address.street}
+                  onChange={(e) =>
+                    setAddress({ ...address, street: e.target.value })
+                  }
+                />
+
+                {/* Province */}
+                <select
+                  className="w-full border p-2 rounded-lg"
+                  value={address.province}
+                  onChange={(e) =>
+                    setAddress({
+                      ...address,
+                      province: e.target.value,
+                      district: "",
+                      city: "",
+                    })
+                  }
+                >
+                  <option value="">Select Province</option>
+                  {provincesEnum.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
+
+                {/* District */}
+                <select
+                  className="w-full border p-2 rounded-lg"
+                  value={address.district}
+                  onChange={(e) =>
+                    setAddress({
+                      ...address,
+                      district: e.target.value,
+                      city: "",
+                    })
+                  }
+                  disabled={!address.province}
+                >
+                  <option value="">Select District</option>
+                  {address.province &&
+                    provinceDistricts[address.province]?.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                </select>
+
+                {/* City sorted by district */}
+                <select
+                  className="w-full border p-2 rounded-lg"
+                  value={address.city}
+                  onChange={(e) =>
+                    setAddress({ ...address, city: e.target.value })
+                  }
+                  disabled={!address.district}
+                >
+                  <option value="">Select City</option>
+                  {address.district &&
+                    districtCities[address.district]?.sort().map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                </select>
+
+                {/* Phone */}
+                <input
+                  type="text"
+                  className="w-full border p-2 rounded-lg"
+                  placeholder="Phone"
+                  value={address.phone}
+                  onChange={(e) =>
+                    setAddress({ ...address, phone: e.target.value }) 
+                    }
+                    required
+                />
+
+                {/* Save Button */}
+                <button
+                  onClick={() => {
+                    setIsEditing(false);
+                  }}
+                  className="w-full bg-emerald-600 text-white py-2 rounded-lg font-medium"
+                >
+                  Save
+                </button>
+              </div>
+            )}
           </section>
 
           {/* =====  Payment selector  ===== */}
@@ -193,10 +369,11 @@ const Checkout = () => {
           >
             Place Order
           </button>
+
           {orderData && orderData.payment?.method !== "esewa" && (
             <OrderSummary
-              isOpen={true} // Force open
-              onClose={() => navigate("/myorders")} // Redirect when closed
+              isOpen={true}
+              onClose={() => navigate("/myorders")}
               orderId={orderData._id}
               products={orderData.orderItems.map((item) => {
                 const foundProduct = products?.find(
