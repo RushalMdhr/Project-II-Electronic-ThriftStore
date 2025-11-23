@@ -51,6 +51,8 @@ import CustomerOrderDashboard from "./TestComponents/TestComponent.jsx";
 import BlackListedProducts from "./components/Admin/BlackListedProducts.jsx";
 import VendorDashboard from "./pages/Vendor/VendorDashboard.jsx";
 import Category from "./pages/Home/Category.jsx";
+import OrderCheckUp from "./pages/Delivery/OrderCheckUp.jsx";
+import VendorPayments from "./pages/Admin/VendorPayments.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -119,6 +121,8 @@ const router = createBrowserRouter(
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/vendor" element={<VendorRegister />} />
+
+        <Route path="/delivery-orders-checkup" element={<OrderCheckUp />} />
         {/* <Route path="/upload" element={<UploadPageTest />} /> */}
         <Route path="/admin/productcard" element={<ProductList />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
@@ -133,6 +137,7 @@ const router = createBrowserRouter(
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="users" element={<UserList />} />
+          <Route path="vendor-payments" element={<VendorPayments />} />
           <Route path="orders" element={<ManageOrders />} />
           <Route path="blacklisted-products" element={<BlackListedProducts />} />
           <Route path="users/:id/edit" element={<UserUpdate />} />
