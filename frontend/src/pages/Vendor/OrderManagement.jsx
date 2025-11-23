@@ -17,8 +17,13 @@ const COLORS = {
 };
 
 function sum(items = []) {
-  return items.reduce((s, it) => s + (it.price || 0), 0);
+  const original = items.reduce((s, it) => s + (it.price || 0), 0);
+  const commission = original * 0.10;
+  const final = original - commission;
+
+  return { original, commission, final };
 }
+
 
 export default function OrderManagement() {
   const { data } = useGetSoldOrdersQuery();
@@ -262,7 +267,7 @@ export default function OrderManagement() {
                   </span>
                 </td>
 
-                <td className="cell">Rs. {sum(o.orderItems)}</td>
+                <td className="cell">Rs. {sum(o.orderItems).final}</td>
                 <td className="cell">
                   {
                     <button
@@ -333,9 +338,21 @@ export default function OrderManagement() {
                 >
                   <div>
                     <div className="font-semibold"><Link to={`/overview/${it.product._id}`}>{it.product.name}</Link></div>
-                    <div className="text-sm opacity-70">
-                      qty: {it.quantity} • Rs. {it.price}
-                    </div>
+                    <div>Quantity:{it.quantity}</div>
+                    <div className="text-sm opacity-70 mb-2">Price Breakdown</div>
+              <div className="flex justify-between text-white">
+                
+                <div>Original Sum:</div>
+                <div>Rs. {sum(selected.orderItems).original}</div>
+              </div>
+              <div className="flex justify-between text-white">
+                <div>Charge (10%):</div>
+                <div>Rs. {sum(selected.orderItems).commission.toFixed(2)}</div>
+              </div>
+              <div className="flex justify-between font-semibold text-white mt-1">
+                <div>Final Total:</div>
+                <div>Rs. {sum(selected.orderItems).final}</div>
+              </div>
                   </div>
 
                   <div className="flex items-center gap-4">
