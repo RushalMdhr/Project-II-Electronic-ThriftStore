@@ -56,7 +56,8 @@ const userSchema = mongoose.Schema(
           "Dhulikhel",
           "Panauti",
         ],
-        required: true,
+        default: "Bhaktapur",
+        // required: true,
       },
       district: String,
       province: {
@@ -71,11 +72,14 @@ const userSchema = mongoose.Schema(
           "Sudurpashchim",
         ],
         default: "Bagmati",
-        required: true,
+        // required: true,
       },
       zipCode: String,
       // country: String,
-      phone: { type: String, required: true },
+      phone: {
+        type: String,
+        // required: true
+      },
     },
 
     shopName: {
