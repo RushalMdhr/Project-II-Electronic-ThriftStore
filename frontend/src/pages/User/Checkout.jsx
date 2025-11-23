@@ -14,6 +14,10 @@ const Checkout = () => {
   const [selectedPayment, setSelectedPayment] = useState("cod");
   const dropdownRef = useRef();
 
+  const dispatch = useDispatch();
+  const [createOrder] = useCreateOrderMutation();
+  const [esewaPayment] = useEsewaPaymentMutation();
+
   /* ------- prices -------- */
   const subTotal = products.reduce(
     (sum, i) => sum + i.product.price * i.quantity,
@@ -23,12 +27,8 @@ const Checkout = () => {
   const tax = subTotal * 0.13;
   const total = subTotal + shipping + tax;
 
-  const dispatch = useDispatch();
-  const [createOrder] = useCreateOrderMutation();
-  const [esewaPayment] = useEsewaPaymentMutation();
-
-  /* show details only after successful order */
-  const [orderId, setOrderId] = useState(null);
+  /* ---------- store order details after placing order ---------- */
+  const [orderData, setOrderData] = useState(null);
 
   const data = {
     orderItems: products?.map((e) => ({
@@ -59,8 +59,10 @@ const Checkout = () => {
         toast.error(res.error.message);
         return;
       }
-      setOrderId(res._id); // <-- triggers detail card
+
+      setOrderData(res); // store full order details
       toast.success("Order placed!");
+
       if (selectedPayment === "esewa") {
         const payment = await esewaPayment({
           amount: total,
@@ -87,7 +89,6 @@ const Checkout = () => {
               Your cart is empty
             </div>
           ) : (
-            // ONLY this area scrolls
             <div className="flex-1 overflow-y-auto pr-2 space-y-6">
               {products.map((item) => (
                 <div
@@ -111,7 +112,8 @@ const Checkout = () => {
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-bold text-slate-800">
-                      Rs. {item.product.price.toLocaleString()}
+                      Rs.{" "}
+                      {(item.product.price * item.quantity).toLocaleString()}
                     </p>
                     <p className="text-sm text-slate-400">
                       Qty: {item.quantity}
@@ -191,17 +193,30 @@ const Checkout = () => {
           >
             Place Order
           </button>
+          {orderData && orderData.payment?.method !== "esewa" && (
+            <OrderSummary
+              isOpen={true} // Force open
+              onClose={() => navigate("/myorders")} // Redirect when closed
+              orderId={orderData._id}
+              products={orderData.orderItems.map((item) => {
+                const foundProduct = products?.find(
+                  (p) => p?.product?._id == item?.product
+                );
 
-          {/* =====  Post-order summary (appears below details)  ===== */}
-          {orderId && (
-            <div className="pt-6 border-t border-slate-200">
-              <OrderSummary
-                products={products}
-                shipping={shipping}
-                tax={tax}
-                total={total}
-              />
-            </div>
+                return {
+                  product: foundProduct?.product || {
+                    name: foundProduct?.product?.name || "Unknown Product",
+                    price: item?.price,
+                    images: foundProduct?.product?.images || [],
+                  },
+                  quantity: item.quantity,
+                };
+              })}
+              shipping={orderData.shipping}
+              tax={orderData.tax}
+              total={orderData.total}
+              paymentStatus={orderData.payment?.status || "pending"}
+            />
           )}
         </div>
       </div>
