@@ -23,12 +23,6 @@ const Checkout = () => {
   const [esewaPayment] = useEsewaPaymentMutation();
   const userId = useUserId();
   const [userData, setUserData] = useState(null);
-const customerCity = userData?.shippingAddress?.city; 
- const vendorGroups = groupProductsByVendor(products, customerCity);
-  const totalShipping = Object.values(vendorGroups).reduce(
-    (sum, g) => sum + g.shipping,
-    0
-  );
 
   useEffect(() => {
     if (!userId) return;
@@ -53,9 +47,14 @@ const customerCity = userData?.shippingAddress?.city;
     province: "",
     phone: "",
   });
-
+  const customerCity = address.city || userData?.shippingAddress?.city;
   const [isEditing, setIsEditing] = useState(false);
 
+  const vendorGroups = groupProductsByVendor(products, customerCity);
+  const totalShipping = Object.values(vendorGroups).reduce(
+    (sum, g) => sum + g.shipping,
+    0
+  );
   /* ------- prices -------- */
   const subTotal = products.reduce(
     (sum, i) => sum + i.product.price * i.quantity,
@@ -117,7 +116,6 @@ const customerCity = userData?.shippingAddress?.city;
     tax, // number
     total, // number
   };
-
 
   useEffect(() => {
     const handle = (e) => {
@@ -313,9 +311,9 @@ const customerCity = userData?.shippingAddress?.city;
                   placeholder="Phone"
                   value={address.phone}
                   onChange={(e) =>
-                    setAddress({ ...address, phone: e.target.value }) 
-                    }
-                    required
+                    setAddress({ ...address, phone: e.target.value })
+                  }
+                  required
                 />
 
                 {/* Save Button */}
