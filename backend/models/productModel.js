@@ -1,26 +1,6 @@
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Schema.Types;
 
-// const reviewsSchema = mongoose.Schema({
-//     name:{type : String, required: true},
-//     rating : {type : Number, required : true},
-//     comment:{type : String, required: true},
-//     user : {
-//         type : mongoose.Schema.Types.ObjectId,
-//         required : true,
-//         ref : 'User',
-//     },
-// },
-// {timestamps : true}
-// );
-
-// const ratingsSchema = mongoose.Schema({
-//     rating: { type: Number, min: 1, max: 5, default: 0 },
-//     user: {
-//         type : ObjectId, ref : "User", required : true
-//     },
-// })
-
 const ProductSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -33,8 +13,8 @@ const ProductSchema = mongoose.Schema(
     condition: {
       type: String,
       required: true,
-      enum: ["Brand New", "Like New", "Refurbished", "Good", "Fair"],
-      default: "Brand New",
+      enum: ["Excellent condition", "Well-kept", "Clean condition", "Moderately used", "Functional but worn"],
+      default: "Excellent condition",
     },
     // numReviews: { type: Number, required: true, default: 0 },
     price: { type: Number, required: true, default: 0 },
@@ -60,7 +40,6 @@ const ProductSchema = mongoose.Schema(
       of: String,
       default: {},
     },
-    // sold: { type: Boolean, default: false },
 
     blackListed: { type: Boolean, default: false },
   },
