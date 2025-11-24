@@ -234,7 +234,7 @@ const UploadPageTest = () => {
 
         <input
           type="number"
-          placeholder="Quantity"
+          placeholder="In Stock Quantity"
           min="0"
           value={quantity}
           onChange={(e) =>
@@ -274,11 +274,11 @@ const UploadPageTest = () => {
           className="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select Condition</option>
-          <option value="Brand New">Brand New</option>
-          <option value="Like New">Like New</option>
-          <option value="Refurbished">Refurbished</option>
-          <option value="Good">Good</option>
-          <option value="Fair">Fair</option>
+          <option value="Excellent condition">Excellent condition</option>
+          <option value="Well-kept">Well-kept</option>
+          <option value="Clean condition">Clean condition</option>
+          <option value="Moderately used">Moderately used</option>
+          <option value="Functional but worn">Functional but worn</option>
         </select>
 
         {/* Specifications */}
