@@ -37,8 +37,8 @@ app.use(
 );
 
 // _______________________________________________ Cleanup job _______________________________________________
-cron.schedule('*/2 * * * *', deleteErrorOrder); // Every 2 minutes
-// cron.schedule('0 * * * *', deleteErrorOrder);    // Every hour
+// cron.schedule('*/2 * * * *', deleteErrorOrder); // Every 2 minutes
+cron.schedule('0 * * * *', deleteErrorOrder);    // Every hour
 // cron.schedule('0 2 * * *', deleteErrorOrder);    // Daily at 2 AM
 
 app.use(express.json());

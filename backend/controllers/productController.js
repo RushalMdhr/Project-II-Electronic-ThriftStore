@@ -71,10 +71,12 @@ const updateProductDetails = asyncHandler(async (req, res) => {
   console.time("updateProductDetails");
 
   try {
+    console.log("updating product");
     const formData = {
       ...req.fields, // Spread all fields first
       images: JSON.parse(req.fields?.images || "[]"), // Then parse images
     };
+    console.log("updating product");
     // console.log(formData);
     const updates = formData; // dynamic updates from client
 
@@ -83,11 +85,25 @@ const updateProductDetails = asyncHandler(async (req, res) => {
       return res.status(404).json({ error: "Product not found" });
     }
 
+    console.log("updating product");
     const oldCategory = product.category?.toString();
 
     // update only provided fields
-    Object.assign(product, updates);
+    console.log("updating product2");
+    console.log("updates : ", {
+      ...updates,
+      specifications: updates.specifications
+        ? JSON.parse(updates.specifications)
+        : {},
+    });
+    Object.assign(product, {
+      ...updates,
+      specifications: updates.specifications
+        ? JSON.parse(updates.specifications)
+        : {},
+    });
     await product.save();
+    console.log("updating product2");
 
     // if category changed, adjust counts
     if (updates.category && updates.category !== oldCategory) {
@@ -523,8 +539,6 @@ const removeReportFromProduct = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Report removed successfully." });
 });
 
-
-
 const getBlackListedProducts = asyncHandler(async (req, res) => {
   try {
     const products = await Product.aggregate([
@@ -563,7 +577,7 @@ const getBlackListedProducts = asyncHandler(async (req, res) => {
           reportRatio: 1,
           reportPercentage: { $multiply: ["$reportRatio", 100] },
           reported: 1,
-          blackListed : 1,
+          blackListed: 1,
           // Include other fields you need
         },
       },
