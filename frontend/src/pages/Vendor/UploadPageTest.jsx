@@ -22,7 +22,8 @@ const UploadPageTest = () => {
   const [description, setDescription] = useState(product?.description || "");
   const [category, setCategory] = useState(product?.category?._id || "");
   const [quantity, setQuantity] = useState(product?.countInStock || "");
-  const [specifications, setSpecifications] = useState({});
+  const [specifications, setSpecifications] = useState(product?.specifications ||{});
+  specifications && console.log("spe :",specifications)
   const [tempKey, setTempKey] = useState("");
   const [tempValue, setTempValue] = useState("");
 
