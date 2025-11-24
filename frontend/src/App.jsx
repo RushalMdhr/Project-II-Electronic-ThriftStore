@@ -37,19 +37,24 @@ function App() {
   // }, [uncheckedOrderId, checkingOrders]); // ✅ Add dependency
 
   return (
-    <>
-      <ToastContainer />
-      <Navbar />
-      <ScrollToTop />
+    // ✅ ADDED WRAPPER (for sticky footer)
+    <div className="min-h-screen flex flex-col">
+      <>
+        <ToastContainer />
+        <Navbar />
+        <ScrollToTop />
 
-      {/* This triggers the API call that checks auth status and forces logout if banned */}
-      <AuthWatcher />
+        {/* This triggers the API call that checks auth status and forces logout if banned */}
+        <AuthWatcher />
 
-      <main className="">
-        <Outlet />
-      </main>
-      <Footer />
-    </>
+        {/* ✅ ADDED flex-grow to push footer down */}
+        <main className="flex-grow">
+          <Outlet />
+        </main>
+
+        <Footer />
+      </>
+    </div>
   );
 }
 
