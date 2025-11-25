@@ -587,6 +587,16 @@ const deleteErrorOrder = asyncHandler(async (req, res) => {
       $set: { status: "processing" }, // ✅ Add this - what to update
     }
   );
+
+  await Order.updateMany(
+    {
+      status: "shipped",
+      // expiresAt: { $lt: new Date() },
+    },
+    {
+      $set: { status: "delivered" }, // ✅ Add this - what to update
+    }
+  );
 });
 
 const getOrder = asyncHandler(async (req, res) => {
