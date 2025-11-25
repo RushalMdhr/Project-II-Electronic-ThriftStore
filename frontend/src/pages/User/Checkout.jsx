@@ -79,7 +79,7 @@ const customerCity = userData?.shippingAddress?.city;
   const provinceDistricts = {
     Koshi: ["Morang", "Sunsari", "Jhapa"],
     Madhesh: ["Dhanusha", "Mahottari"],
-    Bagmati: ["Kathmandu", "Lalitpur", "Bhaktapur"],
+    Bagmati: ["Kathmandu", "Lalitpur", "Bhaktapur","Kavrepalanchok"],
     Gandaki: ["Kaski", "Lamjung"],
     Lumbini: ["Rupandehi", "Kapilvastu"],
     Karnali: ["Surkhet"],
@@ -91,9 +91,9 @@ const customerCity = userData?.shippingAddress?.city;
     Lalitpur: ["Lalitpur", "Godawari", "Sankharapur"],
     Bhaktapur: ["Bhaktapur", "Madhyapur Thimi", "Banepa"],
     Kirtipur: ["Kirtipur"],
+    Kavrepalanchok : ["Dhulikhel", "Panauti","Banepa"],
     Chandragiri: ["Chandragiri"],
     Suryabinayak: ["Suryabinayak"],
-    Dhulikhel: ["Dhulikhel", "Panauti"],
   };
 
   useEffect(() => {
