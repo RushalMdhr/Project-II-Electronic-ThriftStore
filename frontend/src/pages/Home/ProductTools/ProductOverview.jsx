@@ -58,15 +58,15 @@ const ProductOverview = () => {
   const createReport = async () => {
     try {
       const report = await reportProduct({
-      reason,
-      productId: param.productId,
-    }).unwrap();
-    toast.success("Thanks for giving feed back")
-    console.log(report);
-    setShowPopup(false);
-    setReason("");
+        reason,
+        productId: param.productId,
+      }).unwrap();
+      toast.success("Thanks for giving feed back");
+      console.log(report);
+      setShowPopup(false);
+      setReason("");
     } catch (error) {
-      toast.error("you have already reported this product")
+      toast.error("you have already reported this product");
     }
   };
 
@@ -174,7 +174,7 @@ const ProductOverview = () => {
 
               <div className="flex items-center gap-4">
                 <span className="text-3xl font-bold text-green-600">
-                  ${product.price}
+                  Rs.{product.price}
                 </span>
                 {product.countInStock > 0 ? (
                   <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-100 border border-green-200 text-green-700">
@@ -191,7 +191,10 @@ const ProductOverview = () => {
                 {/* Uploader badge with gradient */}
                 <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border border-orange-300 shadow-sm bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-200">
                   <span className="text-black text-sm font-medium leading-none">
-                    by <Link to={`/profile/${product.uploadedBy?.username}`}>{product.uploadedBy?.username || "Uploader"}</Link>
+                    by{" "}
+                    <Link to={`/profile/${product.uploadedBy?.username}`}>
+                      {product.uploadedBy?.username || "Uploader"}
+                    </Link>
                   </span>
                 </div>
 
@@ -253,8 +256,7 @@ const ProductOverview = () => {
                 </div>
               )}
               {(!userInfo ||
-                (
-                  userInfo._id !== product.uploadedBy?._id?.toString() &&
+                (userInfo._id !== product.uploadedBy?._id?.toString() &&
                   userInfo._id !== product.uploadedBy?.toString())) && (
                 <button
                   type="button"
@@ -302,6 +304,5 @@ const SpecRow = ({ label, value, highlight }) => (
     </span>
   </div>
 );
-
 
 export default ProductOverview;
