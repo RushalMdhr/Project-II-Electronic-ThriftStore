@@ -42,7 +42,7 @@ const ProductCard = () => {
     );
     formData.append("category", "6901dc594471da93aa7af305");
     formData.append("countInStock", 1);
-    formData.append("condition", "Good");
+    formData.append("condition", "Excellent condition");
     formData.append(
       "specifications",
       JSON.stringify({

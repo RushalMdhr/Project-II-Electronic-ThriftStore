@@ -8,6 +8,7 @@ import OrderSummary from "./OrderSummary";
 import { useUserId } from "../../components/UserProvider";
 import { groupProductsByVendor } from "../../Utils/shipping.js";
 import VendorProducts from "./VendorProducts.jsx";
+import { useDeleteCartItemMutation } from "../../redux/api/cartApiSlice";
 
 const Checkout = () => {
   const { state } = useLocation();
@@ -23,6 +24,7 @@ const Checkout = () => {
   const [esewaPayment] = useEsewaPaymentMutation();
   const userId = useUserId();
   const [userData, setUserData] = useState(null);
+  const [deleteCartItem] = useDeleteCartItemMutation();
 
   useEffect(() => {
     if (!userId) return;
@@ -78,7 +80,7 @@ const Checkout = () => {
   const provinceDistricts = {
     Koshi: ["Morang", "Sunsari", "Jhapa"],
     Madhesh: ["Dhanusha", "Mahottari"],
-    Bagmati: ["Kathmandu", "Lalitpur", "Bhaktapur"],
+    Bagmati: ["Kathmandu", "Lalitpur", "Bhaktapur","Kavrepalanchok"],
     Gandaki: ["Kaski", "Lamjung"],
     Lumbini: ["Rupandehi", "Kapilvastu"],
     Karnali: ["Surkhet"],
@@ -90,9 +92,9 @@ const Checkout = () => {
     Lalitpur: ["Lalitpur", "Godawari", "Sankharapur"],
     Bhaktapur: ["Bhaktapur", "Madhyapur Thimi", "Banepa"],
     Kirtipur: ["Kirtipur"],
+    Kavrepalanchok : ["Dhulikhel", "Panauti","Banepa"],
     Chandragiri: ["Chandragiri"],
     Suryabinayak: ["Suryabinayak"],
-    Dhulikhel: ["Dhulikhel", "Panauti"],
   };
 
   useEffect(() => {
@@ -131,6 +133,17 @@ const Checkout = () => {
     { value: "esewa", label: "eSewa" },
   ];
 
+    // ✅ ADD THIS FUNCTION TO DELETE SELECTED ITEMS
+  const clearSelectedItems = async () => {
+    try {
+      for (const item of products) {
+        await deleteCartItem(item._id).unwrap();
+      }
+    } catch (err) {
+      console.error("Failed to clear selected cart items", err);
+    }
+  };
+
   const HandleOrder = async () => {
     try {
       const res = await createOrder(data).unwrap();
@@ -141,6 +154,9 @@ const Checkout = () => {
 
       setOrderData(res); // store full order details
       toast.success("Order placed!");
+
+      // ✅ DELETE SELECTED ITEMS FROM CART
+      await clearSelectedItems();
 
       if (selectedPayment === "esewa") {
         const payment = await esewaPayment({
