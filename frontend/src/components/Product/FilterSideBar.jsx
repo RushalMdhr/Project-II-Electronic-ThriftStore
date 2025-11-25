@@ -3,7 +3,13 @@ import PriceRange from "./PriceRange.jsx";
 // import { useSearchParams } from "react-router";
 import { useEffect } from "react";
 
-const FilterSideBar = ({ filter, setFilter, categories, searchParams, setSearchParams }) => {
+const FilterSideBar = ({
+  filter,
+  setFilter,
+  categories,
+  searchParams,
+  setSearchParams,
+}) => {
   const [category, setCategory] = useState("");
   const [search, setSearch] = useState("");
 
@@ -14,13 +20,18 @@ const FilterSideBar = ({ filter, setFilter, categories, searchParams, setSearchP
     "oldest",
     "popular",
   ];
-  const condition = ["Brand New", "Like New", "Refurbished", "Good", "Fair"];
+  const condition = [
+    "Excellent condition",
+    "Well-kept",
+    "Clean condition",
+    "Moderately used",
+    "Functional but worn",
+  ];
 
   useEffect(() => {
     const categoryFromUrl = searchParams.get("category") || "";
     setFilter((prev) => ({ ...prev, category: categoryFromUrl }));
   }, [searchParams]);
-
 
   return (
     <aside className="bg-white p-6 rounded-lg shadow space-y-6 w-full md:w-72">
@@ -45,9 +56,9 @@ const FilterSideBar = ({ filter, setFilter, categories, searchParams, setSearchP
           <input
             type="number"
             value={filter.min || 0}
-            onChange={(e) =>
-              {const v = Math.max(0, Number(e.target.value));
-    setFilter({ ...filter, min: Math.min(v, filter.max) }); // never > max
+            onChange={(e) => {
+              const v = Math.max(0, Number(e.target.value));
+              setFilter({ ...filter, min: Math.min(v, filter.max) }); // never > max
             }}
             className="w-full p-2 border rounded"
           />
@@ -57,7 +68,7 @@ const FilterSideBar = ({ filter, setFilter, categories, searchParams, setSearchP
           <input
             type="number"
             value={filter.max || 0}
-            onChange={(e) =>{
+            onChange={(e) => {
               const v = Math.max(0, Number(e.target.value));
               setFilter({ ...filter, max: Math.max(v, filter.min) }); // never < min
             }}
@@ -119,7 +130,7 @@ const FilterSideBar = ({ filter, setFilter, categories, searchParams, setSearchP
               <span className="text-gray-700">{cat.name}</span>
             </label>
           ))}
-          
+
           {/* Optional: None / Default */}
           <label className="inline-flex items-center gap-2 cursor-pointer mt-1">
             <input
