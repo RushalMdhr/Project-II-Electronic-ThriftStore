@@ -35,7 +35,7 @@ const UploadPageTest = () => {
       setCondition("");
       setDescription("");
       setCategory("");
-      setQuantity("");
+      setQuantity("1");
       setExistingImgs([]);
       setNewImgs([]);
     }
@@ -245,7 +245,7 @@ const UploadPageTest = () => {
         <input
           type="number"
           placeholder="In Stock Quantity"
-          min="0"
+          min="1"
           value={quantity}
           onChange={(e) =>
             setQuantity(e.target.value >= 0 ? e.target.value : 0)
