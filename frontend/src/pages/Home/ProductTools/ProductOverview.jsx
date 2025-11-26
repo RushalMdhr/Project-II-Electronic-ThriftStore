@@ -202,13 +202,13 @@ const ProductOverview = () => {
                 <div
                   className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full shadow-sm border
       ${
-        product.condition === "Good"
+        product.condition === "Well-kept"
           ? "bg-green-100 border-green-200 text-green-700"
-          : product.condition === "Fair"
+          : product.condition === "Like new/Open box"
           ? "bg-yellow-100 border-yellow-200 text-yellow-700"
-          : product.condition === "Used"
+          : product.condition === "Functional but worn"
           ? "bg-orange-100 border-orange-200 text-orange-700"
-          : product.condition === "Refurbished"
+          : product.condition === "Moderately used"
           ? "bg-blue-100 border-blue-200 text-blue-700"
           : "bg-gray-100 border-gray-200 text-gray-700"
       }`}
@@ -225,6 +225,7 @@ const ProductOverview = () => {
                 </p>
               )}
             </div>
+          
 
             {/* ===== Action Buttons ===== */}
             <div className="space-y-4">

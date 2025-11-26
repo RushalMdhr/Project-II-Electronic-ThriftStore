@@ -13,8 +13,8 @@ const ProductSchema = mongoose.Schema(
     condition: {
       type: String,
       required: true,
-      enum: ["Excellent condition", "Well-kept", "Clean condition", "Moderately used", "Functional but worn"],
-      default: "Excellent condition",
+      enum: ["Like new/Open box", "Well-kept",  "Moderately used", "Functional but worn"],
+      default: "Well-kept",
     },
     // numReviews: { type: Number, required: true, default: 0 },
     price: { type: Number, required: true, default: 0 },

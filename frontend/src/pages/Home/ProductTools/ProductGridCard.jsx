@@ -54,8 +54,19 @@ const ProductGridCard = ({ products }) => {
               </button> */}
 
               {/* Condition Badge */}
-              <div className="absolute bottom-3 left-3 bg-emerald-500 text-white px-2 py-1 rounded-full text-xs font-medium shadow-md">
+              <div className={`absolute bottom-3 left-3 ${
+        product.condition === "Well-kept"
+          ? "bg-green-300 border-green-200 text-green-700"
+          : product.condition === "Like new/Open box"
+          ? "bg-yellow-300 border-yellow-200 text-yellow-700"
+          : product.condition === "Functional but worn"
+          ? "bg-orange-300 border-orange-200 text-orange-700"
+          : product.condition === "Moderately used"
+          ? "bg-blue-300 border-blue-200 text-blue-700"
+          : "bg-gray-300 border-gray-200 text-gray-700"
+      } px-2 py-1 rounded-full text-xs font-medium shadow-md`}>
                 {product.condition}
+                
               </div>
             </div>
 
