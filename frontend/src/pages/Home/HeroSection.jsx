@@ -44,7 +44,7 @@ const HeroSection = () => {
               variant="outline"
               className="border-gray-600 text-white hover:bg-gray-800 px-8 py-3 text-lg bg-transparent"
             >
-              {admin ? "Go to Dashboard" : " Join as Vendor"}
+              {admin ? "Go to Dashboard" : localStorage.isvendor ? "start selling" : " Join as Vendor"}
             </Button>
           </Link>
         </div>
