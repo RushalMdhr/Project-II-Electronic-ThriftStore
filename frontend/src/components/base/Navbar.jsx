@@ -165,12 +165,12 @@ const Navbar = () => {
                 userInfo?.isVendor &&
                 !userInfo?.isAdmin && (
                   <>
-                    <Link
+                    {/* <Link
                       to="/vendor/dashboard"
                       className="text-gray-300 hover:text-white"
                     >
                       Dashboard
-                    </Link>
+                    </Link> */}
                     <Link
                       to="/vendor/products"
                       className="text-gray-300 hover:text-white"
@@ -178,12 +178,12 @@ const Navbar = () => {
                     >
                       My Products
                     </Link>
-                    <Link
+                    {/* <Link
                       to="/vendor/upload"
                       className="text-gray-300 hover:text-white"
                     >
                       Upload
-                    </Link>
+                    </Link> */}
                   </>
                 )}
             </div>

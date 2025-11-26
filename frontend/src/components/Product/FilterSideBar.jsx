@@ -21,9 +21,8 @@ const FilterSideBar = ({
     "popular",
   ];
   const condition = [
-    "Excellent condition",
+    "Like new/Open box",
     "Well-kept",
-    "Clean condition",
     "Moderately used",
     "Functional but worn",
   ];
