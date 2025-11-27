@@ -79,11 +79,11 @@ const loginUser = asyncHandler(async (req, res) => {
       exitingUser.status = "inactive";
       await exitingUser.save();
       return res.status(403).json({
-        message: `Account set to inactive due to ${INACTIVITY_LIMIT_MINUTES / 60
-          } hours of inactivity. Log in again to reactivate.`,
+        message: `Account set to inactive due to ${
+          INACTIVITY_LIMIT_MINUTES / 60
+        } hours of inactivity. Log in again to reactivate.`,
       });
     }
-
 
     const isPasswordValid = await bcrypt.compare(
       password,
@@ -118,7 +118,6 @@ const loginUser = asyncHandler(async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 const logout = asyncHandler(async (req, res) => {
   res.cookie("jwt", "", {
@@ -165,12 +164,12 @@ const getAllUsers = asyncHandler(async (req, res) => {
 
 export const getUserById = async (req, res) => {
   try {
-    console.log('i m here')
-    console.log(req.params.id)
+    console.log("i m here");
+    console.log(req.params.id);
     const user = await User.findById(req.params.id).select("-password");
-    console.log("user",user)
+    console.log("user", user);
     if (user) {
-      console.log(user)
+      console.log(user);
       res.json(user);
     } else {
       res.status(404).json({ message: "User not found" });
@@ -227,29 +226,25 @@ export const updateUserById = asyncHandler(async (req, res) => {
   });
 });
 
-
-
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
-
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
-      return res.status(404).send("user not found")
+      return res.status(404).send("user not found");
     }
 
     // const updates = req.body
-    const { shopName, shopDescription, username } = req.body
+    const { shopName, shopDescription, username } = req.body;
 
     if (username !== undefined) user.username = username;
     if (shopName !== undefined) user.shopName = shopName;
     if (shopDescription !== undefined) user.shopDescription = shopDescription;
 
     const updatedUser = await user.save();
-    res.status(200).send({message : "user details updated sucessfully !"})
-    console.log("updated",updatedUser)
-
+    res.status(200).send({ message: "user details updated sucessfully !" });
+    console.log("updated", updatedUser);
   } catch (error) {
-    return res.status(500).send("internal server error")
+    return res.status(500).send("internal server error");
   }
 });
 
@@ -261,7 +256,9 @@ const updateVendorShop = asyncHandler(async (req, res) => {
   }
   const { shopName, shopDescription } = req.body;
   if (!shopName || !shopDescription) {
-    return res.status(400).json({ message: "Shop name and description are required" });
+    return res
+      .status(400)
+      .json({ message: "Shop name and description are required" });
   }
   user.shopName = shopName;
   user.shopDescription = shopDescription;
@@ -295,4 +292,20 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
-export { createUser, loginUser, logout, getAllUsers, deleteUser, updateCurrentUserProfile, updateVendorShop, getCurrentUserProfile };
+const getPendingPaymentUsers = asyncHandler(async (req, res) => {
+  const users = await User.find({ "income.pending": { $gt: 0 } }).select(
+    "username email shopName status income shippingAddress"
+  );
+  res.status(200).json(users);
+});
+export {
+  createUser,
+  loginUser,
+  logout,
+  getAllUsers,
+  deleteUser,
+  updateCurrentUserProfile,
+  updateVendorShop,
+  getCurrentUserProfile,
+  getPendingPaymentUsers,
+};

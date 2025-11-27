@@ -60,6 +60,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
       keepUnusedDataFor: 5,
     }),
 
+    getPendingPaymentVendors: builder.query({
+      query: () => ({
+        url: `${USERS_URL}/pending-payment-vendor`,
+      }),
+      // keepUnusedDataFor: 5,
+    }),
+
     updateUser: builder.mutation({
       query: ({userId,...body}) => ({
         url: `${USERS_URL}/${userId}`,
@@ -95,6 +102,7 @@ export const {
   useGetUserDetailsQuery,
   useUpdateUserMutation,
   useMakeVendorMutation,
+  useGetPendingPaymentVendorsQuery,
   useGetCurrentUserQuery,
 
 
