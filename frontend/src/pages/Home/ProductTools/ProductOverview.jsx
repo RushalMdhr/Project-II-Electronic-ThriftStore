@@ -171,6 +171,11 @@ const ProductOverview = () => {
               <h1 className="text-4xl font-bold leading-tight">
                 {product.name}
               </h1>
+              {userInfo && userInfo._id === product.uploadedBy?._id && (
+                <div className="inline-flex items-center px-3 py-1 mt-2 rounded-full bg-yellow-400 text-black text-sm font-semibold shadow">
+                  My Product
+                </div>
+              )}
 
               <div className="flex items-center gap-4">
                 <span className="text-3xl font-bold text-green-600">
