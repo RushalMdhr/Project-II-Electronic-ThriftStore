@@ -117,6 +117,7 @@ const Checkout = () => {
     shipping: totalShipping, // keep as number
     tax, // number
     total, // number
+    phone,
   };
 
   useEffect(() => {
@@ -146,6 +147,7 @@ const Checkout = () => {
 
   const HandleOrder = async () => {
     try {
+
       const res = await createOrder(data).unwrap();
       if (res.error) {
         toast.error(res.error.message);

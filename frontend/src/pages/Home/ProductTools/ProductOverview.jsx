@@ -284,8 +284,55 @@ const ProductOverview = () => {
             </div>
           </div>
         </div>
+        <Tabs labels={["Specifications", "Reviews", "Shipping & Returns"]}>
+          <div label="Specifications">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <tbody>
+                  {product.specifications &&
+                    Object.entries(product.specifications).map(
+                      ([key, value]) => (
+                        <tr key={key} className="border-b border-gray-200">
+                          <th className="py-2 pr-4 font-medium text-gray-700">
+                            {key}
+                          </th>
+                          <td className="py-2" colSpan={3}>
+                            {value || "-"}
+                          </td>
+                        </tr>
+                      )
+                    )}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-        <Tabs product={product} />
+          <div label="Reviews">
+            <div>
+              {product.reviews?.length > 0 ? (
+                product.reviews.map((r) => (
+                  <div key={r._id} className="border-b border-gray-200 py-2">
+                    <p className="font-semibold text-gray-800">
+                      {r.user?.username}
+                    </p>
+                    <p className="text-gray-700">Rating: {r.rating} / 5</p>
+                    <p className="text-gray-700">{r.comment}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-600">
+                  No reviews yet. Be the first to review this product!
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div label="Shipping & Returns">
+            <p>
+              Standard shipping: 3-7 business days. Free returns within 30 days.
+            </p>
+          </div>
+        </Tabs>
 
         {/* ===== Related Products ===== */}
         <div className="border-t border-gray-300 pt-16 mt-16">

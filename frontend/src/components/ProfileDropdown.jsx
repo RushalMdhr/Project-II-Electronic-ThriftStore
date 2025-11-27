@@ -29,6 +29,12 @@ const ProfileDropdown = () => {
       {/* Action Buttons */}
       <div className="flex flex-col text-sm font-medium">
         <Link
+          to={`/profile/${userInfo._id}`}
+          className="px-4 py-2 text-gray-300 hover:bg-slate-800 transition"
+        >
+          Profile
+        </Link>
+        <Link
           to="/updateProfile"
           className="px-4 py-2 text-gray-300 hover:bg-slate-800 transition"
         >
@@ -62,7 +68,6 @@ const ProfileDropdown = () => {
             >
               My Orders
             </Link>
-            
           </>
         )}
       </div>
