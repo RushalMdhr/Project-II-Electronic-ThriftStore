@@ -197,7 +197,7 @@ const ProductOverview = () => {
                 <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border border-orange-300 shadow-sm bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-200">
                   <span className="text-black text-sm font-medium leading-none">
                     by{" "}
-                    <Link to={`/profile/${product.uploadedBy?.username}`}>
+                    <Link to={`/profile/${product.uploadedBy?._id}`}>
                       {product.uploadedBy?.username || "Uploader"}
                     </Link>
                   </span>
