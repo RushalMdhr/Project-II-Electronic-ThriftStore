@@ -23,10 +23,10 @@ const Navbar = () => {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
 
-  useEffect(() => {
-    // Redirect to home page on reload/app start
-    navigate("/");
-  }, [navigate]);
+  // useEffect(() => {
+  //   // Redirect to home page on reload/app start
+  //   navigate("/");
+  // }, [navigate]);
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -115,7 +115,8 @@ const Navbar = () => {
                 // to="/tester"
                 // to="/testcomponent"
                 // to="/delivery-orders-checkup"
-                to="/admin/vendor-payments"
+                // to="/admin/vendor-payments"
+                // to={`/profile/${userInfo._id}`}
                 className="text-gray-300 hover:text-white"
                 onClick={() => dispatch(setRole("buyer"))}
               >
