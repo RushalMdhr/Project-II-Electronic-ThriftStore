@@ -1,7 +1,10 @@
-import { useSelector ,useDispatch} from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import Tabs from "../../components/Product/Tabs";
-import { useGetCurrentUserQuery, useGetUserDetailsQuery } from "../../redux/api/usersApiSlice";
+import {
+  useGetCurrentUserQuery,
+  useGetUserDetailsQuery,
+} from "../../redux/api/usersApiSlice";
 import { setCredentials } from "../../redux/features/auth/authSlice";
 import { useEffect } from "react";
 import ProductGrid from "../Home/ProductTools/ProductGrid";
@@ -9,6 +12,7 @@ import { useParams } from "react-router-dom";
 import { useGetMyProductsQuery } from "../../redux/api/productsApiSlice";
 const Profile = () => {
   const { id: userId } = useParams();
+  const { userInfo } = useSelector((state) => state.auth);
 
   // No ID → don't show anything
   if (!userId) return <p>No user selected</p>;
@@ -81,30 +85,6 @@ const Profile = () => {
                   ? "Vendor"
                   : "Customer"}
               </span>
-
-              {/* Market-ready CTA
-              <Link
-                to="/profile/edit"
-                className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-2.5
-               bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700
-               text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-xl
-               transition-all duration-200 active:scale-[0.98]"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
-                  />
-                </svg>
-                Edit Profile
-              </Link> */}
             </div>
 
             {/* RIGHT SIDE BADGES */}
@@ -173,9 +153,67 @@ const Profile = () => {
                 </p>
               </div>
             </div>
+            {/* Vendor Information - full width */}
+            {user.isVendor && (
+              <div className="bg-emerald-100/70 rounded-2xl shadow-sm p-6 mt-6 backdrop-blur-sm">
+                <h2 className="text-lg font-semibold text-emerald-700 mb-4">
+                  Vendor Information
+                </h2>
 
-            {/* Bio */}
-            <p className="text-gray-700 mt-6">{user.bio || "No bio yet."}</p>
+                <div className="grid sm:grid-cols-2 gap-3 text-sm text-gray-700">
+                  <p>
+                    <span className="text-gray-400">Shop Name:</span>{" "}
+                    <span className="font-medium">
+                      {user.shopName || "N/A"}
+                    </span>
+                  </p>
+
+                  <p>
+                    <span className="text-gray-400">No. of Sales</span>{" "}
+                    <span className="font-medium">{user.sales || "N/A"}</span>
+                  </p>
+
+                  <p>
+                    <span className="text-gray-400">Shop Description:</span>{" "}
+                    <span className="font-medium">
+                      {user.shopDescription || "N/A"}
+                    </span>
+                  </p>
+
+                  <p>
+                    <span className="text-gray-400">Status:</span>{" "}
+                    <span className="font-medium">
+                      {user.vendor?.status || "Active"}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {userInfo?._id === userId && (
+              <Link
+                to={`/updateprofile`}
+                className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-2.5
+      bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700
+      text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-xl
+      transition-all duration-200 active:scale-[0.98]"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                  />
+                </svg>
+                Edit Profile
+              </Link>
+            )}
           </div>
 
           <div label="Products">
