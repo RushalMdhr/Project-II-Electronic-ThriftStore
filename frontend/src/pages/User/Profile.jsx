@@ -1,26 +1,41 @@
 import { useSelector ,useDispatch} from "react-redux";
 import { Link } from "react-router-dom";
 import Tabs from "../../components/Product/Tabs";
-import { useGetCurrentUserQuery } from "../../redux/api/usersApiSlice";
+import { useGetCurrentUserQuery, useGetUserDetailsQuery } from "../../redux/api/usersApiSlice";
 import { setCredentials } from "../../redux/features/auth/authSlice";
 import { useEffect } from "react";
-
+import ProductGrid from "../Home/ProductTools/ProductGrid";
+import { useParams } from "react-router-dom";
+import { useGetMyProductsQuery } from "../../redux/api/productsApiSlice";
 const Profile = () => {
-  const dispatch = useDispatch();
+  const { id: userId } = useParams();
 
-  const { userInfo } = useSelector((state) => state.auth);
-  const { data: currentUser, isFetching, isSuccess } = useGetCurrentUserQuery();
+  // No ID → don't show anything
+  if (!userId) return <p>No user selected</p>;
 
-  // --- FIX: Correct sync state with backend user ---
-  useEffect(() => {
-    if (isSuccess && currentUser) {
-      dispatch(setCredentials(currentUser)); // updates Redux + localStorage
-    }
-  }, [isSuccess, currentUser, dispatch]);
+  // Fetch user info
+  const {
+    data: user,
+    isLoading: userLoading,
+    isError: userError,
+  } = useGetUserDetailsQuery(userId, {
+    skip: !userId,
+  });
 
-  const user = currentUser || userInfo; // fallback
+  // Fetch user's products
+  const {
+    data: myProducts,
+    isLoading: productLoading,
+    isError: productError,
+  } = useGetMyProductsQuery(userId, {
+    skip: !userId,
+  });
 
-  if (isFetching || !user) return <p>Loading...</p>;
+  // Handle loading
+  if (userLoading) return <p>Loading...</p>;
+
+  // Handle error (user not found)
+  if (userError || !user) return <p>User not found</p>;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -164,9 +179,12 @@ const Profile = () => {
           </div>
 
           <div label="Products">
-            <p className="text-gray-600">
+            {/* <p className="text-gray-600">
               Products listed by {user.username} appear here.
-            </p>
+            </p> */}
+            <div className="bg-gray-200">
+              <ProductGrid products={myProducts} />
+            </div>
           </div>
 
           <div label="Reviews">
