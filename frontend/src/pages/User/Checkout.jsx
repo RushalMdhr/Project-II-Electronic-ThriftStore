@@ -80,7 +80,7 @@ const Checkout = () => {
   const provinceDistricts = {
     Koshi: ["Morang", "Sunsari", "Jhapa"],
     Madhesh: ["Dhanusha", "Mahottari"],
-    Bagmati: ["Kathmandu", "Lalitpur", "Bhaktapur","Kavrepalanchok"],
+    Bagmati: ["Kathmandu", "Lalitpur", "Bhaktapur", "Kavrepalanchok"],
     Gandaki: ["Kaski", "Lamjung"],
     Lumbini: ["Rupandehi", "Kapilvastu"],
     Karnali: ["Surkhet"],
@@ -92,7 +92,7 @@ const Checkout = () => {
     Lalitpur: ["Lalitpur", "Godawari", "Sankharapur"],
     Bhaktapur: ["Bhaktapur", "Madhyapur Thimi", "Banepa"],
     Kirtipur: ["Kirtipur"],
-    Kavrepalanchok : ["Dhulikhel", "Panauti","Banepa"],
+    Kavrepalanchok: ["Dhulikhel", "Panauti", "Banepa"],
     Chandragiri: ["Chandragiri"],
     Suryabinayak: ["Suryabinayak"],
   };
@@ -117,7 +117,7 @@ const Checkout = () => {
     shipping: totalShipping, // keep as number
     tax, // number
     total, // number
-    phone,
+    phone:address.phone,
   };
 
   useEffect(() => {
@@ -134,7 +134,7 @@ const Checkout = () => {
     { value: "esewa", label: "eSewa" },
   ];
 
-    // ✅ ADD THIS FUNCTION TO DELETE SELECTED ITEMS
+  // ✅ ADD THIS FUNCTION TO DELETE SELECTED ITEMS
   const clearSelectedItems = async () => {
     try {
       for (const item of products) {
@@ -147,7 +147,6 @@ const Checkout = () => {
 
   const HandleOrder = async () => {
     try {
-
       const res = await createOrder(data).unwrap();
       if (res.error) {
         toast.error(res.error.message);
