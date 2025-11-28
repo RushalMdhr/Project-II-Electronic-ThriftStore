@@ -10,7 +10,7 @@ const createProduct = asyncHandler(async (req, res) => {
   try {
     const images = JSON.parse(req.fields["images"] || "[]");
     // console.log("images : ", images);
-    const { name, description, price, category, quantity, brand } = req.fields;
+    const { name, description, price, category, brand } = req.fields;
     switch (true) {
       case !name:
         return res.json({ error: "name is required" });

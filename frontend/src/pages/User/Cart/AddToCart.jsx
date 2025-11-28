@@ -1,4 +1,3 @@
-import React from "react";
 import { useAddToCartMutation } from "../../../redux/api/cartApiSlice";
 import { useUserId } from "../../../components/UserProvider";
 import { toast } from "react-toastify";

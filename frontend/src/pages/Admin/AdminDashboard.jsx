@@ -1,11 +1,9 @@
-import { useState } from "react";
 import { useGetAdminSummaryQuery } from "../../redux/api/adminApiSlice.js";
 import StatCard from "../../components/Admin/StatCard";
 import DashboardChart from "../../components/Admin/DashboardChart";
 import OrderList from "../../components/Admin/OrderList";
 
 const AdminDashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data: summary, isLoading, error } = useGetAdminSummaryQuery();
 
   console.log("User Growth Data:", summary?.userGrowthData);

@@ -45,9 +45,9 @@ const userSchema = mongoose.Schema(
           "Kathmandu",
           "Lalitpur",
           "Bhaktapur",
-          "Kavrepalanchowk",],
-        default:"Bhaktapur",
-      } ,
+          "Kavrepalanchok",
+        ]
+      },
       province: {
         type: String,
         enum: [
@@ -86,15 +86,10 @@ const userSchema = mongoose.Schema(
       total: Number, // 120 + 200
       received: Number, // Already paid
       pending: Number, // To be paid
-      // currency: {
-      //   type: String,
-      //   enum: ["USD", "EUR", "GBP", "NPR"],
-      //   default: "NPR",
-      // },
-      // currency : {
-      //   type : String,
-      //   default : "Rs."
-      // }
+      lastPaid : {
+        type : Date,
+        default : null
+      },
     },
     blackListStreak: {
       type: Number,

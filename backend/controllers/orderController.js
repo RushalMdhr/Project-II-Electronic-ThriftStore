@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import { Transaction } from "../models/esewaModel.js";
+import User from "../models/userModel.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -572,11 +573,6 @@ const deleteErrorOrder = asyncHandler(async (req, res) => {
     "payment.status": "pending",
     expiresAt: { $lt: new Date() },
   });
-  // if (!orderEsewaPending) {
-  //   console.log("sorry orderEsewa not found");
-  // } else {
-  //   console.log("Deleted:", orderEsewaPending.deletedCount);
-  // }
 
   await Order.updateMany(
     {
@@ -588,15 +584,36 @@ const deleteErrorOrder = asyncHandler(async (req, res) => {
     }
   );
 
-  await Order.updateMany(
-    {
-      status: "shipped",
-      // expiresAt: { $lt: new Date() },
-    },
-    {
-      $set: { status: "delivered" }, // ✅ Add this - what to update
+  //______________ to update shipped to delivered and update vendor income _____________________
+  const orders = await Order.find({
+    status: "shipped",
+    // expiresAt: { $lt: new Date() },
+  });
+
+  for (const order of orders) {
+    // Update order status
+    await Order.findByIdAndUpdate(order._id, {
+      $set: { status: "delivered" },
+    });
+
+    // Update each vendor's income
+    for (const item of order.orderItems) {
+      const commission = item.price * item.quantity * 0.1;
+      const pending = item.price * item.quantity - commission;
+
+      const user = await User.findById(item.vendor);
+      if (!user.income?.lastPaid) {
+        await User.findByIdAndUpdate(item.vendor, {
+          $inc: { "income.pending": pending },
+          $set: { "income.lastPaid": new Date() },
+        });
+      } else {
+        await User.findByIdAndUpdate(item.vendor, {
+          $inc: { "income.pending": pending },
+        });
+      }
     }
-  );
+  }
 });
 
 const getOrder = asyncHandler(async (req, res) => {

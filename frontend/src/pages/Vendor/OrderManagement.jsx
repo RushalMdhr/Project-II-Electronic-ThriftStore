@@ -299,7 +299,7 @@ export default function OrderManagement() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-bold">
-                  Order {selected._id?.slice(0, 8)}...
+                  Order {shortIds(selected._id)} 
                 </h2>
                 <div className="text-sm opacity-80">
                   {formatDate(selected.createdAt)}

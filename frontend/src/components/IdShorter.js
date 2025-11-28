@@ -11,26 +11,34 @@ export const shortIds = (id) => {
   return hash.toString(36).padStart(6, "0").substring(0, 6).toUpperCase();
 };
 
-
 export const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    return `${monthNames[date.getMonth()]}-${String(date.getDate()).padStart(
-      2,
-      "0"
-    )},${date.getFullYear()}`;
-  };
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  return `${monthNames[date.getMonth()]}-${String(date.getDate()).padStart(
+    2,
+    "0"
+  )},${date.getFullYear()}`;
+};
+
+export const formatDateRaw = (dateString) => {
+  if (!dateString) return "Never";
+  try {
+    return new Date(dateString).toLocaleDateString();
+  } catch (e) {
+    return "Invalid date";
+  }
+};

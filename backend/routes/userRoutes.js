@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
-import { createUser, loginUser, logout, deleteUser, getAllUsers, updateCurrentUserProfile, getUserById, updateUserById, updateVendorShop, getCurrentUserProfile } from "../controllers/userControllers.js";
+import { createUser, loginUser, logout, deleteUser, getAllUsers, updateCurrentUserProfile, getUserById, updateUserById, updateVendorShop, getCurrentUserProfile, getPendingPaymentUsers } from "../controllers/userControllers.js";
 // router using
 const router = express.Router();
 
@@ -11,6 +11,7 @@ router.route("/")
 router.route("/login").post(loginUser)
 router.route("/logout").post(authenticate, logout)
 router.route("/vendor/shop").post(authenticate, updateVendorShop);
+router.route("/pending-payment-vendor").get(authenticate,authorizeAdmin, getPendingPaymentUsers);
 
 // --------- TO UPDATE YOUR PROFILE----------------------------
 router.route("/profile").get(authenticate, getCurrentUserProfile).put(authenticate, updateCurrentUserProfile)

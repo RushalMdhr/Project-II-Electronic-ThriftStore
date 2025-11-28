@@ -136,6 +136,12 @@ const ProductCard = () => {
         +
       </button>
       <div>display : </div>
+      <div>
+        <div>colors</div>
+        <div className="p-3 m-2 bg-teal-700"> Navbar</div>
+        <div className="p-3 m-2 border-emerald-400">Navbar</div>
+        <button><Link to="/order/69291a684d7b8b6393dfd840">OrderId</Link></button>
+      </div>
     </>
   );
 };
