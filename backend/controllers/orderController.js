@@ -232,6 +232,7 @@ const getMyOrders = asyncHandler(async (req, res) => {
           price: 1,
           "product.name": 1,
           "product._id": 1,
+          "product.uploadedBy": 1,
           reasonForCancel: 1,
         },
       },
@@ -674,6 +675,7 @@ const getOrder = asyncHandler(async (req, res) => {
   const orders = await Order.find(filter)
     .populate("customer", "username email")
     .populate("orderItems.product", "name images")
+    .populate("orderItems.vendor", "name businessName")
     .limit(parseInt(pageSize))
     .skip(parseInt(pageSize) * (parseInt(page) - 1))
     .select("-__v -orderItems.vendor")
