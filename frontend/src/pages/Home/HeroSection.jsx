@@ -1,11 +1,12 @@
 import { Link } from "react-router"
 import { Button } from "../../components/ui/button"
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setRole } from "../../redux/features/auth/authSlice"
 
 const HeroSection = () => {
   const localStorage = useSelector((state) => state.auth)
   const admin = localStorage.userInfo?.isAdmin? true : false
-
+  const dispatch = useDispatch();
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -42,6 +43,8 @@ const HeroSection = () => {
             <Button
               size="lg"
               variant="outline"
+              onClick={() => dispatch(setRole("seller"))}
+
               className="border-gray-600 text-white hover:bg-gray-800 px-8 py-3 text-lg bg-transparent"
             >
               {admin ? "Go to Dashboard" : localStorage.userInfo?.isVendor ? "Start Selling": " Join as Vendor"}
