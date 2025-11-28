@@ -85,7 +85,7 @@ const ProductList = () => {
     <div className="products-container">
       {products.map((product) => (
         <ProductCard
-          key={product.id}
+          key={product._id}
           product={product}
           onDelete={(id) => handleDelete(id)}
           onEdit={handleEdit}

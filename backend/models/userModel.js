@@ -33,7 +33,6 @@ const userSchema = mongoose.Schema(
     },
 
     shippingAddress: {
-      name: String,
       street: String,
       city: {
         type: String,

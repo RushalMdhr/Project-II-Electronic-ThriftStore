@@ -171,6 +171,11 @@ const ProductOverview = () => {
               <h1 className="text-4xl font-bold leading-tight">
                 {product.name}
               </h1>
+              {userInfo && userInfo._id === product.uploadedBy?._id && (
+                <div className="inline-flex items-center px-3 py-1 mt-2 rounded-full bg-yellow-400 text-black text-sm font-semibold shadow">
+                  My Product
+                </div>
+              )}
 
               <div className="flex items-center gap-4">
                 <span className="text-3xl font-bold text-green-600">
@@ -192,7 +197,7 @@ const ProductOverview = () => {
                 <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border border-orange-300 shadow-sm bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-200">
                   <span className="text-black text-sm font-medium leading-none">
                     by{" "}
-                    <Link to={`/profile/${product.uploadedBy?.username}`}>
+                    <Link to={`/profile/${product.uploadedBy?._id}`}>
                       {product.uploadedBy?.username || "Uploader"}
                     </Link>
                   </span>
@@ -202,13 +207,13 @@ const ProductOverview = () => {
                 <div
                   className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full shadow-sm border
       ${
-        product.condition === "Good"
+        product.condition === "Well-kept"
           ? "bg-green-100 border-green-200 text-green-700"
-          : product.condition === "Fair"
+          : product.condition === "Like new/Open box"
           ? "bg-yellow-100 border-yellow-200 text-yellow-700"
-          : product.condition === "Used"
+          : product.condition === "Functional but worn"
           ? "bg-orange-100 border-orange-200 text-orange-700"
-          : product.condition === "Refurbished"
+          : product.condition === "Moderately used"
           ? "bg-blue-100 border-blue-200 text-blue-700"
           : "bg-gray-100 border-gray-200 text-gray-700"
       }`}
@@ -225,6 +230,7 @@ const ProductOverview = () => {
                 </p>
               )}
             </div>
+          
 
             {/* ===== Action Buttons ===== */}
             <div className="space-y-4">
@@ -278,8 +284,55 @@ const ProductOverview = () => {
             </div>
           </div>
         </div>
+        <Tabs labels={["Specifications", "Reviews", "Shipping & Returns"]}>
+          <div label="Specifications">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <tbody>
+                  {product.specifications &&
+                    Object.entries(product.specifications).map(
+                      ([key, value]) => (
+                        <tr key={key} className="border-b border-gray-200">
+                          <th className="py-2 pr-4 font-medium text-gray-700">
+                            {key}
+                          </th>
+                          <td className="py-2" colSpan={3}>
+                            {value || "-"}
+                          </td>
+                        </tr>
+                      )
+                    )}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-        <Tabs product={product} />
+          <div label="Reviews">
+            <div>
+              {product.reviews?.length > 0 ? (
+                product.reviews.map((r) => (
+                  <div key={r._id} className="border-b border-gray-200 py-2">
+                    <p className="font-semibold text-gray-800">
+                      {r.user?.username}
+                    </p>
+                    <p className="text-gray-700">Rating: {r.rating} / 5</p>
+                    <p className="text-gray-700">{r.comment}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-600">
+                  No reviews yet. Be the first to review this product!
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div label="Shipping & Returns">
+            <p>
+              Standard shipping: 3-7 business days. Free returns within 30 days.
+            </p>
+          </div>
+        </Tabs>
 
         {/* ===== Related Products ===== */}
         <div className="border-t border-gray-300 pt-16 mt-16">

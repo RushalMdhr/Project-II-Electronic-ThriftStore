@@ -1,79 +1,237 @@
-import { useSelector } from "react-redux";
-import { Link } from "react-router";
-
+import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import Tabs from "../../components/Product/Tabs";
+import {
+  useGetCurrentUserQuery,
+  useGetUserDetailsQuery,
+} from "../../redux/api/usersApiSlice";
+import { setCredentials } from "../../redux/features/auth/authSlice";
+import { useEffect } from "react";
+import ProductGrid from "../Home/ProductTools/ProductGrid";
+import { useParams } from "react-router-dom";
+import { useGetMyProductsQuery } from "../../redux/api/productsApiSlice";
 const Profile = () => {
+  const { id: userId } = useParams();
   const { userInfo } = useSelector((state) => state.auth);
 
+  // No ID → don't show anything
+  if (!userId) return <p>No user selected</p>;
+
+  // Fetch user info
+  const {
+    data: user,
+    isLoading: userLoading,
+    isError: userError,
+  } = useGetUserDetailsQuery(userId, {
+    skip: !userId,
+  });
+
+  // Fetch user's products
+  const {
+    data: myProducts,
+    isLoading: productLoading,
+    isError: productError,
+  } = useGetMyProductsQuery(userId, {
+    skip: !userId,
+  });
+
+  // Handle loading
+  if (userLoading) return <p>Loading...</p>;
+
+  // Handle error (user not found)
+  if (userError || !user) return <p>User not found</p>;
+
   return (
-    <div className="max-w-lg mx-auto mt-12 p-8 bg-slate-900 rounded-3xl shadow-2xl flex flex-col gap-6 items-center">
-      {/* Avatar */}
-      <div className="w-24 h-24 rounded-full bg-slate-700 flex items-center justify-center mb-2 shadow-lg">
-        <span className="text-4xl text-white font-bold">
-          {userInfo?.username?.charAt(0).toUpperCase() || "U"}
-        </span>
-      </div>
-      {/* User Info */}
-      <h2 className="text-white text-2xl font-bold">{userInfo?.username || "User Name"}</h2>
-      <p className="text-slate-300 text-base">{userInfo?.email}</p>
-      <div className="flex gap-4 mt-2">
-        <span className="bg-blue-900 text-blue-300 px-3 py-1 rounded-full text-xs">
-          {userInfo?.isVendor ? "Vendor" : "Customer"}
-        </span>
-        {/* Add more tags if needed */}
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* ---------- COVER + AVATAR SECTION ---------- */}
+      <section className="px-4 pt-4">
+        {/* Cover Image */}
+        <div className="relative rounded-3xl overflow-hidden shadow-md">
+          <img
+            src={user.coverImage || "/uploads/cover/default.png"}
+            alt="Cover"
+            className="w-full h-56 md:h-72 object-cover"
+          />
+        </div>
 
-      {/* Action Buttons */}
-      <div className="w-full flex flex-col gap-3 mt-6">
-        <Link
-          to="/updateProfile"
-          className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-full transition"
-        >
-          Edit Profile
-        </Link>
+        {/* Profile Area */}
+        <div className="relative -mt-4">
+          <div className="flex items-center gap-6 ml-[20%]">
+            {/* Profile Image */}
+            <img
+              src={user.profileImage || "/uploads/profile/default.png"}
+              alt={user.username}
+              className="w-40 h-40 rounded-full ring-4 ring-white shadow-2xl object-cover"
+            />
 
-        {userInfo?.isVendor ? (
-          <>
-            <Link
-              to="/vendor/dashboard"
-              className="w-full text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-full transition"
-            >
-              Vendor Dashboard
-            </Link>
-            <Link
-              to="/portfolio"
-              className="w-full text-center bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 rounded-full transition"
-            >
-              Reviews & Ratings
-            </Link>
-          </>
-        ) : (
-          <Link
-            to="/vendor/register"
-            className="w-full text-center bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-full transition"
-          >
-            Become a Vendor
-          </Link>
-        )}
+            {/* LEFT COLUMN – Username / Email / Vendor Badge / Edit */}
+            <div className="flex flex-col justify-center gap-2">
+              {/* Username */}
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+                {user.username}
+              </h1>
 
-        <Link
-          to="/myorders"
-          className="w-full text-center bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold py-2 rounded-full transition"
-        >
-          My Orders
-        </Link>
-        <Link
-          to="/orderHistory"
-          className="w-full text-center bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold py-2 rounded-full transition"
-        >
-          Order History
-        </Link>
-        <Link
-          to="/wishlist"
-          className="w-full text-center bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 rounded-full transition"
-        >
-          Wishlist
-        </Link>
-      </div>
+              {/* Email */}
+              <p className="text-gray-600">{user.email}</p>
+
+              {/* Vendor Badge */}
+              <span
+                className="inline-flex items-center bg-blue-100 border border-blue-300 text-blue-700 
+               px-3 py-1 rounded-full text-xs font-medium w-fit"
+              >
+                {user?.isAdmin
+                  ? "Admin"
+                  : user?.isVendor
+                  ? "Vendor"
+                  : "Customer"}
+              </span>
+            </div>
+
+            {/* RIGHT SIDE BADGES */}
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-3 items-center">
+                {/* Admin Badge */}
+                <span className="w-20 h-20 flex items-center justify-center rounded-full bg-purple-600 text-white text-sm font-bold shadow-md">
+                  A
+                </span>
+
+                {/* Vendor Badge */}
+                <span className="w-20 h-20 flex items-center justify-center rounded-full bg-blue-500 text-white text-sm font-bold shadow-md">
+                  V
+                </span>
+
+                {/* Sales Badge */}
+                <span className="w-20 h-20 flex items-center justify-center rounded-full bg-yellow-500 text-white text-base font-bold shadow-md">
+                  ⭐
+                </span>
+
+                {/* Blacklist Badge */}
+                <span className="w-20 h-20 flex items-center justify-center rounded-full bg-red-500 text-white text-sm font-bold shadow-md">
+                  !
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- TABS SECTION ---------- */}
+      <section className="pt-12 pb-12 px-4 max-w-5xl mx-auto">
+        <Tabs labels={["About", "Products", "Reviews"]}>
+          <div label="About">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Shipping Address */}
+              <div className="bg-white rounded-2xl shadow-sm p-6">
+                <h2 className="text-lg font-semibold text-emerald-700 mb-4">
+                  Address
+                </h2>
+                <div className="grid sm:grid-cols-2 gap-3 text-sm text-gray-700">
+                  {[
+                    ["Street", user.shippingAddress?.street],
+                    ["City", user.shippingAddress?.city],
+                    ["District", user.shippingAddress?.district],
+                    ["Province", user.shippingAddress?.province],
+                    ["ZIP", user.shippingAddress?.zipCode],
+                    ["Phone", user.shippingAddress?.phone],
+                  ].map(([label, val]) => (
+                    <p key={label}>
+                      <span className="text-gray-400">{label}:</span>{" "}
+                      <span className="font-medium">{val || "N/A"}</span>
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+              {/* Member Since */}
+              <div className="bg-white rounded-2xl shadow-sm p-6 flex flex-col justify-center">
+                <p className="text-sm text-gray-400">Member since</p>
+                <p className="text-xl font-semibold text-gray-800">
+                  {new Date(user.createdAt).toLocaleDateString("en-US", {
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+            </div>
+            {/* Vendor Information - full width */}
+            {user.isVendor && (
+              <div className="bg-emerald-100/70 rounded-2xl shadow-sm p-6 mt-6 backdrop-blur-sm">
+                <h2 className="text-lg font-semibold text-emerald-700 mb-4">
+                  Vendor Information
+                </h2>
+
+                <div className="grid sm:grid-cols-2 gap-3 text-sm text-gray-700">
+                  <p>
+                    <span className="text-gray-400">Shop Name:</span>{" "}
+                    <span className="font-medium">
+                      {user.shopName || "N/A"}
+                    </span>
+                  </p>
+
+                  <p>
+                    <span className="text-gray-400">No. of Sales</span>{" "}
+                    <span className="font-medium">{user.sales || "N/A"}</span>
+                  </p>
+
+                  <p>
+                    <span className="text-gray-400">Shop Description:</span>{" "}
+                    <span className="font-medium">
+                      {user.shopDescription || "N/A"}
+                    </span>
+                  </p>
+
+                  <p>
+                    <span className="text-gray-400">Status:</span>{" "}
+                    <span className="font-medium">
+                      {user.vendor?.status || "Active"}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {userInfo?._id === userId && (
+              <Link
+                to={`/updateprofile`}
+                className="mt-3 inline-flex items-center justify-center gap-2 px-5 py-2.5
+      bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700
+      text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-xl
+      transition-all duration-200 active:scale-[0.98]"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                  />
+                </svg>
+                Edit Profile
+              </Link>
+            )}
+          </div>
+
+          <div label="Products">
+            {/* <p className="text-gray-600">
+              Products listed by {user.username} appear here.
+            </p> */}
+            <div className="bg-gray-200">
+              <ProductGrid products={myProducts} />
+            </div>
+          </div>
+
+          <div label="Reviews">
+            <p className="text-gray-600">
+              Reviews for {user.username} appear here.
+            </p>
+          </div>
+        </Tabs>
+      </section>
     </div>
   );
 };

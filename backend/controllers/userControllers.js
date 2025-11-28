@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import createToken from "../utils/createToken.js";
 import mongoose from "mongoose";
 import Joi from "joi";
+import { formatUserResponse } from "../utils/formatUserResponse.js";
 
 // const SECRET_KEY = "bgtery";
 // salt is random
@@ -40,13 +41,7 @@ const createUser = asyncHandler(async (req, res) => {
   try {
     await newUser.save();
     createToken(res, newUser._id);
-    res.status(201).json({
-      _id: newUser._id,
-      username: newUser.username,
-      email: newUser.email,
-      isAdmin: newUser.isAdmin,
-      isVendor: newUser.isVendor,
-    });
+    res.status(201).json(formatUserResponse(newUser));
   } catch (error) {
     res.status(400);
     throw new Error(error);
@@ -103,16 +98,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
     createToken(res, exitingUser._id);
 
-    res.status(200).json({
-      _id: exitingUser._id,
-      username: exitingUser.username,
-      email: exitingUser.email,
-      isAdmin: exitingUser.isAdmin,
-      isVendor: exitingUser.isVendor,
-      shopName: exitingUser.shopName,
-      shopDescription: exitingUser.shopDescription,
-      status: exitingUser.status,
-    });
+    res.status(200).json(formatUserResponse(exitingUser));
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -277,15 +264,7 @@ const updateVendorShop = asyncHandler(async (req, res) => {
 const getCurrentUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
   if (user) {
-    res.status(200).json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      isVendor: user.isVendor,
-      shopName: user.shopName,
-      shopDescription: user.shopDescription,
-    });
+     res.status(200).json(formatUserResponse(user));
   } else {
     res.status(404);
     throw new Error("user not found");

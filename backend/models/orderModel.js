@@ -26,7 +26,7 @@ const OrderSchema = new mongoose.Schema(
           enum: ["pending", "confirmed", "cancelled", "refunded"],
           default: "pending",
         },
-        reasonForCancel : String
+        reasonForCancel: String,
       },
     ],
     subtotal: { type: Number, default: 0 },
@@ -47,13 +47,37 @@ const OrderSchema = new mongoose.Schema(
       default: "pending",
     },
     shippingAddress: {
-      name: String,
       street: String,
-      city: String,
-      state: String,
+      city: {
+        type: String,
+        default: "Bhaktapur",
+        // required: true,
+      },
+      district: {
+        type: String,
+        enum: ["Kathmandu", "Lalitpur", "Bhaktapur", "Kavrepalanchowk"],
+        default: "Bhaktapur",
+      },
+      province: {
+        type: String,
+        enum: [
+          "Koshi",
+          "Madhesh",
+          "Bagmati",
+          "Gandaki",
+          "Lumbini",
+          "Karnali",
+          "Sudurpashchim",
+        ],
+        default: "Bagmati",
+        // required: true,
+      },
       zipCode: String,
-      country: String,
-      phone: String,
+      // country: String,
+      phone: {
+        type: String,
+        // required: true
+      },
     },
     payment: {
       method: {
