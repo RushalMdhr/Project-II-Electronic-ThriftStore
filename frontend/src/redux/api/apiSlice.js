@@ -52,6 +52,6 @@ const customBaseQuery = async (args, api, extraOptions) => {
 
 export const apiSlice = createApi({
   baseQuery: customBaseQuery,
-  tagTypes: ["Products", "Users", "Orders", "Category"],
+  tagTypes: ["Products", "Users", "Orders", "Category", "Reviews"],
   endpoints: () => ({}),
 });

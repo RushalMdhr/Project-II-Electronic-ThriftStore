@@ -21,6 +21,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import cartitemRoutes from "./routes/cartitemRoutes.js";
 import esewaRoutes from "./routes/esewaRoutes.js";
 import vendorRoutes from "./routes/vendorRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 import { deleteErrorOrder } from "./controllers/orderController.js";
 
 //db connection
@@ -53,6 +54,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/cart", cartitemRoutes);
 app.use("/api/esewa", esewaRoutes);
 app.use("/api/vendor", vendorRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // __________________IMAGE________________________________________
 app.use("/api/upload", uploadRoutes);

@@ -11,6 +11,7 @@ import {
 import { useGetMyOrdersQuery } from "../../../redux/api/orderApiSlice";
 import { shortIds, formatDate } from "../../../components/IdShorter";
 import OrderFilterBar from "./OrderFilterBar"; // <-- imported bar
+import CreateReview from "../../../components/CreateReview";
 
 /* =================================================================== */
 /*  Market-ready “My Orders” page                                      */
@@ -202,7 +203,6 @@ const MyOrders = () => {
       </div>
     );
   }
-
   /* ----------  main UI  ---------- */
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -228,8 +228,9 @@ const MyOrders = () => {
         {/* order cards */}
         <div className="space-y-4">
           {orders.map((order, idx) => {
-            const vendor = order.orderItems?.[0]?.product?.vendor;
+            const vendor = order.orderItems?.[0]?.vendor;
             const isOpen = expanded.has(order._id);
+
             return (
               <section
                 key={order._id}
@@ -298,30 +299,58 @@ const MyOrders = () => {
                                   : "border-gray-200"
                               }`}
                             >
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <Link
-                                    to={`/overview/${it.product._id}`}
-                                    className={`font-medium text-gray-900 hover:text-emerald-600 ${
-                                      it.status === "cancelled"
-                                        ? "line-through text-gray-400"
-                                        : ""
-                                    }`}
-                                  >
-                                    {it.product.name}
-                                  </Link>
-                                  <div className="mt-2 flex items-center gap-4 text-sm text-gray-600">
-                                    <span>Qty {it.quantity}</span>
-                                    <span>Rs. {it.price?.toFixed(2)} each</span>
-                                    <span className="font-medium text-gray-900">
-                                      Rs. {(it.quantity * it.price)?.toFixed(2)}
-                                    </span>
+                              <div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {/* LEFT COLUMN — Product Info */}
+                                  <div className="flex flex-col">
+                                    <Link
+                                      to={`/overview/${it.product._id}`}
+                                      className={`font-medium text-gray-900 hover:text-emerald-600 ${
+                                        it.status === "cancelled"
+                                          ? "line-through text-gray-400"
+                                          : ""
+                                      }`}
+                                    >
+                                      {it.product.name}
+                                    </Link>
+
+                                    <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                                      {/* Quantity */}
+                                      <span className="flex items-center gap-1">
+                                        <i className="fa-solid fa-box"></i>
+                                        Qty {it.quantity}
+                                      </span>
+
+                                      {/* Price Each */}
+                                      <span className="flex items-center gap-1">
+                                        <i className="fa-solid fa-tag"></i>
+                                        Rs. {it.price?.toFixed(2)}
+                                      </span>
+
+                                      {/* Total Price */}
+                                      <span className="font-medium text-gray-900 flex items-center gap-1">
+                                        <i className="fa-solid fa-coins"></i>
+                                        Rs.{" "}
+                                        {(it.quantity * it.price)?.toFixed(2)}
+                                      </span>
+                                    </div>
+
+                                    {it.status === "cancelled" && (
+                                      <p className="mt-2 text-xs text-red-600">
+                                        <i className="fa-solid fa-circle-xmark"></i>
+                                        &nbsp;Cancelled · {it.reasonForCancel}
+                                      </p>
+                                    )}
                                   </div>
-                                  {it.status === "cancelled" && (
-                                    <p className="mt-2 text-xs text-red-600">
-                                      Cancelled · {it.reasonForCancel}
-                                    </p>
-                                  )}
+
+                                  {/* RIGHT COLUMN — Review Button / Form */}
+                                  <div className="md:ml-auto w-full md:w-auto md:justify-self-end">
+                                    <CreateReview
+                                      productId={it.product._id}
+                                      orderId={order._id}
+                                      sellerId={it.product.uploadedBy}
+                                    />
+                                  </div>
                                 </div>
                               </div>
                             </div>

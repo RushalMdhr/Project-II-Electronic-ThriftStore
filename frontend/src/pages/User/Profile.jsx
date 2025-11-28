@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import ProductGrid from "../Home/ProductTools/ProductGrid";
 import { useParams } from "react-router-dom";
 import { useGetMyProductsQuery } from "../../redux/api/productsApiSlice";
+import VendorReviewList from "../../components/VendorReviewList";
 const Profile = () => {
   const { id: userId } = useParams();
   const { userInfo } = useSelector((state) => state.auth);
@@ -226,9 +227,7 @@ const Profile = () => {
           </div>
 
           <div label="Reviews">
-            <p className="text-gray-600">
-              Reviews for {user.username} appear here.
-            </p>
+            <VendorReviewList sellerId={userId} />
           </div>
         </Tabs>
       </section>
