@@ -1,7 +1,10 @@
-import { Link } from "react-router-dom" 
-import { Button } from "../../components/ui/button"
-
+import { Link } from "react-router-dom" ;
+import { Button } from "../../components/ui/button";
+import { useDispatch } from "react-redux";
+import { setRole } from "../../redux/features/auth/authSlice"
+  
 export default function HeroSection() {
+    const dispatch = useDispatch();
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -39,6 +42,8 @@ export default function HeroSection() {
             <Button
               size="lg"
               variant="outline"
+              onClick={() => dispatch(setRole("seller"))}
+
               className="border-gray-600 text-white hover:bg-gray-800 px-8 py-3 text-lg bg-transparent"
             >
               Start Selling
