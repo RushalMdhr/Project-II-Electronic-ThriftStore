@@ -1,11 +1,8 @@
-import HeroSectionUser from "./HeroSectionUser.jsx";
 import ShopByCategories from "../User/ShopByCategories.jsx";
 import { useSelector } from "react-redux";
 import ProductGrid from "./ProductTools/ProductGrid.jsx";
 import { useGetTopProductQuery } from "../../redux/api/productsApiSlice.js";
 import { useEffect } from "react";
-import HeroSectionAdmin from "./HeroSectionAdmin.jsx";
-import HeroSectionVendor from "./HeroSectionVendor.jsx";
 import HeroSection from "./HeroSection.jsx";
 import { Link } from "react-router-dom";
 // import AdminProductGrid from "./Admin/AdminProductGrid"; // If you have one
@@ -24,11 +21,11 @@ const Home = () => {
   }, []);
 
   const renderHeroSection = () => {
-    if (userInfo) {
-      if (userInfo.isAdmin) return <HeroSectionAdmin />;
-      if (userInfo.isVendor) return <HeroSectionVendor />;
-      if (userInfo.isUser) return <HeroSectionUser />;
-    }
+    // if (userInfo) {
+    //   if (userInfo.isAdmin) return <HeroSectionAdmin />;
+    //   if (userInfo.isVendor) return <HeroSectionVendor />;
+    //   if (userInfo.isUser) return <HeroSectionUser />;
+    // }
     return <HeroSection />; // Guest
   };
 

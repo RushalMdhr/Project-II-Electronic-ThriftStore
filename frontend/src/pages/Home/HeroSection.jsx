@@ -38,13 +38,13 @@ const HeroSection = () => {
               {admin ? "Manage Users" : "Shop Now"}
             </Button>
           </Link>
-          <Link to={admin ? "/admin" : "/vendor/register"}>
+          <Link to={admin ? "/admin" : localStorage.userInfo?.isVendor ? "/vendor/upload": "/vendor/register"}>
             <Button
               size="lg"
               variant="outline"
               className="border-gray-600 text-white hover:bg-gray-800 px-8 py-3 text-lg bg-transparent"
             >
-              {admin ? "Go to Dashboard" : " Join as Vendor"}
+              {admin ? "Go to Dashboard" : localStorage.userInfo?.isVendor ? "Start Selling": " Join as Vendor"}
             </Button>
           </Link>
         </div>
