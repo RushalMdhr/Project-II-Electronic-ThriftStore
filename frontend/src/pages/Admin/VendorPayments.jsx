@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useGetPendingPaymentVendorsQuery } from "../../redux/api/usersApiSlice";
-import { CheckCircle, Clock, CreditCard, User, MapPin, Package } from "lucide-react";
+import { CreditCard, User, MapPin, Calendar } from "lucide-react";
+import { formatDate } from "../../components/IdShorter";
 
 // Dark, premium emerald palette - matching the existing admin theme
 const COLORS = {
@@ -11,9 +12,8 @@ const COLORS = {
   surface: "rgba(255,255,255,0.03)",
 };
 
-export default function VendorPayments() {
+const VendorPayments = () => {
   const { data: pendingPaymentVendors, isLoading, error } = useGetPendingPaymentVendorsQuery();
-  pendingPaymentVendors && console.log('pending vendors : ',pendingPaymentVendors)
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -36,6 +36,8 @@ export default function VendorPayments() {
     // In a real implementation, this would call a mutation to process payment
     alert(`Processing payment for vendor ${vendorId}`);
   };
+
+
 
   if (isLoading) {
     return (
@@ -83,13 +85,21 @@ export default function VendorPayments() {
           box-shadow: 0 8px 24px rgba(2,6,23,0.5); 
           border-color: rgba(255,255,255,0.08);
         }
-        .payment-badge { 
-          padding: 6px 12px; 
+        .status-active { 
+          background: rgba(76, 175, 80, 0.15); 
+          color: #4CAF50; 
+          padding: 4px 8px; 
           border-radius: 999px; 
-          font-weight: 700; 
-          display: inline-flex; 
-          align-items: center; 
-          gap: 6px;
+          font-weight: 600;
+          font-size: 12px;
+        }
+        .status-inactive { 
+          background: rgba(244, 67, 54, 0.15); 
+          color: #F44336; 
+          padding: 4px 8px; 
+          border-radius: 999px; 
+          font-weight: 600;
+          font-size: 12px;
         }
       `}</style>
 
@@ -127,7 +137,7 @@ export default function VendorPayments() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="card p-6 rounded-xl">
           <div className="flex items-center justify-between">
             <div>
@@ -149,18 +159,6 @@ export default function VendorPayments() {
             <CreditCard className="w-8 h-8 text-emerald-400" />
           </div>
         </div>
-        
-        <div className="card p-6 rounded-xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-400 text-sm">Total Earned</p>
-              <p className="text-2xl font-bold">
-                {pendingPaymentVendors?.reduce((sum, vendor) => sum + (vendor.income?.total || 0), 0).toLocaleString()} NPR
-              </p>
-            </div>
-            <Package className="w-8 h-8 text-emerald-400" />
-          </div>
-        </div>
       </div>
 
       {/* Vendor Payments Table */}
@@ -180,9 +178,8 @@ export default function VendorPayments() {
                     <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Vendor</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Shop</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Location</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Pending</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Total Earned</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Pending Amount</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Last Paid</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Action</th>
                   </tr>
                 </thead>
@@ -195,12 +192,14 @@ export default function VendorPayments() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="font-medium">{vendor.shopName}</div>
-                        <div className="text-sm text-gray-400">{vendor.status}</div>
+                        <div className={vendor.status === "active" ? "status-active" : "status-inactive"}>
+                          {vendor.status?.charAt(0).toUpperCase() + vendor.status?.slice(1)}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center text-sm text-gray-300">
                           <MapPin className="w-4 h-4 mr-1" />
-                          {vendor.shippingAddress?.city}, {vendor.shippingAddress?.province}
+                          {vendor.shippingAddress?.city}, {vendor.shippingAddress?.district || vendor.shippingAddress?.provience}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -209,15 +208,10 @@ export default function VendorPayments() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-gray-300">
-                          {(vendor.income?.total || 0).toLocaleString()} NPR
+                        <div className="flex items-center text-sm text-gray-300">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          {formatDate(vendor.income?.lastPaid)}
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="payment-badge" style={{ background: "rgba(255,213,128,0.15)", color: "#FFD580" }}>
-                          <Clock className="w-3 h-3" />
-                          Pending
-                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
@@ -290,4 +284,6 @@ export default function VendorPayments() {
       </div>
     </div>
   );
-}
+};
+
+export default VendorPayments;
