@@ -37,29 +37,18 @@ const userSchema = mongoose.Schema(
       street: String,
       city: {
         type: String,
+        default: "Bhaktapur",
+        // required: true,
+      },
+      district: {
+        type: String,
         enum: [
           "Kathmandu",
           "Lalitpur",
           "Bhaktapur",
-          "Kirtipur",
-          "Madhyapur Thimi",
-          "Tokha",
-          "Budhanilkantha",
-          "Gokarneshwar",
-          "Sankharapur",
-          "Chandragiri",
-          "Godawari",
-          "Suryabinayak",
-
-          // Surrounding cities
-          "Banepa",
-          "Dhulikhel",
-          "Panauti",
-        ],
-        default: "Bhaktapur",
-        // required: true,
+          "Kavrepalanchok",
+        ]
       },
-      district: String,
       province: {
         type: String,
         enum: [
