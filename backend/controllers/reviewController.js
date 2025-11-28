@@ -56,7 +56,6 @@ export const createReview = asyncHandler(async (req, res) => {
   });
 });
 
-
 // --------------------------------------------------
 // @desc    Get all reviews for a product
 // @route   GET /api/reviews/product/:productId
@@ -66,7 +65,7 @@ export const getReviewsByProduct = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
   const reviews = await Review.find({ productId })
-    .populate("user", "name avatar")
+    .populate("user", "username avatar")
     .populate("sellerId", "name avatar")
     .sort({ createdAt: -1 });
 
@@ -82,7 +81,7 @@ export const getReviewsBySeller = asyncHandler(async (req, res) => {
   const { sellerId } = req.params;
 
   const reviews = await Review.find({ sellerId })
-    .populate("user", "name avatar")
+    .populate("user", "username avatar")
     .populate("productId", "name images")
     .sort({ createdAt: -1 });
 
