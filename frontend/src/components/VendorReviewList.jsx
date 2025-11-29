@@ -3,11 +3,7 @@ import { useGetReviewsBySellerQuery } from "../redux/api/reviewApiSlice";
 import { Link } from "react-router";
 
 const VendorReviewList = ({ sellerId }) => {
-  const {
-    data: reviews,
-    isLoading,
-    error,
-  } = useGetReviewsBySellerQuery(sellerId, {
+  const { data, isLoading, error } = useGetReviewsBySellerQuery(sellerId, {
     skip: !sellerId,
   });
 
@@ -15,8 +11,11 @@ const VendorReviewList = ({ sellerId }) => {
 
   if (isLoading) return <p className="text-gray-600">Loading reviews...</p>;
   if (error) return <p className="text-red-600">Failed to load reviews.</p>;
-  if (!reviews || reviews.length === 0)
+
+  if (!data || data.reviews.length === 0)
     return <p className="text-gray-500">No reviews yet.</p>;
+
+  const { reviews, averageRating, totalReviews } = data;
 
   return (
     <>
@@ -39,6 +38,44 @@ const VendorReviewList = ({ sellerId }) => {
           Customer Reviews
         </h2>
 
+        {/* Rating Header */}
+        <div className="flex items-center gap-3 mb-4">
+          <div>
+          {[1, 2, 3, 4, 5].map((star) => {
+            const isFull = star <= Math.floor(averageRating);
+            const isHalf =
+              star === Math.ceil(averageRating) && averageRating % 1 !== 0;
+
+            return (
+              <span key={star} className="relative text-2xl">
+                {/* Gray background star */}
+                <span className="text-gray-300">★</span>
+
+                {/* Full star overlay */}
+                {isFull && (
+                  <span className="absolute left-0 top-0 text-yellow-500">
+                    ★
+                  </span>
+                )}
+
+                {/* Half star overlay */}
+                {isHalf && (
+                  <span
+                    className="absolute left-0 top-0 text-yellow-500 overflow-hidden"
+                    style={{ width: "50%" }}
+                  >
+                    ★
+                  </span>
+                )}
+              </span>
+            );
+          })}
+        </div>
+        {/* Rating text */}
+        <p className="text-gray-800 font-medium">
+          {averageRating.toFixed(1)} / 5 ({totalReviews} reviews)
+        </p>
+</div>
         <div className="space-y-6">
           {reviews.map((review) => (
             <div
@@ -101,23 +138,20 @@ const VendorReviewList = ({ sellerId }) => {
               {/* Product Info */}
               <Link to={`/overview/${review.productId?._id}`}>
                 <div className="mt-3 bg-white p-3 rounded-lg border flex gap-3">
-                
                   <img
-                  src={review.productId?.images?.[0]}
-                  className="w-16 h-16 object-cover rounded"
-                  alt="product"
-                />
-                
-                <div>
-                  <p className="font-medium text-gray-800">
-                    {review.productId?.name}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Product ID: {review.productId?._id}
-                  </p>
-                </div>
-                
-                
+                    src={review.productId?.images?.[0]}
+                    className="w-16 h-16 object-cover rounded"
+                    alt="product"
+                  />
+
+                  <div>
+                    <p className="font-medium text-gray-800">
+                      {review.productId?.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Product ID: {review.productId?._id}
+                    </p>
+                  </div>
                 </div>
               </Link>
             </div>
