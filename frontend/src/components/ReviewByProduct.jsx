@@ -1,17 +1,16 @@
-import { useState } from "react"; // <-- REQUIRED
-import { useGetReviewsBySellerQuery } from "../redux/api/reviewApiSlice";
-import { Link } from "react-router";
+import { useState } from "react";
+import { useGetReviewsByProductQuery } from "../redux/api/reviewApiSlice";
 
-const VendorReviewList = ({ sellerId }) => {
+const ReviewByProduct = ({ productId }) => {
   const {
     data: reviews,
     isLoading,
     error,
-  } = useGetReviewsBySellerQuery(sellerId, {
-    skip: !sellerId,
+  } = useGetReviewsByProductQuery(productId, {
+    skip: !productId,
   });
 
-  const [previewImage, setPreviewImage] = useState(null); // <-- Add this
+  const [previewImage, setPreviewImage] = useState(null);
 
   if (isLoading) return <p className="text-gray-600">Loading reviews...</p>;
   if (error) return <p className="text-red-600">Failed to load reviews.</p>;
@@ -36,7 +35,7 @@ const VendorReviewList = ({ sellerId }) => {
 
       <div className="bg-white p-6 rounded-xl shadow-md mt-4">
         <h2 className="text-xl font-semibold text-emerald-700 mb-4">
-          Customer Reviews
+          Product Reviews
         </h2>
 
         <div className="space-y-6">
@@ -45,7 +44,7 @@ const VendorReviewList = ({ sellerId }) => {
               key={review._id}
               className="border rounded-lg p-4 bg-gray-50 hover:shadow transition"
             >
-              {/* Reviewer Info */}
+              {/* User Info */}
               <div className="flex items-center gap-3 mb-3">
                 <img
                   src={review.user?.avatar || "/default-avatar.png"}
@@ -90,36 +89,13 @@ const VendorReviewList = ({ sellerId }) => {
                     <img
                       key={index}
                       src={img}
-                      onClick={() => setPreviewImage(img)} // <-- ENABLE PREVIEW
+                      onClick={() => setPreviewImage(img)}
                       className="w-20 h-20 object-cover rounded border cursor-pointer hover:opacity-80"
                       alt="review upload"
                     />
                   ))}
                 </div>
               )}
-
-              {/* Product Info */}
-              <Link to={`/overview/${review.productId?._id}`}>
-                <div className="mt-3 bg-white p-3 rounded-lg border flex gap-3">
-                
-                  <img
-                  src={review.productId?.images?.[0]}
-                  className="w-16 h-16 object-cover rounded"
-                  alt="product"
-                />
-                
-                <div>
-                  <p className="font-medium text-gray-800">
-                    {review.productId?.name}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Product ID: {review.productId?._id}
-                  </p>
-                </div>
-                
-                
-                </div>
-              </Link>
             </div>
           ))}
         </div>
@@ -128,4 +104,4 @@ const VendorReviewList = ({ sellerId }) => {
   );
 };
 
-export default VendorReviewList;
+export default ReviewByProduct;

@@ -6,11 +6,11 @@ import {
   deleteReview,
 } from "../controllers/reviewController.js";
 import { authenticate } from "../middlewares/authMiddleware.js";
-import { uploadSingle } from "../middlewares/multer.js";
+import { uploadMultiple } from "../middlewares/multer.js";
 const router = express.Router();
 
 // Create review
-router.post("/", authenticate, uploadSingle, createReview);
+router.post("/", authenticate, uploadMultiple, createReview);
 
 // Get reviews of a product
 router.get("/product/:productId", getReviewsByProduct);

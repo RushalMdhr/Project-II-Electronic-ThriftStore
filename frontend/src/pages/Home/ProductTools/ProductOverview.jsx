@@ -12,6 +12,7 @@ import AddToCart from "../../User/Cart/AddToCart";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import Tabs from "../../../components/Product/Tabs";
+import ReviewByProduct from "../../../components/ReviewByProduct";
 
 const ProductOverview = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -230,7 +231,6 @@ const ProductOverview = () => {
                 </p>
               )}
             </div>
-          
 
             {/* ===== Action Buttons ===== */}
             <div className="space-y-4">
@@ -308,23 +308,7 @@ const ProductOverview = () => {
           </div>
 
           <div label="Reviews">
-            <div>
-              {product.reviews?.length > 0 ? (
-                product.reviews.map((r) => (
-                  <div key={r._id} className="border-b border-gray-200 py-2">
-                    <p className="font-semibold text-gray-800">
-                      {r.user?.username}
-                    </p>
-                    <p className="text-gray-700">Rating: {r.rating} / 5</p>
-                    <p className="text-gray-700">{r.comment}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-600">
-                  No reviews yet. Be the first to review this product!
-                </p>
-              )}
-            </div>
+            <ReviewByProduct productId={product._id} />
           </div>
 
           <div label="Shipping & Returns">
