@@ -22,6 +22,14 @@ export const reviewApiSlice = apiSlice.injectEndpoints({
       query: (sellerId) => `/api/reviews/seller/${sellerId}`,
       providesTags: ["Reviews"],
     }),
+    // ✅ NEW: Get all reviews (Admin)
+    getAllReviews: builder.query({
+      query: () => ({
+        url: `/api/reviews`,
+        method: "GET",
+      }),
+      providesTags: ["Reviews"],
+    }),
 
     // Delete a review
     deleteReview: builder.mutation({
@@ -39,5 +47,6 @@ export const {
   useCreateReviewMutation,
   useGetReviewsByProductQuery,
   useGetReviewsBySellerQuery,
+  useGetAllReviewsQuery,
   useDeleteReviewMutation,
 } = reviewApiSlice;
