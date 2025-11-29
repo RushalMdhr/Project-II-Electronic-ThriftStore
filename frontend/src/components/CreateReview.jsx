@@ -20,9 +20,13 @@ const handleSubmit = async (e) => {
     formData.append("rating", rating);
     formData.append("description", description);
 
-    if (images[0]) {
-      formData.append("images", images[0]);
-    }
+ if (images.length > 0) {
+   images.forEach((img) => {
+     formData.append("images", img);
+   });
+ }
+
+
 
     await createReview(formData).unwrap();
 
@@ -88,12 +92,12 @@ const handleSubmit = async (e) => {
           <input
             type="file"
             accept="image/*"
+            multiple
             className="w-full border rounded-lg p-2 text-sm"
-            onChange={(e) => setImages([e.target.files[0]])}
+            onChange={(e) => setImages([...e.target.files])}
           />
 
           <div className="flex gap-3">
-            
             <button
               disabled={isLoading}
               className="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700"
