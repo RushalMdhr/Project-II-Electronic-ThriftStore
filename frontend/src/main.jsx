@@ -54,6 +54,7 @@ import Category from "./pages/Home/Category.jsx";
 import OrderInfo from "./pages/User/Orders/OrderInfo.jsx";
 import OrderCheckUp from "./pages/Delivery/OrderCheckUp.jsx";
 import VendorPayments from "./pages/Admin/VendorPayments.jsx";
+import ReviewList from "./components/Admin/ReviewList.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -97,7 +98,7 @@ const router = createBrowserRouter(
 
       <Route element={<VendorRoutes />}>
         <Route path="/vendor" element={<VendorLayout />}>
-          <Route path="dashboard" element={<VendorDashboard/>} />
+          <Route path="dashboard" element={<VendorDashboard />} />
           <Route path="products" element={<VendorProducts />} />
           <Route path="upload" element={<UploadPageTest />} />
           <Route path="order-management" element={<OrderManagement />} />
@@ -141,6 +142,7 @@ const router = createBrowserRouter(
           <Route path="users" element={<UserList />} />
           <Route path="vendor-payments" element={<VendorPayments />} />
           <Route path="orders" element={<ManageOrders />} />
+          <Route path="reviews" element={<ReviewList />} />
           <Route
             path="blacklisted-products"
             element={<BlackListedProducts />}
