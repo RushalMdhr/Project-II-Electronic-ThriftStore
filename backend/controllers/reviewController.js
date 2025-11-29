@@ -65,7 +65,17 @@ export const getReviewsByProduct = asyncHandler(async (req, res) => {
     .populate("sellerId", "name avatar")
     .sort({ createdAt: -1 });
 
-  res.json(reviews);
+  
+  const averageRating =
+    reviews.length > 0
+      ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
+      : 0;
+
+  res.json({
+    reviews,
+    averageRating: Number(averageRating.toFixed(1)),
+    totalReviews: reviews.length,
+  });
 });
 
 // --------------------------------------------------
@@ -73,6 +83,7 @@ export const getReviewsByProduct = asyncHandler(async (req, res) => {
 // @route   GET /api/reviews/seller/:sellerId
 // @access  Public
 // --------------------------------------------------
+
 export const getReviewsBySeller = asyncHandler(async (req, res) => {
   const { sellerId } = req.params;
 
@@ -81,7 +92,16 @@ export const getReviewsBySeller = asyncHandler(async (req, res) => {
     .populate("productId", "name images")
     .sort({ createdAt: -1 });
 
-  res.json(reviews);
+  const averageRating =
+    reviews.length > 0
+      ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
+      : 0;
+
+  res.json({
+    reviews,
+    averageRating: Number(averageRating.toFixed(1)),
+    totalReviews: reviews.length,
+  });
 });
 
 // --------------------------------------------------
