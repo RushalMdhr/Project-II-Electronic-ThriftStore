@@ -4,11 +4,15 @@ import path from "path";
 
 // Define storage
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        let folder = "uploads";
-        if (req.baseUrl.includes("categories")) {
-          folder = path.join("uploads", "categories");
-        }
+  destination: (req, file, cb) => {
+    let folder = "uploads";
+    if (req.baseUrl.includes("categories")) {
+      folder = path.join("uploads", "categories");
+    }
+    // Review uploads
+    if (req.baseUrl.includes("reviews")) {
+      folder = path.join("uploads", "reviews");
+    }
     cb(null, folder);
   },
   filename: (req, file, cb) => {
