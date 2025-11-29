@@ -62,10 +62,9 @@ export const getReviewsByProduct = asyncHandler(async (req, res) => {
 
   const reviews = await Review.find({ productId })
     .populate("user", "username avatar")
-    .populate("sellerId", "name avatar")
+    .populate("sellerId", "username avatar")
     .sort({ createdAt: -1 });
 
-  
   const averageRating =
     reviews.length > 0
       ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
@@ -101,6 +100,37 @@ export const getReviewsBySeller = asyncHandler(async (req, res) => {
     reviews,
     averageRating: Number(averageRating.toFixed(1)),
     totalReviews: reviews.length,
+  });
+});
+
+// --------------------------------------------------
+// @desc    Get ALL reviews (Admin Only) with sorting
+// @route   GET /api/reviews
+// @access  Private/Admin
+// --------------------------------------------------
+export const getAllReviews = asyncHandler(async (req, res) => {
+  const { sortBy, order } = req.query;
+
+  // Sorting options
+  const sortOptions = {
+    date: "createdAt",
+    rating: "rating",
+    seller: "sellerId.username",
+    product: "productId.name",
+  };
+
+  const sortField = sortOptions[sortBy] || "createdAt";
+  const sortOrder = order === "asc" ? 1 : -1;
+
+  const reviews = await Review.find()
+    .populate("user", "username avatar")
+    .populate("sellerId", "username avatar")
+    .populate("productId", "name images")
+    .sort({ [sortField]: sortOrder });
+
+  res.json({
+    total: reviews.length,
+    reviews,
   });
 });
 
