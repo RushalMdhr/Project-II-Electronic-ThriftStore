@@ -3,7 +3,7 @@ import { useGetReviewsByProductQuery } from "../redux/api/reviewApiSlice";
 
 const ReviewByProduct = ({ productId }) => {
   const {
-    data: reviews,
+    data,
     isLoading,
     error,
   } = useGetReviewsByProductQuery(productId, {
@@ -14,8 +14,13 @@ const ReviewByProduct = ({ productId }) => {
 
   if (isLoading) return <p className="text-gray-600">Loading reviews...</p>;
   if (error) return <p className="text-red-600">Failed to load reviews.</p>;
-  if (!reviews || reviews.length === 0)
-    return <p className="text-gray-500">No reviews yet.</p>;
+
+
+if (!data || !data.reviews || data.reviews.length === 0) {
+  return <p className="text-gray-500">No reviews yet.</p>;
+}
+
+  const { reviews, averageRating, totalReviews } = data;
 
   return (
     <>
@@ -37,6 +42,45 @@ const ReviewByProduct = ({ productId }) => {
         <h2 className="text-xl font-semibold text-emerald-700 mb-4">
           Product Reviews
         </h2>
+
+        {/* Rating Header */}
+        <div className="flex items-center gap-3 mb-4">
+          <div>
+            {[1, 2, 3, 4, 5].map((star) => {
+              const isFull = star <= Math.floor(averageRating);
+              const isHalf =
+                star === Math.ceil(averageRating) && averageRating % 1 !== 0;
+
+              return (
+                <span key={star} className="relative text-2xl">
+                  {/* Gray background star */}
+                  <span className="text-gray-300">★</span>
+
+                  {/* Full star overlay */}
+                  {isFull && (
+                    <span className="absolute left-0 top-0 text-yellow-500">
+                      ★
+                    </span>
+                  )}
+
+                  {/* Half star overlay */}
+                  {isHalf && (
+                    <span
+                      className="absolute left-0 top-0 text-yellow-500 overflow-hidden"
+                      style={{ width: "50%" }}
+                    >
+                      ★
+                    </span>
+                  )}
+                </span>
+              );
+            })}
+          </div>
+          {/* Rating text */}
+          <p className="text-gray-800 font-medium">
+            {averageRating.toFixed(1)} / 5 ({totalReviews} reviews)
+          </p>
+        </div>
 
         <div className="space-y-6">
           {reviews.map((review) => (
