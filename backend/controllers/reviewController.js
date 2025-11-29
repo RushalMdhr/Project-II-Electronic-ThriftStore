@@ -9,18 +9,16 @@ import Order from "../models/orderModel.js";
 // --------------------------------------------------
 export const createReview = asyncHandler(async (req, res) => {
   console.log("REQ BODY:", req.body);
+  console.log("REQ FILES:", req.files);
 
   const { productId, orderId, sellerId, rating, description } = req.body;
   const userId = req.user._id;
-  // Log each ID separately (important for BSON errors)
-  console.log("productId:", productId);
-  console.log("orderId:", orderId);
-  console.log("sellerId:", sellerId);
-  console.log("userId:", userId);
-  const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+
+  const imagePaths = req.files
+    ? req.files.map((file) => `/uploads/reviews/${file.filename}`)
+    : [];
 
   const order = await Order.findOne({ _id: orderId, customer: userId });
-
   if (!order) {
     return res
       .status(400)
@@ -45,10 +43,8 @@ export const createReview = asyncHandler(async (req, res) => {
     orderId,
     rating,
     description,
-    images: imagePath ? [imagePath] : [],
+    images: imagePaths,
   });
-  console.log("REQ BODY:", req.body);
-  console.log("REQ FILE:", req.file);
 
   res.status(201).json({
     message: "Review added successfully.",
