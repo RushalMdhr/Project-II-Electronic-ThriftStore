@@ -1,11 +1,9 @@
 import mongoose from "mongoose"; // Define the Transaction schema
+const { ObjectId } = mongoose.Schema.Types;
 
 const transactionSchema = new mongoose.Schema(
   {
-    product_id: {
-      type: String,
-      required: true,
-    },
+    product_id: { type: ObjectId, ref: "Order", required: true },
     amount: {
       type: Number,
       required: true,

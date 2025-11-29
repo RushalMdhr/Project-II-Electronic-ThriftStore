@@ -296,6 +296,7 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
           esewaPayment.amount = order.total;
           console.log("complete payment");
           order.payment.status = "paid";
+          order.payment.paidAt = Date.now();
           await order.save();
           return res.status(200).json({ message: "Order paid successfully" });
 
@@ -593,9 +594,16 @@ const deleteErrorOrder = asyncHandler(async (req, res) => {
 
   for (const order of orders) {
     // Update order status
-    await Order.findByIdAndUpdate(order._id, {
-      $set: { status: "delivered" },
-    });
+    // await Order.findByIdAndUpdate(order._id, {
+    //   $set: { status: "delivered" },
+    //   $set: { deliveredAt: new Date() },
+    // });
+    order.status = "delivered";
+    order.deliveredAt = new Date();
+    if(order.payment.method==="cod" && order.payment.status!=="pending"){
+      order.payment.status = "paid";
+    }
+    await order.save();
 
     // Update each vendor's income
     for (const item of order.orderItems) {
