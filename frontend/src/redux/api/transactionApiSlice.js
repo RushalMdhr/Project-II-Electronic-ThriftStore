@@ -12,13 +12,26 @@ export const transactionApiSlice = apiSlice.injectEndpoints({
     }),
 
     esewaSuccess: builder.mutation({
-      query: ({product_id}) => ({
+      query: ({ product_id }) => ({
         url: `${ESEWA_URL}/payment-status`,
         method: "POST",
-        body : {product_id},
+        body: { product_id },
       }),
+    }),
+
+    getEsewaPayments: builder.query({
+      query: (filter) => ({
+        url: `${ESEWA_URL}/get-esewa-transactions`,
+        method: "GET",
+        params : filter,
+      }),
+      keepUnusedDataFor: 5,
     }),
   }),
 });
 
-export const { useEsewaPaymentMutation, useEsewaSuccessMutation } = transactionApiSlice;
+export const {
+  useEsewaPaymentMutation,
+  useEsewaSuccessMutation,
+  useGetEsewaPaymentsQuery,
+} = transactionApiSlice;

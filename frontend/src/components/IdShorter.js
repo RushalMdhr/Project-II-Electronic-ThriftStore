@@ -42,3 +42,18 @@ export const formatDateRaw = (dateString) => {
     return "Invalid date";
   }
 };
+
+export const formatDateWithTime = (dateString) => {
+  if (!dateString) return 'N/A';
+  try {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (e) {
+    return 'Invalid date';
+  }
+};

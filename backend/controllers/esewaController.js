@@ -1,10 +1,11 @@
+import asyncHandler from "../middlewares/asyncHandler.js";
 import { Transaction } from "../models/esewaModel.js"; //for saving the ordered data in database
 import { EsewaPaymentGateway, EsewaCheckStatus } from "esewajs";
 
 const EsewaInitiatePayment = async (req, res) => {
-  console.log('Initiating eSewa payment');
+  console.log("Initiating eSewa payment");
   const { amount, productId } = req.body;
-  console.log('amount and productId :',amount,productId)
+  console.log("amount and productId :", amount, productId);
 
   try {
     const reqPayment = await EsewaPaymentGateway(
@@ -20,12 +21,14 @@ const EsewaInitiatePayment = async (req, res) => {
       process.env.ESEWAPAYMENT_URL
     );
 
-    console.log('Payment gateway response received');
+    console.log("Payment gateway response received");
 
     if (!reqPayment) {
-      return res.status(400).json({ error: "Error sending data to payment gateway" });
+      return res
+        .status(400)
+        .json({ error: "Error sending data to payment gateway" });
     }
-    
+
     if (reqPayment.status === 200) {
       const transaction = new Transaction({
         product_id: productId,
@@ -34,32 +37,33 @@ const EsewaInitiatePayment = async (req, res) => {
 
       await transaction.save();
       console.log("Transaction saved successfully");
-      
+
       return res.status(200).json({
         success: true,
         url: reqPayment.request.res.responseUrl,
-        message: "Payment initiated successfully"
+        message: "Payment initiated successfully",
       });
     } else {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: "Payment gateway returned non-200 status",
-        status: reqPayment.status 
+        status: reqPayment.status,
       });
     }
   } catch (error) {
     console.error("Payment initiation error:", error);
-    
+
     // More detailed error response
-    if (error.code === 'ENOTFOUND') {
-      return res.status(500).json({ 
+    if (error.code === "ENOTFOUND") {
+      return res.status(500).json({
         error: "Network error: Cannot connect to payment gateway",
-        details: "Please check your internet connection and the payment gateway URL"
+        details:
+          "Please check your internet connection and the payment gateway URL",
       });
     }
-    
-    return res.status(400).json({ 
+
+    return res.status(400).json({
       error: "Error initiating payment",
-      details: error.message 
+      details: error.message,
     });
   }
 };
@@ -70,7 +74,7 @@ const paymentStatus = async (req, res) => {
     const { product_id } = req.body;
 
     if (!product_id) {
-      console.log('no product id buddy')
+      console.log("no product id buddy");
       return res
         .status(400)
         .json({ message: "Product ID missing in query params" });
@@ -81,7 +85,7 @@ const paymentStatus = async (req, res) => {
     // 🔍 Find transaction in DB
     const transaction = await Transaction.findOne({ product_id });
     if (!transaction) {
-      console.log('transaction not found buddy sorry')
+      console.log("transaction not found buddy sorry");
       return res.status(404).json({ message: "Transaction not found" });
     }
 
@@ -92,7 +96,7 @@ const paymentStatus = async (req, res) => {
       process.env.MERCHANT_ID,
       process.env.ESEWAPAYMENT_STATUS_CHECK_URL
     );
-    console.log('survived till here buddy')
+    console.log("survived till here buddy");
     if (paymentStatusCheck.status === 200) {
       transaction.status = paymentStatusCheck.data.status || "completed";
       await transaction.save();
@@ -111,4 +115,38 @@ const paymentStatus = async (req, res) => {
   }
 };
 
-export { EsewaInitiatePayment, paymentStatus };
+const getEsewaTransactions = asyncHandler(async (req, res) => {
+  console.log("i m in get esewa");
+  console.log("req.query : ", req.query );
+  const { pageSize } = req.query || 2;
+  const { page } = req.query || 1;
+  const { dateFrom, dateTo, orderId } = req.query;
+  const filter = {};
+  if (dateFrom || dateTo) {
+    filter.createdAt = {};
+    if (dateFrom) filter.createdAt.$gte = new Date(dateFrom);
+    if (dateTo) filter.createdAt.$lte = new Date(dateTo);
+  }
+  if (orderId && orderId.length === 24) {
+    filter.product_id = orderId;
+  }
+  const transactions = await Transaction.find(filter)
+    .sort({ createdAt: -1 })
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+    .lean();
+  // .populate("product_id");
+  if (!transactions) {
+    return res.status(404).json({ message: "No transactions found" });
+  }
+  const totalTransactions = await Transaction.countDocuments(filter);
+
+  res.status(200).json({
+    transactions,
+    totalPages: Math.ceil(totalTransactions / pageSize),
+    currentPage: page,
+    totalTransactions,
+  });
+});
+
+export { EsewaInitiatePayment, paymentStatus, getEsewaTransactions };

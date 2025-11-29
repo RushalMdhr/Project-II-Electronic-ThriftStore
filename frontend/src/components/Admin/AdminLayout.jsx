@@ -116,6 +116,17 @@ const AdminLayout = () => {
             <i className="ri-folders-line text-2xl"></i>
             {!collapsed && <span>Pending Payments</span>}
           </Link>
+          <Link
+            to="/admin/transaction-histry"
+            className={`flex items-center px-3 py-3 transition
+    hover:bg-[#1de9b6] hover:text-[#0a1120] rounded-sm
+    ${collapsed ? "justify-center w-12 h-12" : "space-x-3 rounded-lg"}
+  `}
+            title="Transaction Histry"
+          >
+            <i className="ri-folders-line text-2xl"></i>
+            {!collapsed && <span>Transaction Histry</span>}
+          </Link>
         </nav>
       </aside>
 

@@ -55,6 +55,7 @@ import OrderInfo from "./pages/User/Orders/OrderInfo.jsx";
 import OrderCheckUp from "./pages/Delivery/OrderCheckUp.jsx";
 import VendorPayments from "./pages/Admin/VendorPayments.jsx";
 import ReviewList from "./components/Admin/ReviewList.jsx";
+import TransactionHistoryAdmin from "./pages/Admin/TransactionList.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -149,6 +150,7 @@ const router = createBrowserRouter(
           />
           <Route path="users/:id/edit" element={<UserUpdate />} />
           <Route path="categories" element={<CategoryManagement />} />
+          <Route path="transaction-histry" element={<TransactionHistoryAdmin />} />
         </Route>
       </Route>
     </Route>
