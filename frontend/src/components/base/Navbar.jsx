@@ -108,9 +108,9 @@ const Navbar = () => {
                 Home
               </Link>
               <Link
-                // to={
-                //   userInfo?.isVendor ? `/vendor/order-management` : userInfo?.isAdmin ? `/admin/orders`: `/myorders`
-                // }
+                to={
+                  userInfo?.isVendor ? `/tester` : userInfo?.isAdmin ? `/admin/orders`: `/myorders`
+                }
                 // to={`/profile/${userInfo.username}`}
                 // to="/tester"
                 // to="/testcomponent"
