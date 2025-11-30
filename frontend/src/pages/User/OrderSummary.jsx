@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { X, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,10 +14,23 @@ const OrderSummary = ({
 }) => {
   const navigate = useNavigate();
   if (!isOpen) return null;
+  const [donePressed, setDonePressed] = useState(false);
 
   const handleDone = () => {
-    navigate("/myorders");
+    if (donePressed) return; // prevent duplicate trigger
+
+    setDonePressed(true);
+    onClose?.(); // closes modal
+    navigate("/myorders"); // redirect safely
   };
+
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === "Enter") handleDone();
+    };
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [donePressed]);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -26,9 +39,7 @@ const OrderSummary = ({
         <button
           className="absolute top-4 right-4 text-gray-400 hover:text-emerald-600 transition"
           onClick={onClose}
-        >
-          
-        </button>
+        ></button>
 
         {/* Header with icon */}
         <div className="text-center mb-6">
@@ -137,9 +148,15 @@ const OrderSummary = ({
         <div className="mt-8 flex justify-center">
           <button
             onClick={handleDone}
-            className="px-8 py-3 rounded-full bg-emerald-500 text-white font-semibold hover:bg-emerald-600 shadow-lg hover:shadow-emerald-200 transition transform hover:-translate-y-0.5"
+            disabled={donePressed}
+            className={`px-8 py-3 rounded-full text-white font-semibold shadow-lg transition
+    ${
+      donePressed
+        ? "bg-gray-300 cursor-not-allowed"
+        : "bg-emerald-500 hover:bg-emerald-600 hover:shadow-emerald-200"
+    }`}
           >
-            Done
+            {donePressed ? "Processing..." : "Done"}
           </button>
         </div>
       </div>

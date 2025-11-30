@@ -117,7 +117,7 @@ const Checkout = () => {
     shipping: totalShipping, // keep as number
     tax, // number
     total, // number
-    phone:address.phone,
+    phone: address.phone,
   };
 
   useEffect(() => {
@@ -145,18 +145,23 @@ const Checkout = () => {
     }
   };
 
+  const [orderProcessing, setOrderProcessing] = useState(false);
+
   const HandleOrder = async () => {
+    if (orderProcessing) return; // ⛔ stops duplicate orders
+    setOrderProcessing(true);
+
     try {
       const res = await createOrder(data).unwrap();
       if (res.error) {
         toast.error(res.error.message);
+        setOrderProcessing(false);
         return;
       }
 
-      setOrderData(res); // store full order details
+      setOrderData(res);
       toast.success("Order placed!");
 
-      // ✅ DELETE SELECTED ITEMS FROM CART
       await clearSelectedItems();
 
       if (selectedPayment === "esewa") {
@@ -164,10 +169,12 @@ const Checkout = () => {
           amount: total,
           productId: res._id,
         }).unwrap();
+
         if (payment?.url) window.location.href = payment.url;
       }
     } catch (err) {
       toast.error(err?.message || "Order failed");
+      setOrderProcessing(false); // allow retry
     }
   };
 
@@ -388,7 +395,7 @@ const Checkout = () => {
           {orderData && orderData.payment?.method !== "esewa" && (
             <OrderSummary
               isOpen={true}
-              onClose={() => navigate("/myorders")}
+              onClose={() => setOrderData(null)}
               orderId={orderData._id}
               products={orderData.orderItems.map((item) => {
                 const foundProduct = products?.find(
