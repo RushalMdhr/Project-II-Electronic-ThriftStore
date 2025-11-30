@@ -48,11 +48,17 @@ const Profile = () => {
       <section className="px-4 pt-4">
         {/* Cover Image */}
         <div className="relative rounded-3xl overflow-hidden shadow-md">
-          <img
-            src={user.coverImage || "/uploads/cover/default.png"}
-            alt="Cover"
-            className="w-full h-56 md:h-72 object-cover"
-          />
+          {user?.isVendor ? (
+            // ---- Vendor: Show actual cover image ----
+            <img
+              src={user.coverImage || "/uploads/cover/default.png"}
+              alt="Cover"
+              className="w-full h-56 md:h-72 object-cover"
+            />
+          ) : (
+            // ---- Non-vendor: Show a pattern background ----
+            <div className="w-full h-56 md:h-72 bg-[radial-gradient(circle_at_20%_20%,#d1fae5,transparent),radial-gradient(circle_at_80%_80%,#a7f3d0,transparent),radial-gradient(circle_at_50%_50%,#f0fdfa,transparent)]"></div>
+          )}
         </div>
 
         {/* Profile Area */}
