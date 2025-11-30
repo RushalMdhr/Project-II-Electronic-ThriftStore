@@ -91,25 +91,13 @@ const Profile = () => {
             {/* RIGHT SIDE BADGES */}
             <div className="flex flex-col gap-3">
               <div className="flex gap-3 items-center">
-                {/* Admin Badge */}
-                <span className="w-20 h-20 flex items-center justify-center rounded-full bg-purple-600 text-white text-sm font-bold shadow-md">
-                  A
-                </span>
-
-                {/* Vendor Badge */}
-                <span className="w-20 h-20 flex items-center justify-center rounded-full bg-blue-500 text-white text-sm font-bold shadow-md">
-                  V
-                </span>
-
-                {/* Sales Badge */}
-                <span className="w-20 h-20 flex items-center justify-center rounded-full bg-yellow-500 text-white text-base font-bold shadow-md">
-                  ⭐
-                </span>
-
-                {/* Blacklist Badge */}
-                <span className="w-20 h-20 flex items-center justify-center rounded-full bg-red-500 text-white text-sm font-bold shadow-md">
-                  !
-                </span>
+                {/* SALES BADGE */}
+                <div
+                  className="w-20 h-20 flex items-center justify-center rounded-full shadow-md 
+      bg-yellow-500 text-white font-bold"
+                >
+                  {user.sales ? `${user.sales} Sales` : "No Sales"}
+                </div>
               </div>
             </div>
           </div>
