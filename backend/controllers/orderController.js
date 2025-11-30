@@ -587,20 +587,13 @@ const deleteErrorOrder = asyncHandler(async (req, res) => {
   );
 
   //______________ to update shipped to delivered and update vendor income _____________________
-  const orders = await Order.find({
-    status: "shipped",
-    // expiresAt: { $lt: new Date() },
-  });
+  const orders = await Order.find({ status: "shipped" });
 
   for (const order of orders) {
     // Update order status
-    // await Order.findByIdAndUpdate(order._id, {
-    //   $set: { status: "delivered" },
-    //   $set: { deliveredAt: new Date() },
-    // });
     order.status = "delivered";
     order.deliveredAt = new Date();
-    if(order.payment.method==="cod" && order.payment.status!=="pending"){
+    if (order.payment.method === "cod" && order.payment.status === "pending") {
       order.payment.status = "paid";
     }
     await order.save();
@@ -611,14 +604,22 @@ const deleteErrorOrder = asyncHandler(async (req, res) => {
       const pending = item.price * item.quantity - commission;
 
       const user = await User.findById(item.vendor);
+      if (!user) continue;
+
       if (!user.income?.lastPaid) {
         await User.findByIdAndUpdate(item.vendor, {
-          $inc: { "income.pending": pending },
+          $inc: {
+            "income.pending": pending,
+            sales: 1,
+          },
           $set: { "income.lastPaid": new Date() },
         });
       } else {
         await User.findByIdAndUpdate(item.vendor, {
-          $inc: { "income.pending": pending },
+          $inc: {
+            "income.pending": pending,
+            sales: 1,
+          },
         });
       }
     }

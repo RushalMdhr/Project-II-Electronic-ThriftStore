@@ -10,8 +10,10 @@ export const getAdminSummary = async (req, res) => {
     const products = await Product.countDocuments();
 
     const orders = await Order.find().populate("customer", "email").lean();
+    
+    // Calculate total revenue from adminRevenue field
     const revenue = orders.reduce(
-      (acc, order) => acc + (order.totalPrice ?? 0),
+      (acc, order) => acc + (order.adminRevenue ?? 0), // Use adminRevenue instead of totalPrice
       0
     );
 
@@ -24,7 +26,7 @@ export const getAdminSummary = async (req, res) => {
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
-          total: { $sum: "$totalPrice" },
+          total: { $sum: "$adminRevenue" }, // Sum adminRevenue instead of totalPrice
         },
       },
       { $sort: { _id: 1 } },
@@ -50,7 +52,7 @@ export const getAdminSummary = async (req, res) => {
       vendors,
       products,
       revenue,
-      orders,
+      orders: orders.length, // Send count instead of all orders
       salesData,
       userGrowthData,
     });
