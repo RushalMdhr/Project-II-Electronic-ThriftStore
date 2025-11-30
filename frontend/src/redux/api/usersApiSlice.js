@@ -68,7 +68,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
     }),
 
     updateUser: builder.mutation({
-      query: ({userId,...body}) => ({
+      query: ({ userId, ...body }) => ({
         url: `${USERS_URL}/${userId}`,
         method: "PUT",
         body,
@@ -88,7 +88,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
         url: `${USERS_URL}/profile`,
         method: "GET",
       }),
-  }),
+    }),
+    becomeAdmin: builder.mutation({
+      query: () => ({
+        url : `${USERS_URL}/become-admin`,
+        method: "POST",
+      })
+    })
   }),
 });
 
@@ -104,8 +110,7 @@ export const {
   useMakeVendorMutation,
   useGetPendingPaymentVendorsQuery,
   useGetCurrentUserQuery,
-
-
+  useBecomeAdminMutation,
 } = userApiSlice;
 // http://localhost:5000/api/users/auth
 // we ll request to this url

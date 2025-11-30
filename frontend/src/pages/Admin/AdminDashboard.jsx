@@ -2,6 +2,7 @@ import { useGetAdminSummaryQuery } from "../../redux/api/adminApiSlice.js";
 import StatCard from "../../components/Admin/StatCard";
 import DashboardChart from "../../components/Admin/DashboardChart";
 import OrderList from "../../components/Admin/OrderList";
+import LoadingScreen from "../../components/ui/Loading.jsx";
 
 const AdminDashboard = () => {
   const { data: summary, isLoading, error } = useGetAdminSummaryQuery();
@@ -15,7 +16,7 @@ const AdminDashboard = () => {
           <h2 className="text-3xl font-semibold mb-6">Admin Dashboard</h2>
 
           {isLoading ? (
-            <p className="text-gray-400">Loading...</p>
+            <LoadingScreen/>
           ) : error ? (
             <p className="text-red-500">Error fetching data</p>
           ) : (

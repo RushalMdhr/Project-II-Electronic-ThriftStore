@@ -109,7 +109,7 @@ const Navbar = () => {
               </Link>
               <Link
                 to={
-                  userInfo?.isVendor ? `/tester` : userInfo?.isAdmin ? `/admin/orders`: `/myorders`
+                  userInfo?.isVendor ? `/tester` : userInfo?.isAdmin ? `/admin/orders`: `/become-admin`
                 }
                 // to={`/profile/${userInfo.username}`}
                 // to="/tester"
