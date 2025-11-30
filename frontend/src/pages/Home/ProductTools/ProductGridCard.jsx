@@ -1,12 +1,13 @@
 // import { Heart, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AddToCart from "../../User/Cart/AddToCart";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setRole } from "../../../redux/features/auth/authSlice"
 
 const ProductGridCard = ({ products }) => {
   const { userInfo } = useSelector((state) => state.auth);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();  
   const handleEdit = (product) => {
     navigate("/vendor/upload", { state: { product } });
   };
@@ -116,7 +117,11 @@ const ProductGridCard = ({ products }) => {
                     userInfo._id === product.uploadedBy?.toString()) ? (
                   // Uploader: Edit button
                   <button
-                    onClick={() => handleEdit(product)}
+                    onClick={() => { handleEdit(product);
+                      dispatch(setRole("seller"));
+                    }
+                   }
+                    
                     className="w-full px-4 py-2 rounded-lg mt-2 font-medium transition-all duration-200 bg-gradient-to-r from-yellow-500 to-orange-400 text-white hover:from-yellow-600 hover:to-orange-500 shadow-md hover:shadow-orange-400/40"
                   >
                     Edit My Product

@@ -77,6 +77,7 @@ const CategoryManagement = () => {
     ...cat,
     productCount: cat.used || 0,
   }));
+  
 
   const chartSeries = categoriesWithCount.map((cat) => cat.productCount);
   const chartLabels = categoriesWithCount.map((cat) => cat.name);
