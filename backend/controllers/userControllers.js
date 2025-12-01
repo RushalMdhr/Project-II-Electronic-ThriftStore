@@ -238,6 +238,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     const {
       shopName,
       shopDescription,
+      phoneNumber,
       username,
       address: addressString,
     } = req.body;
@@ -251,6 +252,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
         console.error("Error parsing address:", error);
       }
     }
+    console.log('address : ',address)
 
     // Handle file uploads - they will be in req.files
     const profilePicFile = req.files?.profilePic?.[0];
@@ -268,7 +270,8 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
         district: address.district || user.shippingAddress?.district || "",
         city: address.city || user.shippingAddress?.city || "",
         street: address.street || user.shippingAddress?.street || "",
-        phone: user.shippingAddress?.phone || "",
+        phone: phoneNumber || user.shippingAddress?.phone || "",
+        zipCode: address.zipcode || user.shippingAddress?.zipCode || "",
       };
     }
 
@@ -327,27 +330,32 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
 
 // Create or update vendor shop details and set isVendor to true
 const updateVendorShop = asyncHandler(async (req, res) => {
-  console.log('here i m be vendor')
+  console.log("here i m be vendor");
   const user = await User.findById(req.user._id);
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
-  const { shopName, shopDescription,shopAddress,phone } = req.body;
-  console.log('here i m',shopName, shopDescription,shopAddress,phone,req.body)
+  const { shopName, shopDescription, shopAddress, phone } = req.body;
+  console.log(
+    "here i m",
+    shopName,
+    shopDescription,
+    shopAddress,
+    phone,
+    req.body
+  );
   if (!shopName || !shopDescription || !shopAddress || !phone) {
-    return res
-      .status(400)
-      .json({ message: "Please fill all the field" });
+    return res.status(400).json({ message: "Please fill all the field" });
   }
-  
+
   user.shopName = shopName;
   user.shopDescription = shopDescription;
   user.shippingAddress = {
-    province : shopAddress.province || "Bagmati",
-    district : shopAddress.district || "",
-    city : shopAddress.city || "",
-    phone : phone || "",
-  }
+    province: shopAddress.province || "Bagmati",
+    district: shopAddress.district || "",
+    city: shopAddress.city || "",
+    phone: phone || "",
+  };
   user.shopDescription = shopDescription;
   user.isVendor = true;
   await user.save();
