@@ -10,12 +10,13 @@ import LoadingScreen from "../../components/ui/Loading";
 const UpdateProfile = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
-  const { data: userDetails } = useGetUserDetailsQuery(userInfo?._id);
+  const {  data : userDetails } = useGetUserDetailsQuery(userInfo?._id);
 
   const [username, setUsername] = useState("");
   const [shopName, setShopName] = useState("");
   const [shopDescription, setShopDescription] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [profilePicFile, setProfilePicFile] = useState(userDetails?.profilePic || null);
   const [profilePicPreview, setProfilePicPreview] = useState("");
   const [coverPicFile, setCoverPicFile] = useState(null);
@@ -26,6 +27,7 @@ const UpdateProfile = () => {
   const [district, setDistrict] = useState(userDetails?.shippingAddress?.district ||"");
   const [city, setCity] = useState(userDetails?.shippingAddress?.city || "");
   const [street, setStreet] = useState(userDetails?.shippingAddress?.street || "");
+  const [zipcode, setZipcode] = useState(userDetails?.shippingAddress?.zipcode || "");
 
   const [updateProfile, { isLoading }] = useProfileMutation();
 
@@ -60,11 +62,13 @@ const UpdateProfile = () => {
       setCoverPicPreview(userDetails.coverPic || "");
       
       // Set address fields
-      if (userDetails.address) {
-        setProvince(userDetails.address.province || "Bagmati");
-        setDistrict(userDetails.address.district || "");
-        setCity(userDetails.address.city || "");
-        setStreet(userDetails.address.street || "");
+      if (userDetails.shippingAddress) {
+        setPhoneNumber(userDetails?.shippingAddress?.phone || "");
+        setProvince(userDetails?.shippingAddress?.province || "Bagmati");
+        setDistrict(userDetails?.shippingAddress?.district || "");
+        setCity(userDetails?.shippingAddress?.city || "");
+        setStreet(userDetails?.shippingAddress?.street || "");
+        setZipcode(userDetails?.shippingAddress?.zipCode || "");
       }
     }
   }, [userDetails]);
@@ -104,6 +108,7 @@ const UpdateProfile = () => {
     try {
       const formData = new FormData();
       formData.append('username', username);
+      formData.append('phoneNumber', phoneNumber);
       
       if (profilePicFile) {
         formData.append('profilePic', profilePicFile);
@@ -114,7 +119,8 @@ const UpdateProfile = () => {
         province: province,
         district: district,
         city: city,
-        street: street
+        street: street,
+        zipcode: zipcode
       };
       formData.append('address', JSON.stringify(address));
 
@@ -167,6 +173,20 @@ const UpdateProfile = () => {
                 value={email}
                 readOnly
                 className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg cursor-not-allowed opacity-80 text-base"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-lg font-semibold text-gray-800 mb-2">
+                Phone Number *
+              </label>
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+                placeholder="Enter your phone number"
+                className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
               />
             </div>
             
@@ -258,6 +278,20 @@ const UpdateProfile = () => {
                 onChange={(e) => setStreet(e.target.value)}
                 required
                 placeholder="Enter your street address"
+                className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-lg font-semibold text-gray-800 mb-2">
+                ZIP Code *
+              </label>
+              <input
+                type="text"
+                value={zipcode}
+                onChange={(e) => setZipcode(e.target.value)}
+                required
+                placeholder="Enter ZIP code"
                 className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
               />
             </div>
