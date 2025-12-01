@@ -277,7 +277,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
 
     // Handle profile picture (all users)
     if (profilePicFile) {
-      user.profilePic = profilePicFile.path; // e.g., "uploads/profile/profile-123456.jpg"
+      user.profilePic = profilePicFile.path.replace(/\\/g, "/");
     }
 
     // Handle vendor-specific updates
@@ -287,7 +287,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
 
       // Handle cover picture (vendors only)
       if (coverPicFile) {
-        user.coverPic = coverPicFile.path; // e.g., "uploads/cover/cover-123456.jpg"
+        user.coverPic = coverPicFile.path.replace(/\\/g, "/");
       }
     }
 
@@ -304,7 +304,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
         ...(updatedUser.isVendor && {
           shopName: updatedUser.shopName,
           shopDescription: updatedUser.shopDescription,
-          CoverPic: updatedUser.CoverPic,
+          coverPic: updatedUser.coverPic,
         }),
       },
     });

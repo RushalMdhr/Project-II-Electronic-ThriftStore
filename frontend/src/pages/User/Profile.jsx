@@ -26,7 +26,7 @@ const Profile = () => {
   } = useGetUserDetailsQuery(userId, {
     skip: !userId,
   });
-
+  console.log("Profile", user);
   // Fetch user's products
   const {
     data: myProducts,
@@ -47,17 +47,51 @@ const Profile = () => {
       {/* ---------- COVER + AVATAR SECTION ---------- */}
       <section className="px-4 pt-4">
         {/* Cover Image */}
-        <div className="relative rounded-3xl overflow-hidden shadow-md">
+        <div className="relative rounded-3xl border-1 border-emerald-600 overflow-hidden shadow-md">
           {user?.isVendor ? (
             // ---- Vendor: Show actual cover image ----
             <img
-              src={user.coverImage || "/uploads/cover/default.png"}
+              src={
+                `http://localhost:5000/${user.coverPic}` ||
+                "/uploads/cover/default.png"
+              }
               alt="Cover"
               className="w-full h-56 md:h-72 object-cover"
             />
           ) : (
             // ---- Non-vendor: Show a pattern background ----
-            <div className="w-full h-56 md:h-72 bg-[radial-gradient(circle_at_20%_20%,#d1fae5,transparent),radial-gradient(circle_at_80%_80%,#a7f3d0,transparent),radial-gradient(circle_at_50%_50%,#f0fdfa,transparent)]"></div>
+            <Link to="/vendor/register">
+              <div
+                className="relative w-full h-56 md:h-72 
+    bg-gray-200 
+    bg-[linear-gradient(to_right,rgba(0,0,0,0.05)_1px,transparent_1px),
+        linear-gradient(to_bottom,rgba(0,0,0,0.05)_1px,transparent_1px)]
+    bg-[size:40px_40px]"
+              >
+                <button
+                  className="absolute bottom-4 right-4 flex items-center gap-2 
+             px-5 py-2.5 bg-emerald-600 text-white font-medium 
+             rounded-xl shadow-md hover:bg-emerald-700 
+             transition-all duration-200 active:scale-95"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 9l1-5h16l1 5M4 9h16v11H4V9z"
+                    />
+                  </svg>
+                  Be a Seller
+                </button>
+              </div>
+            </Link>
           )}
         </div>
 
@@ -66,9 +100,12 @@ const Profile = () => {
           <div className="flex items-center gap-6 ml-[20%]">
             {/* Profile Image */}
             <img
-              src={user.profileImage || "/uploads/profile/default.png"}
+              src={
+                `http://localhost:5000/${user.profilePic}` ||
+                "/uploads/profile/default.png"
+              }
               alt={user.username}
-              className="w-40 h-40 rounded-full ring-4 ring-white shadow-2xl object-cover"
+              className="w-40 h-40 rounded-full ring-4 ring-emerald-600 shadow-2xl object-cover"
             />
 
             {/* LEFT COLUMN – Username / Email / Vendor Badge / Edit */}
@@ -97,12 +134,30 @@ const Profile = () => {
             {/* RIGHT SIDE BADGES */}
             <div className="flex flex-col gap-3">
               <div className="flex gap-3 items-center">
-                {/* SALES BADGE */}
                 <div
-                  className="w-20 h-20 flex items-center justify-center rounded-full shadow-md 
-      bg-yellow-500 text-white font-bold"
+                  key={user.sales} // re-triggers animation on change
+                  className="
+    absolute
+    w-24 h-24
+    grid place-content-center
+    bg-gradient-to-br from-emerald-500 to-emerald-400
+    rounded-full
+    text-white
+    font-bold
+    text-xs
+    shadow-xl
+    border-4 border-emerald-200/80
+    animate-pulse origin-bottom-left
+  "
+                  style={{
+                    animationIterationCount: 1,
+                    animationDuration: ".5s",
+                  }}
                 >
-                  {user.sales ? `${user.sales} Sales` : "No Sales"}
+                  <div className="text-center leading-tight">
+                    <div className="text-2xl">{user.sales}</div>
+                    <div className="opacity-80">sales</div>
+                  </div>
                 </div>
               </div>
             </div>
