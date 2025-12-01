@@ -147,7 +147,7 @@ const Profile = () => {
     text-xs
     shadow-xl
     border-4 border-emerald-200/80
-    animate-bounce origin-bottom-left
+    animate-pulse origin-bottom-left
   "
                   style={{
                     animationIterationCount: 1,
