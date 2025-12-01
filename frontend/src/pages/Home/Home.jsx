@@ -40,7 +40,7 @@ const Home = () => {
       {!isAdmin && !isVendorSeller && (
         <>
           <ShopByCategories />
-          <div className="text-center mb-12">
+          <div className="text-center mb-12 mt-20">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Trending Thrift Finds
             </h2>
@@ -50,7 +50,7 @@ const Home = () => {
             </p>
           </div>
           <ProductGrid products={topProducts} />
-          <div className="text-center mt-12">
+          <div className="text-center mt-12 mb-10">
             <Link to="/products">
               <button className="px-8 py-3 border-2 border-emerald-600 text-emerald-600 rounded-full hover:bg-emerald-50 transition-colors font-medium">
                 View All Products
