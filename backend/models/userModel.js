@@ -34,11 +34,7 @@ const userSchema = mongoose.Schema(
 
     shippingAddress: {
       street: String,
-      city: {
-        type: String,
-        default: "Bhaktapur",
-        // required: true,
-      },
+      city: String,
       district: {
         type: String,
         enum: ["Kathmandu", "Lalitpur", "Bhaktapur", "Kavrepalanchok"],
@@ -55,14 +51,9 @@ const userSchema = mongoose.Schema(
           "Sudurpashchim",
         ],
         default: "Bagmati",
-        // required: true,
       },
       zipCode: String,
-      // country: String,
-      phone: {
-        type: String,
-        // required: true
-      },
+      phone: String,
     },
 
     shopName: {

@@ -284,7 +284,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
 
       // Handle cover picture (vendors only)
       if (coverPicFile) {
-        user.CoverPic = coverPicFile.path; // e.g., "uploads/cover/cover-123456.jpg"
+        user.coverPic = coverPicFile.path; // e.g., "uploads/cover/cover-123456.jpg"
       }
     }
 
@@ -327,17 +327,27 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
 
 // Create or update vendor shop details and set isVendor to true
 const updateVendorShop = asyncHandler(async (req, res) => {
+  console.log('here i m be vendor')
   const user = await User.findById(req.user._id);
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
-  const { shopName, shopDescription } = req.body;
-  if (!shopName || !shopDescription) {
+  const { shopName, shopDescription,shopAddress,phone } = req.body;
+  console.log('here i m',shopName, shopDescription,shopAddress,phone,req.body)
+  if (!shopName || !shopDescription || !shopAddress || !phone) {
     return res
       .status(400)
-      .json({ message: "Shop name and description are required" });
+      .json({ message: "Please fill all the field" });
   }
+  
   user.shopName = shopName;
+  user.shopDescription = shopDescription;
+  user.shippingAddress = {
+    province : shopAddress.province || "Bagmati",
+    district : shopAddress.district || "",
+    city : shopAddress.city || "",
+    phone : phone || "",
+  }
   user.shopDescription = shopDescription;
   user.isVendor = true;
   await user.save();
