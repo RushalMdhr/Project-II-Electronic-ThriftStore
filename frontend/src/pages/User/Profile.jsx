@@ -2,15 +2,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import Tabs from "../../components/Product/Tabs";
 import {
-  useGetCurrentUserQuery,
   useGetUserDetailsQuery,
 } from "../../redux/api/usersApiSlice";
-import { setCredentials } from "../../redux/features/auth/authSlice";
-import { useEffect } from "react";
 import ProductGrid from "../Home/ProductTools/ProductGrid";
 import { useParams } from "react-router-dom";
 import { useGetMyProductsQuery } from "../../redux/api/productsApiSlice";
 import VendorReviewList from "../../components/VendorReviewList";
+import LoadingScreen from "../../components/ui/Loading";
 const Profile = () => {
   const { id: userId } = useParams();
   const { userInfo } = useSelector((state) => state.auth);
@@ -36,8 +34,37 @@ const Profile = () => {
     skip: !userId,
   });
 
+  const getBadgeClass = (sales) => {
+    if (sales >= 30) {
+      return `
+        bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500
+        border-yellow-300/70
+        animate-pulse
+        shadow-yellow-500/30
+      `;
+    } else if (sales >= 15) {
+      return `
+        bg-gradient-to-br from-purple-500 to-pink-500
+        border-purple-300/70
+        animate-pulse
+        shadow-purple-500/30
+      `;
+    } else if (sales >= 10) {
+      return `
+        bg-gradient-to-br from-blue-500 to-teal-400
+        border-blue-300/70
+        shadow-blue-500/30
+      `;
+    } else {
+      return `
+        bg-gradient-to-br from-emerald-500 to-emerald-400
+        border-emerald-300/70
+      `;
+    }
+  };
+
   // Handle loading
-  if (userLoading) return <p>Loading...</p>;
+  if (userLoading) return <LoadingScreen color="emerald"  text="user loading..." />;
 
   // Handle error (user not found)
   if (userError || !user) return <p>User not found</p>;
@@ -133,31 +160,33 @@ const Profile = () => {
 
             {/* RIGHT SIDE BADGES */}
             <div className="flex flex-col gap-3">
-              <div className="flex gap-3 items-center">
+              <div className="relative">
+                {/* Dynamic Badge Based on Sales */}
                 <div
-                  key={user.sales} // re-triggers animation on change
-                  className="
-    absolute
-    w-24 h-24
-    grid place-content-center
-    bg-gradient-to-br from-emerald-500 to-emerald-400
-    rounded-full
-    text-white
-    font-bold
-    text-xs
-    shadow-xl
-    border-4 border-emerald-200/80
-    animate-pulse origin-bottom-left
-  "
-                  style={{
-                    animationIterationCount: 1,
-                    animationDuration: ".5s",
-                  }}
+                  key={user.sales}
+                  className={`
+        w-24 h-24
+        grid place-content-center
+        rounded-full
+        text-white
+        font-bold
+        shadow-2xl
+        border-4
+        transform transition-all duration-500
+        ${getBadgeClass(user.sales)}
+      `}
                 >
                   <div className="text-center leading-tight">
                     <div className="text-2xl">{user.sales}</div>
-                    <div className="opacity-80">sales</div>
+                    <div className="opacity-80 text-xs">sales</div>
                   </div>
+
+                  {/* Legendary Crown for 30+ */}
+                  {user.sales >= 30 && (
+                    <div className="absolute -top-2 -right-2 text-yellow-400 animate-bounce">
+                      👑
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
