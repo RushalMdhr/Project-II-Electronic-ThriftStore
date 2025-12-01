@@ -447,10 +447,10 @@ const ManageOrders = () => {
                                       <div className="mt-2 flex items-center space-x-4 text-sm text-gray-300">
                                         <span>Qty: {item.quantity}</span>
                                         <span>
-                                          Price: ${item.price?.toFixed(2)}
+                                          Price: Rs. {item.price?.toFixed(2)}
                                         </span>
                                         <span className="font-medium text-white">
-                                          Total: $
+                                          Total: Rs.{" "}
                                           {(
                                             item.quantity * item.price
                                           )?.toFixed(2)}
@@ -492,26 +492,26 @@ const ManageOrders = () => {
                               <div className="flex justify-between text-sm">
                                 <span className="text-gray-300">Subtotal:</span>
                                 <span className="font-medium">
-                                  ${order.subtotal?.toFixed(2)}
+                                  Rs. {order.subtotal?.toFixed(2)}
                                 </span>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span className="text-gray-300">Shipping:</span>
                                 <span className="font-medium">
-                                  ${order.shipping?.toFixed(2)}
+                                  Rs. {order.shipping?.toFixed(2)}
                                 </span>
                               </div>
                               <div className="flex justify-between text-sm">
                                 <span className="text-gray-300">Tax:</span>
                                 <span className="font-medium">
-                                  ${order.tax?.toFixed(2)}
+                                  Rs. {order.tax?.toFixed(2)}
                                 </span>
                               </div>
                               <div className="border-t border-gray-700 pt-3">
                                 <div className="flex justify-between text-base font-bold">
                                   <span>Total:</span>
                                   <span className="text-emerald-400">
-                                    ${order.total?.toFixed(2)}
+                                    Rs. {order.total?.toFixed(2)}
                                   </span>
                                 </div>
                               </div>
