@@ -100,7 +100,7 @@ const userSchema = mongoose.Schema(
       default: Date.now,
     },
     profilePic: String,
-    CoverPic: String,
+    coverPic: String,
   },
   {
     timestamps: true, //when we create or delete a user it will give the specific time

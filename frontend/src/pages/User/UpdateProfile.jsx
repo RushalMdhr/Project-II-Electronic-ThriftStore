@@ -16,16 +16,16 @@ const UpdateProfile = () => {
   const [shopName, setShopName] = useState("");
   const [shopDescription, setShopDescription] = useState("");
   const [email, setEmail] = useState("");
-  const [profilePicFile, setProfilePicFile] = useState(null);
+  const [profilePicFile, setProfilePicFile] = useState(userDetails?.profilePic || null);
   const [profilePicPreview, setProfilePicPreview] = useState("");
   const [coverPicFile, setCoverPicFile] = useState(null);
   const [coverPicPreview, setCoverPicPreview] = useState("");
   
   // Address state
-  const [province, setProvince] = useState("Bagmati");
-  const [district, setDistrict] = useState("");
-  const [city, setCity] = useState("");
-  const [street, setStreet] = useState("");
+  const [province, setProvince] = useState( userDetails?.shippingAddress?.province || "Bagmati");
+  const [district, setDistrict] = useState(userDetails?.shippingAddress?.district ||"");
+  const [city, setCity] = useState(userDetails?.shippingAddress?.city || "");
+  const [street, setStreet] = useState(userDetails?.shippingAddress?.street || "");
 
   const [updateProfile, { isLoading }] = useProfileMutation();
 
