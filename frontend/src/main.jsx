@@ -56,6 +56,7 @@ import OrderCheckUp from "./pages/Delivery/OrderCheckUp.jsx";
 import VendorPayments from "./pages/Admin/VendorPayments.jsx";
 import ReviewList from "./components/Admin/ReviewList.jsx";
 import TransactionHistoryAdmin from "./pages/Admin/TransactionList.jsx";
+import BecomeAdmin from "./pages/Auth/BecomeAdmin.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -85,6 +86,7 @@ const router = createBrowserRouter(
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/become-admin" element={<BecomeAdmin />} />
       <Route path="/aboutus" element={<AboutUs />} />
       <Route path="/products" element={<Products />} />
       <Route path="/contactus" element={<ContactUs />} />

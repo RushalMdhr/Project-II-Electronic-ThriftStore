@@ -101,7 +101,7 @@ const AdminLayout = () => {
   `}
             title="Reviews"
           >
-            <i className="ri-folders-line text-2xl"></i>
+            <i className="ri-chat-1-line text-2xl"></i>
             {!collapsed && <span>Reviews</span>}
           </Link>
 
@@ -113,7 +113,8 @@ const AdminLayout = () => {
   `}
             title="Manage Categories"
           >
-            <i className="ri-folders-line text-2xl"></i>
+            <i className="ri-time-line text-2xl"></i>
+
             {!collapsed && <span>Pending Payments</span>}
           </Link>
           <Link
@@ -124,7 +125,8 @@ const AdminLayout = () => {
   `}
             title="Transaction Histry"
           >
-            <i className="ri-folders-line text-2xl"></i>
+            <i className="ri-file-list-3-line text-2xl"></i>
+
             {!collapsed && <span>Transaction Histry</span>}
           </Link>
         </nav>

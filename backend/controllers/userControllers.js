@@ -99,7 +99,6 @@ const loginUser = asyncHandler(async (req, res) => {
     createToken(res, exitingUser._id);
 
     res.status(200).json(formatUserResponse(exitingUser));
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -213,25 +212,116 @@ export const updateUserById = asyncHandler(async (req, res) => {
   });
 });
 
+const becomeAdmin = asyncHandler(async (req, res) => {
+  const userNumber = await User.countDocuments({ isAdmin: true });
+  if (!userNumber) {
+    const user = await User.findById(req.user._id);
+    if (user.isVendor) {
+      return res.status(400).json({ message: "Vendors cannot become admins" });
+    }
+    user.isAdmin = true;
+    await user.save();
+    return res.status(200).json({ message: "You are now an admin" });
+  } else {
+    return res.status(200).json({ message: "request is under review" });
+    // return res.status(400).json({message:"An admin already exists"});
+  }
+});
+
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
-      return res.status(404).send("user not found");
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // const updates = req.body
-    const { shopName, shopDescription, username } = req.body;
+    const {
+      shopName,
+      shopDescription,
+      username,
+      address: addressString,
+    } = req.body;
 
+    // Parse address from string to object
+    let address = {};
+    if (addressString) {
+      try {
+        address = JSON.parse(addressString);
+      } catch (error) {
+        console.error("Error parsing address:", error);
+      }
+    }
+
+    // Handle file uploads - they will be in req.files
+    const profilePicFile = req.files?.profilePic?.[0];
+    const coverPicFile = req.files?.coverPic?.[0];
+
+    // Update basic fields
     if (username !== undefined) user.username = username;
-    if (shopName !== undefined) user.shopName = shopName;
-    if (shopDescription !== undefined) user.shopDescription = shopDescription;
+
+    // Update address fields
+    if (address) {
+      user.shippingAddress = {
+        ...user.shippingAddress,
+        province:
+          address.province || user.shippingAddress?.province || "Bagmati",
+        district: address.district || user.shippingAddress?.district || "",
+        city: address.city || user.shippingAddress?.city || "",
+        street: address.street || user.shippingAddress?.street || "",
+        phone: user.shippingAddress?.phone || "",
+      };
+    }
+
+    // Handle profile picture (all users)
+    if (profilePicFile) {
+      user.profilePic = profilePicFile.path; // e.g., "uploads/profile/profile-123456.jpg"
+    }
+
+    // Handle vendor-specific updates
+    if (user.isVendor) {
+      if (shopName !== undefined) user.shopName = shopName;
+      if (shopDescription !== undefined) user.shopDescription = shopDescription;
+
+      // Handle cover picture (vendors only)
+      if (coverPicFile) {
+        user.CoverPic = coverPicFile.path; // e.g., "uploads/cover/cover-123456.jpg"
+      }
+    }
 
     const updatedUser = await user.save();
-    res.status(200).send({ message: "user details updated sucessfully !" });
-    console.log("updated", updatedUser);
+
+    res.status(200).json({
+      message: "Profile updated successfully!",
+      user: {
+        _id: updatedUser._id,
+        username: updatedUser.username,
+        profilePic: updatedUser.profilePic,
+        shippingAddress: updatedUser.shippingAddress,
+        isVendor: updatedUser.isVendor,
+        ...(updatedUser.isVendor && {
+          shopName: updatedUser.shopName,
+          shopDescription: updatedUser.shopDescription,
+          CoverPic: updatedUser.CoverPic,
+        }),
+      },
+    });
   } catch (error) {
-    return res.status(500).send("internal server error");
+    console.error("Profile update error:", error);
+
+    // Handle multer errors specifically
+    if (error.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        message: "File too large. Profile max 5MB, Cover max 10MB",
+      });
+    }
+
+    if (error.message.includes("Only image files")) {
+      return res.status(400).json({
+        message: "Only image files (JPEG, PNG, WebP, GIF) are allowed",
+      });
+    }
+
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -264,7 +354,7 @@ const updateVendorShop = asyncHandler(async (req, res) => {
 const getCurrentUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
   if (user) {
-     res.status(200).json(formatUserResponse(user));
+    res.status(200).json(formatUserResponse(user));
   } else {
     res.status(404);
     throw new Error("user not found");
@@ -274,7 +364,7 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
 const getPendingPaymentUsers = asyncHandler(async (req, res) => {
   const users = await User.find({
     "income.pending": { $gt: 0 },
-    "income.lastPaid": { $lt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) },
+    "income.lastPaid": { $lt: new Date(Date.now() - 0 * 24 * 60 * 60 * 1000) },
   }).select("username email shopName status income shippingAddress");
   res.status(200).json(users);
 });
@@ -288,4 +378,5 @@ export {
   updateVendorShop,
   getCurrentUserProfile,
   getPendingPaymentUsers,
+  becomeAdmin,
 };

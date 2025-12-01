@@ -1,27 +1,48 @@
 import express from "express";
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
-import { createUser, loginUser, logout, deleteUser, getAllUsers, updateCurrentUserProfile, getUserById, updateUserById, updateVendorShop, getCurrentUserProfile, getPendingPaymentUsers } from "../controllers/userControllers.js";
+import {
+  createUser,
+  loginUser,
+  logout,
+  deleteUser,
+  getAllUsers,
+  updateCurrentUserProfile,
+  getUserById,
+  updateUserById,
+  updateVendorShop,
+  getCurrentUserProfile,
+  getPendingPaymentUsers,
+  becomeAdmin,
+} from "../controllers/userControllers.js";
+import { uploadBothPics, uploadSingle } from "../middlewares/multer.js";
 // router using
 const router = express.Router();
 
-router.route("/")
-    .get(authenticate, authorizeAdmin, getAllUsers)
-    .post(createUser)
+router
+  .route("/")
+  .get(authenticate, authorizeAdmin, getAllUsers)
+  .post(createUser);
 
-router.route("/login").post(loginUser)
-router.route("/logout").post(authenticate, logout)
+router.route("/login").post(loginUser);
+router.route("/logout").post(authenticate, logout);
+router.route("/become-admin").post(authenticate, becomeAdmin);
 router.route("/vendor/shop").post(authenticate, updateVendorShop);
-router.route("/pending-payment-vendor").get(authenticate,authorizeAdmin, getPendingPaymentUsers);
+router
+  .route("/pending-payment-vendor")
+  .get(authenticate, authorizeAdmin, getPendingPaymentUsers);
 
 // --------- TO UPDATE YOUR PROFILE----------------------------
-router.route("/profile").get(authenticate, getCurrentUserProfile).put(authenticate, updateCurrentUserProfile)
+router
+  .route("/profile")
+  .get(authenticate, getCurrentUserProfile)
+  .put(authenticate, uploadBothPics, updateCurrentUserProfile);
 
 // ---------------------- SOMEONE VISITS YOUR PROFILE -------------------------------
-router.route("/:id")
-    .get(authenticate, getUserById)
-// ---------------------- ADMIN UPDATES PROFILE -------------------------------
-    .put(authenticate, authorizeAdmin, updateUserById)
-    .delete(authenticate, authorizeAdmin, deleteUser);
-
+router
+  .route("/:id")
+  .get(authenticate, getUserById)
+  // ---------------------- ADMIN UPDATES PROFILE -------------------------------
+  .put(authenticate, authorizeAdmin, updateUserById)
+  .delete(authenticate, authorizeAdmin, deleteUser);
 
 export default router;

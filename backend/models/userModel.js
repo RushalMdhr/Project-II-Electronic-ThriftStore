@@ -41,12 +41,7 @@ const userSchema = mongoose.Schema(
       },
       district: {
         type: String,
-        enum: [
-          "Kathmandu",
-          "Lalitpur",
-          "Bhaktapur",
-          "Kavrepalanchok",
-        ]
+        enum: ["Kathmandu", "Lalitpur", "Bhaktapur", "Kavrepalanchok"],
       },
       province: {
         type: String,
@@ -86,9 +81,9 @@ const userSchema = mongoose.Schema(
       total: Number, // 120 + 200
       received: Number, // Already paid
       pending: Number, // To be paid
-      lastPaid : {
-        type : Date,
-        default : null
+      lastPaid: {
+        type: Date,
+        default: null,
       },
     },
     blackListStreak: {
@@ -104,6 +99,8 @@ const userSchema = mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    profilePic: String,
+    CoverPic: String,
   },
   {
     timestamps: true, //when we create or delete a user it will give the specific time
