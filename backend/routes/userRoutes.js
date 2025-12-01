@@ -14,7 +14,7 @@ import {
   getPendingPaymentUsers,
   becomeAdmin,
 } from "../controllers/userControllers.js";
-import { uploadBothPics, uploadSingle } from "../middlewares/multer.js";
+import { uploadBothPics } from "../middlewares/multer.js";
 // router using
 const router = express.Router();
 

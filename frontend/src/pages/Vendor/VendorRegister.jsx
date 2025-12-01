@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  useMakeVendorMutation,
-} from "../../redux/api/usersApiSlice";
+import { useMakeVendorMutation } from "../../redux/api/usersApiSlice";
 import { useDispatch } from "react-redux";
 import { setCredentials, setRole } from "../../redux/features/auth/authSlice";
 import { toast } from "react-toastify";
@@ -15,7 +13,7 @@ export default function SellerRegister() {
     province: "Bagmati", // Only Bagmati is available
     district: "",
     city: "",
-    phone: ""
+    phone: "",
   });
 
   const [makeVendor] = useMakeVendorMutation();
@@ -24,49 +22,74 @@ export default function SellerRegister() {
 
   // Districts in Bagmati Province
   const bagmatiDistricts = [
-    "Kathmandu", "Lalitpur", "Bhaktapur", "Kavrepalanchok", "Dhading", 
-    "Sindhupalchok", "Rasuwa", "Nuwakot", "Dhankuta", "Sindhuli", 
-    "Ramechhap", "Dolakha", "Chitwan", "Makwanpur", "Rautahat", 
-    "Bara", "Parsa"
+    "Kathmandu",
+    "Lalitpur",
+    "Bhaktapur",
+    "Kavrepalanchok",
+    "Dhading",
+    "Sindhupalchok",
+    "Rasuwa",
+    "Nuwakot",
+    "Dhankuta",
+    "Sindhuli",
+    "Ramechhap",
+    "Dolakha",
+    "Chitwan",
+    "Makwanpur",
+    "Rautahat",
+    "Bara",
+    "Parsa",
   ];
 
   // Cities based on selected district (simplified mapping)
   const districtCities = {
-    "Kathmandu": ["Kathmandu", "Budhanilkantha", "Tokha", "Kageshwari", "Gokarneshwor"],
-    "Lalitpur": ["Lalitpur", "Mahalaxmi", "Godawari"],
-    "Bhaktapur": ["Bhaktapur", "Changunarayan", "Madhyapur Thimi"],
-    "Kavrepalanchok": ["Dhulikhel", "Banepa", "Panauti", "Khopasi"],
-    "Chitwan": ["Bharatpur", "Kalika", "Rapti", "Ratnanagar"],
-    "Makwanpur": ["Hetauda", "Thaha", "Bhimphedi"],
-    "Rautahat": ["Gaur", "Paroha", "Brindaban"],
-    "Bara": ["Kalaiya", "Jeetpur Simara", "Nijgadh"],
-    "Parsa": ["Birgunj", "Bahudarmai", "Pakaha Mainpur"]
+    Kathmandu: [
+      "Kathmandu",
+      "Budhanilkantha",
+      "Tokha",
+      "Kageshwari",
+      "Gokarneshwor",
+    ],
+    Lalitpur: ["Lalitpur", "Mahalaxmi", "Godawari"],
+    Bhaktapur: ["Bhaktapur", "Changunarayan", "Madhyapur Thimi"],
+    Kavrepalanchok: ["Dhulikhel", "Banepa", "Panauti", "Khopasi"],
+    Chitwan: ["Bharatpur", "Kalika", "Rapti", "Ratnanagar"],
+    Makwanpur: ["Hetauda", "Thaha", "Bhimphedi"],
+    Rautahat: ["Gaur", "Paroha", "Brindaban"],
+    Bara: ["Kalaiya", "Jeetpur Simara", "Nijgadh"],
+    Parsa: ["Birgunj", "Bahudarmai", "Pakaha Mainpur"],
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     // Reset city when district changes
     if (name === "district") {
-      setFormData(prev => ({ ...prev, city: "" }));
+      setFormData((prev) => ({ ...prev, city: "" }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (formData.phone.length < 10) {
+        return toast.error("Phone number must be at least 10 digits");
+      }
+      toast.success("Processing your request...");
       await makeVendor({
         shopName: formData.shopName,
         shopDescription: formData.shopDescription,
         shopAddress: {
           province: formData.province,
           district: formData.district,
-          city: formData.city
+          city: formData.city,
         },
-        phone: formData.phone
+        phone: formData.phone,
       }).unwrap();
-      
+      toast.success("Processing your requested");
+      console.log('formData : ',formData.phone.length)
+
       // Fetch updated user info and update Redux state
       const res = await fetch("/api/users/profile", { credentials: "include" });
       if (res.ok) {
@@ -84,7 +107,9 @@ export default function SellerRegister() {
     }
   };
 
-  const availableCities = formData.district ? districtCities[formData.district] || [] : [];
+  const availableCities = formData.district
+    ? districtCities[formData.district] || []
+    : [];
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8 px-4">
@@ -111,7 +136,7 @@ export default function SellerRegister() {
               className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
             />
           </div>
-          
+
           <div>
             <label
               htmlFor="shopDescription"
@@ -130,7 +155,7 @@ export default function SellerRegister() {
               className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base resize-none"
             />
           </div>
-          
+
           <div>
             <label
               htmlFor="phone"
@@ -149,7 +174,7 @@ export default function SellerRegister() {
               className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
             />
           </div>
-          
+
           <div>
             <label
               htmlFor="province"
@@ -168,7 +193,7 @@ export default function SellerRegister() {
               <option value="Bagmati">Bagmati</option>
             </select>
           </div>
-          
+
           <div>
             <label
               htmlFor="district"
@@ -185,12 +210,14 @@ export default function SellerRegister() {
               className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
             >
               <option value="">Select District</option>
-              {bagmatiDistricts.map(district => (
-                <option key={district} value={district}>{district}</option>
+              {bagmatiDistricts.map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
               ))}
             </select>
           </div>
-          
+
           <div>
             <label
               htmlFor="city"
@@ -206,16 +233,20 @@ export default function SellerRegister() {
               required
               disabled={!availableCities.length}
               className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base ${
-                availableCities.length ? 'bg-white text-gray-800' : 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                availableCities.length
+                  ? "bg-white text-gray-800"
+                  : "bg-gray-100 text-gray-500 cursor-not-allowed"
               }`}
             >
               <option value="">Select City</option>
-              {availableCities.map(city => (
-                <option key={city} value={city}>{city}</option>
+              {availableCities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
               ))}
             </select>
           </div>
-          
+
           <button
             type="submit"
             
