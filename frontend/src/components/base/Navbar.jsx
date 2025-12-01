@@ -107,7 +107,7 @@ const Navbar = () => {
               >
                 Home
               </Link>
-              <Link
+              {/* <Link
                 to={
                   userInfo?.isVendor ? `/tester` : userInfo?.isAdmin ? `/admin/orders`: `/become-admin`
                 }
@@ -121,7 +121,7 @@ const Navbar = () => {
                 onClick={() => dispatch(setRole("buyer"))}
               >
                 PM
-              </Link>
+              </Link> */}
 
               {(role === "buyer" || !userInfo?.isVendor) &&
                 !userInfo?.isAdmin && (
