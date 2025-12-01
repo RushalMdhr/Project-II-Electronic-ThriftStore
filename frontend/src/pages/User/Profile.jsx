@@ -47,11 +47,14 @@ const Profile = () => {
       {/* ---------- COVER + AVATAR SECTION ---------- */}
       <section className="px-4 pt-4">
         {/* Cover Image */}
-        <div className="relative rounded-3xl overflow-hidden shadow-md">
+        <div className="relative rounded-3xl border-1 border-emerald-600 overflow-hidden shadow-md">
           {user?.isVendor ? (
             // ---- Vendor: Show actual cover image ----
             <img
-              src={user.coverPic || "/uploads/cover/default.png"}
+              src={
+                `http://localhost:5000/${user.coverPic}` ||
+                "/uploads/cover/default.png"
+              }
               alt="Cover"
               className="w-full h-56 md:h-72 object-cover"
             />
@@ -97,9 +100,12 @@ const Profile = () => {
           <div className="flex items-center gap-6 ml-[20%]">
             {/* Profile Image */}
             <img
-              src={user.profilePic || "/uploads/profile/default.png"}
+              src={
+                `http://localhost:5000/${user.profilePic}` ||
+                "/uploads/profile/default.png"
+              }
               alt={user.username}
-              className="w-40 h-40 rounded-full ring-4 ring-white shadow-2xl object-cover"
+              className="w-40 h-40 rounded-full ring-4 ring-emerald-600 shadow-2xl object-cover"
             />
 
             {/* LEFT COLUMN – Username / Email / Vendor Badge / Edit */}
@@ -128,12 +134,30 @@ const Profile = () => {
             {/* RIGHT SIDE BADGES */}
             <div className="flex flex-col gap-3">
               <div className="flex gap-3 items-center">
-                {/* SALES BADGE */}
                 <div
-                  className="w-20 h-20 flex items-center justify-center rounded-full shadow-md 
-      bg-yellow-500 text-white font-bold"
+                  key={user.sales} // re-triggers animation on change
+                  className="
+    absolute
+    w-24 h-24
+    grid place-content-center
+    bg-gradient-to-br from-emerald-500 to-emerald-400
+    rounded-full
+    text-white
+    font-bold
+    text-xs
+    shadow-xl
+    border-4 border-emerald-200/80
+    animate-bounce origin-bottom-left
+  "
+                  style={{
+                    animationIterationCount: 1,
+                    animationDuration: ".5s",
+                  }}
                 >
-                  {user.sales ? `${user.sales} Sales` : "No Sales"}
+                  <div className="text-center leading-tight">
+                    <div className="text-2xl">{user.sales}</div>
+                    <div className="opacity-80">sales</div>
+                  </div>
                 </div>
               </div>
             </div>
