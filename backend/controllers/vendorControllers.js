@@ -1,5 +1,6 @@
 import Product from "../models/productModel.js";
 import Order from "../models/orderModel.js";
+import User from "../models/userModel.js";
 
 // Get main dashboard stats
 export const getVendorDashboard = async (req, res) => {
@@ -12,20 +13,22 @@ export const getVendorDashboard = async (req, res) => {
     });
 
     // Get orders that include this vendor
-    const orders = await Order.find({ "orderItems.vendor": vendorId });
+    // const orders = await Order.find({ "orderItems.vendor": vendorId });
+    const totalOrders = await Order.countDocuments({ "orderItems.vendor": vendorId });
 
+    const income = await User.findById(vendorId).select("income");
     // Total orders and revenue
-    let totalRevenue = 0;
-    orders.forEach((order) => {
-      order.orderItems.forEach((item) => {
-        if (item.vendor.toString() === vendorId.toString()) {
-          totalRevenue += item.price * item.quantity;
-        }
-      });
-    });
-    const totalOrders = orders.length;
+    // let totalRevenue = 0;
+    // orders.forEach((order) => {
+    //   order.orderItems.forEach((item) => {
+    //     if (item.vendor.toString() === vendorId.toString()) {
+    //       totalRevenue += item.price * item.quantity;
+    //     }
+    //   });
+    // });
+    // const totalOrders = orders.length;
 
-    res.json({ productsCount, totalOrders, revenue: totalRevenue });
+    res.json({ productsCount, totalOrders, revenue: income });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
