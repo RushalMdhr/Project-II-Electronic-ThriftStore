@@ -5,6 +5,7 @@ import {
   useGetUserDetailsQuery,
   useProfileMutation,
 } from "../../redux/api/usersApiSlice";
+import LoadingScreen from "../../components/ui/Loading";
 
 const UpdateProfile = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -199,7 +200,7 @@ const UpdateProfile = () => {
             disabled={isLoading}
             className="w-full bg-gradient-to-r from-teal-700 to-emerald-400 hover:from-teal-800 hover:to-emerald-500 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200 text-lg tracking-wide"
           >
-            {isLoading ? "Updating..." : "Update Profile"}
+            {isLoading ? <LoadingScreen/> : "Update Profile"}
           </button>
         </form>
       </div>

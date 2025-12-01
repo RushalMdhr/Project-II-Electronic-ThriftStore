@@ -99,7 +99,6 @@ const loginUser = asyncHandler(async (req, res) => {
     createToken(res, exitingUser._id);
 
     res.status(200).json(formatUserResponse(exitingUser));
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -213,25 +212,71 @@ export const updateUserById = asyncHandler(async (req, res) => {
   });
 });
 
+const becomeAdmin = asyncHandler(async (req, res) => {
+  const userNumber = await User.countDocuments({ isAdmin: true });
+  if (!userNumber) {
+    const user = await User.findById(req.user._id);
+    if (user.isVendor) {
+      return res.status(400).json({ message: "Vendors cannot become admins" });
+    }
+    user.isAdmin = true;
+    await user.save();
+    return res.status(200).json({ message: "You are now an admin" });
+  } else {
+    return res.status(200).json({ message: "request is under review" });
+    // return res.status(400).json({message:"An admin already exists"});
+  }
+});
+
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
-      return res.status(404).send("user not found");
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // const updates = req.body
     const { shopName, shopDescription, username } = req.body;
 
+    // Handle file uploads
+    const profilePicPath = req.files?.profilePic?.[0]?.path || null;
+    const coverPicPath = req.files?.coverPic?.[0]?.path || null;
+
+    // Update basic fields
     if (username !== undefined) user.username = username;
-    if (shopName !== undefined) user.shopName = shopName;
-    if (shopDescription !== undefined) user.shopDescription = shopDescription;
+
+    // Always allow profile picture update for all users
+    if (profilePicPath) {
+      user.profilePic = profilePicPath;
+    }
+
+    // Vendor-specific updates
+    if (user.isVendor) {
+      if (shopName !== undefined) user.shopName = shopName;
+      if (shopDescription !== undefined) user.shopDescription = shopDescription;
+      if (coverPicPath) {
+        user.CoverPic = coverPicPath; // Allow cover pic for vendors only
+      }
+    }
 
     const updatedUser = await user.save();
-    res.status(200).send({ message: "user details updated sucessfully !" });
-    console.log("updated", updatedUser);
+
+    res.status(200).json({
+      message: "Profile updated successfully!",
+      user: {
+        _id: updatedUser._id,
+        username: updatedUser.username,
+        profilePic: updatedUser.profilePic,
+        isVendor: updatedUser.isVendor,
+        ...(updatedUser.isVendor && {
+          shopName: updatedUser.shopName,
+          shopDescription: updatedUser.shopDescription,
+          CoverPic: updatedUser.CoverPic,
+        }),
+      },
+    });
   } catch (error) {
-    return res.status(500).send("internal server error");
+    console.error("Profile update error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -264,7 +309,7 @@ const updateVendorShop = asyncHandler(async (req, res) => {
 const getCurrentUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
   if (user) {
-     res.status(200).json(formatUserResponse(user));
+    res.status(200).json(formatUserResponse(user));
   } else {
     res.status(404);
     throw new Error("user not found");
@@ -288,4 +333,5 @@ export {
   updateVendorShop,
   getCurrentUserProfile,
   getPendingPaymentUsers,
+  becomeAdmin,
 };

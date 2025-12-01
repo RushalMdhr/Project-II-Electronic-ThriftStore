@@ -47,7 +47,7 @@ const VendorPayments = () => {
       >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-400 mx-auto"></div>
-          <p className="mt-4 text-gray-300">Loading vendor payments...</p>
+          <p className="mt-4 text-gray-300">Loading Seller payments...</p>
         </div>
       </div>
     );
@@ -63,7 +63,7 @@ const VendorPayments = () => {
           <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
             <span className="text-red-400 text-2xl">!</span>
           </div>
-          <h3 className="mt-4 text-lg font-medium">Failed to load vendor payments</h3>
+          <h3 className="mt-4 text-lg font-medium">Failed to load Seller payments</h3>
           <p className="mt-2 text-gray-400">Please try again later</p>
         </div>
       </div>
@@ -105,9 +105,9 @@ const VendorPayments = () => {
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Vendor Payments</h1>
+          <h1 className="text-2xl font-bold">Seller Payments</h1>
           <p className="text-gray-400 mt-1">
-            Manage pending payments to vendors for delivered orders
+            Manage pending payments to sellers for delivered orders
           </p>
         </div>
         <div className="text-right">
@@ -128,7 +128,7 @@ const VendorPayments = () => {
           </div>
           <input
             type="text"
-            placeholder="Search vendors by shop name, username, or email..."
+            placeholder="Search sellers by shop name, username, or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
@@ -141,7 +141,7 @@ const VendorPayments = () => {
         <div className="card p-6 rounded-xl">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Vendors</p>
+              <p className="text-gray-400 text-sm">Total Sellers</p>
               <p className="text-2xl font-bold">{pendingPaymentVendors?.length || 0}</p>
             </div>
             <User className="w-8 h-8 text-emerald-400" />
@@ -166,7 +166,7 @@ const VendorPayments = () => {
         {filteredVendors.length === 0 ? (
           <div className="text-center py-12">
             <User className="w-16 h-16 text-gray-600 mx-auto" />
-            <h3 className="mt-4 text-lg font-medium text-gray-300">No vendors found</h3>
+            <h3 className="mt-4 text-lg font-medium text-gray-300">No sellers found</h3>
             <p className="mt-2 text-gray-400">Try adjusting your search or check back later.</p>
           </div>
         ) : (
@@ -175,7 +175,7 @@ const VendorPayments = () => {
               <table className="w-full table-auto">
                 <thead style={{ background: COLORS.surface }}>
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Vendor</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Seller</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Shop</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Location</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-400 uppercase tracking-wider">Pending Amount</th>
