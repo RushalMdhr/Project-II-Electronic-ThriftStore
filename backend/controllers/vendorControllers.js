@@ -1,6 +1,5 @@
 import Product from "../models/productModel.js";
 import Order from "../models/orderModel.js";
-import Category from "../models/categoryModel.js";
 
 // Get main dashboard stats
 export const getVendorDashboard = async (req, res) => {

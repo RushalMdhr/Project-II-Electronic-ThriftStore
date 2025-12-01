@@ -16,6 +16,7 @@ const createOrder = asyncHandler(async (req, res) => {
   }
 
   try {
+    let adminRevenue = 0;
     const validatedItems = await Promise.all(
       orderItems.map(async (items) => {
         const productDoc = await Product.findById(items.productId);
@@ -29,13 +30,15 @@ const createOrder = asyncHandler(async (req, res) => {
             .status(401)
             .send(`Not enough stock for ${productDoc.name}`);
         }
-        productDoc.sold = true;
+        adminRevenue += productDoc.price * items.quantity * 0.1; // 10% admin revenue
         await productDoc.save();
         return {
           product: productDoc._id,
           vendor: productDoc.uploadedBy,
           quantity: items.quantity,
           price: productDoc.price,
+          forSeller: productDoc.price * items.quantity * 0.9,
+          forAdmin: productDoc.price * items.quantity * 0.1,
         };
       })
     ); // Calculate subtotal
@@ -66,6 +69,7 @@ const createOrder = asyncHandler(async (req, res) => {
       shipping, // include shipping
       tax, // include tax
       total, // include total
+      adminRevenue, // include admin revenue
       expiresAt: new Date(Date.now() + 1 * 60 * 1000),
     });
 
@@ -588,39 +592,44 @@ const deleteErrorOrder = asyncHandler(async (req, res) => {
 
   //______________ to update shipped to delivered and update vendor income _____________________
   const orders = await Order.find({ status: "shipped" });
+  if (orders) {
+    console.log("delivering the orders");
+    for (const order of orders) {
+      // Update order status
+      order.status = "delivered";
+      order.deliveredAt = new Date();
+      if (
+        order.payment.method === "cod" &&
+        order.payment.status === "pending"
+      ) {
+        order.payment.status = "paid";
+      }
+      await order.save();
 
-  for (const order of orders) {
-    // Update order status
-    order.status = "delivered";
-    order.deliveredAt = new Date();
-    if (order.payment.method === "cod" && order.payment.status === "pending") {
-      order.payment.status = "paid";
-    }
-    await order.save();
+      // Update each vendor's income
+      for (const item of order.orderItems) {
+        const commission = item.price * item.quantity * 0.1;
+        const pending = item.price * item.quantity - commission;
 
-    // Update each vendor's income
-    for (const item of order.orderItems) {
-      const commission = item.price * item.quantity * 0.1;
-      const pending = item.price * item.quantity - commission;
+        const user = await User.findById(item.vendor);
+        if (!user) continue;
 
-      const user = await User.findById(item.vendor);
-      if (!user) continue;
-
-      if (!user.income?.lastPaid) {
-        await User.findByIdAndUpdate(item.vendor, {
-          $inc: {
-            "income.pending": pending,
-            sales: 1,
-          },
-          $set: { "income.lastPaid": new Date() },
-        });
-      } else {
-        await User.findByIdAndUpdate(item.vendor, {
-          $inc: {
-            "income.pending": pending,
-            sales: 1,
-          },
-        });
+        if (!user.income?.lastPaid) {
+          await User.findByIdAndUpdate(item.vendor, {
+            $inc: {
+              "income.pending": pending,
+              sales: 1,
+            },
+            $set: { "income.lastPaid": new Date() },
+          });
+        } else {
+          await User.findByIdAndUpdate(item.vendor, {
+            $inc: {
+              "income.pending": pending,
+              sales: 1,
+            },
+          });
+        }
       }
     }
   }
