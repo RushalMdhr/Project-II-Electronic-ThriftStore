@@ -28,7 +28,10 @@ const UserCard = ({ user, onDelete, onView }) => {
         {/* Avatar and user info */}
         <div className="flex items-center gap-4 flex-1 min-w-[200px]">
           <img
-            src={user.avatar || "https://i.pravatar.cc/150?img=3"}
+            src={
+              `http://localhost:5000/${user.profilePic}` ||
+              "/uploads/profile/default.png"
+            }
             alt={user.username}
             className="w-12 h-12 rounded-full object-cover"
           />

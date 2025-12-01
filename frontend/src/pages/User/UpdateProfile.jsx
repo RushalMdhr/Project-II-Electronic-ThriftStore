@@ -10,46 +10,75 @@ import LoadingScreen from "../../components/ui/Loading";
 const UpdateProfile = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
-  const {  data : userDetails } = useGetUserDetailsQuery(userInfo?._id);
+  const { data: userDetails } = useGetUserDetailsQuery(userInfo?._id);
 
   const [username, setUsername] = useState("");
   const [shopName, setShopName] = useState("");
   const [shopDescription, setShopDescription] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [profilePicFile, setProfilePicFile] = useState(userDetails?.profilePic || null);
+  const [profilePicFile, setProfilePicFile] = useState(
+    userDetails?.profilePic || null
+  );
   const [profilePicPreview, setProfilePicPreview] = useState("");
   const [coverPicFile, setCoverPicFile] = useState(null);
   const [coverPicPreview, setCoverPicPreview] = useState("");
-  
+
   // Address state
-  const [province, setProvince] = useState( userDetails?.shippingAddress?.province || "Bagmati");
-  const [district, setDistrict] = useState(userDetails?.shippingAddress?.district ||"");
+  const [province, setProvince] = useState(
+    userDetails?.shippingAddress?.province || "Bagmati"
+  );
+  const [district, setDistrict] = useState(
+    userDetails?.shippingAddress?.district || ""
+  );
   const [city, setCity] = useState(userDetails?.shippingAddress?.city || "");
-  const [street, setStreet] = useState(userDetails?.shippingAddress?.street || "");
-  const [zipcode, setZipcode] = useState(userDetails?.shippingAddress?.zipcode || "");
+  const [street, setStreet] = useState(
+    userDetails?.shippingAddress?.street || ""
+  );
+  const [zipcode, setZipcode] = useState(
+    userDetails?.shippingAddress?.zipcode || ""
+  );
 
   const [updateProfile, { isLoading }] = useProfileMutation();
 
   // Districts in Bagmati Province
   const bagmatiDistricts = [
-    "Kathmandu", "Lalitpur", "Bhaktapur", "Kavrepalanchok", "Dhading", 
-    "Sindhupalchok", "Rasuwa", "Nuwakot", "Dhankuta", "Sindhuli", 
-    "Ramechhap", "Dolakha", "Chitwan", "Makwanpur", "Rautahat", 
-    "Bara", "Parsa"
+    "Kathmandu",
+    "Lalitpur",
+    "Bhaktapur",
+    "Kavrepalanchok",
+    "Dhading",
+    "Sindhupalchok",
+    "Rasuwa",
+    "Nuwakot",
+    "Dhankuta",
+    "Sindhuli",
+    "Ramechhap",
+    "Dolakha",
+    "Chitwan",
+    "Makwanpur",
+    "Rautahat",
+    "Bara",
+    "Parsa",
   ];
 
   // Cities based on selected district (simplified mapping)
   const districtCities = {
-    "Kathmandu": ["Kathmandu", "Budhanilkantha", "Tokha", "Kageshwari", "Gokarneshwor"],
-    "Lalitpur": ["Lalitpur", "Mahalaxmi", "Godawari"],
-    "Bhaktapur": ["Bhaktapur", "Changunarayan", "Madhyapur Thimi"],
-    "Kavrepalanchok": ["Dhulikhel", "Banepa", "Panauti", "Khopasi"],
-    "Chitwan": ["Bharatpur", "Kalika", "Rapti", "Ratnanagar"],
-    "Makwanpur": ["Hetauda", "Thaha", "Bhimphedi"],
-    "Rautahat": ["Gaur", "Paroha", "Brindaban"],
-    "Bara": ["Kalaiya", "Jeetpur Simara", "Nijgadh"],
-    "Parsa": ["Birgunj", "Bahudarmai", "Pakaha Mainpur"]
+    Kathmandu: [
+      "Kathmandu",
+      "Budhanilkantha",
+      "Tokha",
+      "Kageshwari",
+      "Gokarneshwor",
+    ],
+    Lalitpur: ["Lalitpur", "Mahalaxmi", "Godawari"],
+    Bhaktapur: ["Bhaktapur", "Changunarayan", "Madhyapur Thimi"],
+    Kavrepalanchok: ["Dhulikhel", "Banepa", "Panauti", "Khopasi"],
+    Chitwan: ["Bharatpur", "Kalika", "Rapti", "Ratnanagar"],
+    Makwanpur: ["Hetauda", "Thaha", "Bhimphedi"],
+    Rautahat: ["Gaur", "Paroha", "Brindaban"],
+    Bara: ["Kalaiya", "Jeetpur Simara", "Nijgadh"],
+    Parsa: ["Birgunj", "Bahudarmai", "Pakaha Mainpur"],
   };
 
   useEffect(() => {
@@ -60,7 +89,7 @@ const UpdateProfile = () => {
       setShopName(userDetails.shopName || "");
       setProfilePicPreview(userDetails.profilePic || "");
       setCoverPicPreview(userDetails.coverPic || "");
-      
+
       // Set address fields
       if (userDetails.shippingAddress) {
         setPhoneNumber(userDetails?.shippingAddress?.phone || "");
@@ -107,11 +136,11 @@ const UpdateProfile = () => {
     e.preventDefault();
     try {
       const formData = new FormData();
-      formData.append('username', username);
-      formData.append('phoneNumber', phoneNumber);
-      
+      formData.append("username", username);
+      formData.append("phoneNumber", phoneNumber);
+
       if (profilePicFile) {
-        formData.append('profilePic', profilePicFile);
+        formData.append("profilePic", profilePicFile);
       }
 
       // Add address information
@@ -120,16 +149,16 @@ const UpdateProfile = () => {
         district: district,
         city: city,
         street: street,
-        zipcode: zipcode
+        zipcode: zipcode,
       };
-      formData.append('address', JSON.stringify(address));
+      formData.append("address", JSON.stringify(address));
 
       // Add vendor-specific fields if user is a vendor
       if (userDetails?.isVendor) {
-        formData.append('shopName', shopName);
-        formData.append('shopDescription', shopDescription);
+        formData.append("shopName", shopName);
+        formData.append("shopDescription", shopDescription);
         if (coverPicFile) {
-          formData.append('coverPic', coverPicFile);
+          formData.append("coverPic", coverPicFile);
         }
       }
 
@@ -163,7 +192,7 @@ const UpdateProfile = () => {
                 className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
               />
             </div>
-            
+
             <div>
               <label className="block text-lg font-semibold text-gray-800 mb-2">
                 Email *
@@ -175,7 +204,7 @@ const UpdateProfile = () => {
                 className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg cursor-not-allowed opacity-80 text-base"
               />
             </div>
-            
+
             <div>
               <label className="block text-lg font-semibold text-gray-800 mb-2">
                 Phone Number *
@@ -186,10 +215,13 @@ const UpdateProfile = () => {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
                 placeholder="Enter your phone number"
+                minLength={10}
+                maxLength={10}
+                pattern="[0-9]{10}"
                 className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
               />
             </div>
-            
+
             <div className="md:col-span-2">
               <label className="block text-lg font-semibold text-gray-800 mb-2">
                 Profile Picture *
@@ -217,7 +249,7 @@ const UpdateProfile = () => {
                 Address Information
               </h3>
             </div>
-            
+
             <div>
               <label className="block text-lg font-semibold text-gray-800 mb-2">
                 Province *
@@ -230,7 +262,7 @@ const UpdateProfile = () => {
                 <option value="Bagmati">Bagmati</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-lg font-semibold text-gray-800 mb-2">
                 District *
@@ -242,12 +274,14 @@ const UpdateProfile = () => {
                 className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
               >
                 <option value="">Select District</option>
-                {bagmatiDistricts.map(district => (
-                  <option key={district} value={district}>{district}</option>
+                {bagmatiDistricts.map((district) => (
+                  <option key={district} value={district}>
+                    {district}
+                  </option>
                 ))}
               </select>
             </div>
-            
+
             <div>
               <label className="block text-lg font-semibold text-gray-800 mb-2">
                 City *
@@ -258,16 +292,20 @@ const UpdateProfile = () => {
                 required
                 disabled={!availableCities.length}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base ${
-                  availableCities.length ? 'bg-white text-gray-800' : 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                  availableCities.length
+                    ? "bg-white text-gray-800"
+                    : "bg-gray-100 text-gray-500 cursor-not-allowed"
                 }`}
               >
                 <option value="">Select City</option>
-                {availableCities.map(city => (
-                  <option key={city} value={city}>{city}</option>
+                {availableCities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
                 ))}
               </select>
             </div>
-            
+
             <div>
               <label className="block text-lg font-semibold text-gray-800 mb-2">
                 Street Address *
@@ -281,7 +319,7 @@ const UpdateProfile = () => {
                 className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
               />
             </div>
-            
+
             <div>
               <label className="block text-lg font-semibold text-gray-800 mb-2">
                 ZIP Code *
@@ -303,7 +341,7 @@ const UpdateProfile = () => {
                     Vendor Information
                   </h3>
                 </div>
-                
+
                 <div className="md:col-span-2">
                   <label className="block text-lg font-semibold text-gray-800 mb-2">
                     Shop Name *
@@ -316,7 +354,7 @@ const UpdateProfile = () => {
                     className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
                   />
                 </div>
-                
+
                 <div className="md:col-span-2">
                   <label className="block text-lg font-semibold text-gray-800 mb-2">
                     Shop Description *
@@ -329,7 +367,7 @@ const UpdateProfile = () => {
                     className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base resize-none"
                   />
                 </div>
-                
+
                 <div className="md:col-span-2">
                   <label className="block text-lg font-semibold text-gray-800 mb-2">
                     Shop Banner/ Cover Picture *
@@ -360,7 +398,7 @@ const UpdateProfile = () => {
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-teal-700 to-emerald-400 hover:from-teal-800 hover:to-emerald-500 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200 text-lg tracking-wide"
             >
-              {isLoading ? <LoadingScreen/> : "Update Profile"}
+              {isLoading ? <LoadingScreen /> : "Update Profile"}
             </button>
           </div>
         </form>

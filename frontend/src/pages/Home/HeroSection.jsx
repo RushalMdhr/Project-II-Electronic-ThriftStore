@@ -13,7 +13,11 @@ const HeroSection = () => {
   let vendorButtonLink = "";
   let showDispatch = false;
 
-  if (!localStorage.userInfo) {
+  if (admin) {
+    vendorButtonText = "Go to Dashboard";
+    vendorButtonLink = "/admin";
+  }
+  else if (!localStorage.userInfo) {
     vendorButtonText = "Become Customer";
     vendorButtonLink = "/register"; // or your customer registration page
   } else if (!localStorage.userInfo.isVendor) {
