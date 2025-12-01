@@ -14,7 +14,7 @@ import {
   getPendingPaymentUsers,
   becomeAdmin,
 } from "../controllers/userControllers.js";
-import { uploadSingle } from "../middlewares/multer.js";
+import { uploadBothPics, uploadSingle } from "../middlewares/multer.js";
 // router using
 const router = express.Router();
 
@@ -35,7 +35,7 @@ router
 router
   .route("/profile")
   .get(authenticate, getCurrentUserProfile)
-  .put(authenticate, updateCurrentUserProfile);
+  .put(authenticate, uploadBothPics, updateCurrentUserProfile);
 
 // ---------------------- SOMEONE VISITS YOUR PROFILE -------------------------------
 router

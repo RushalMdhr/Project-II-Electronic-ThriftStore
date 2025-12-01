@@ -20,8 +20,35 @@ const UpdateProfile = () => {
   const [profilePicPreview, setProfilePicPreview] = useState("");
   const [coverPicFile, setCoverPicFile] = useState(null);
   const [coverPicPreview, setCoverPicPreview] = useState("");
+  
+  // Address state
+  const [province, setProvince] = useState("Bagmati");
+  const [district, setDistrict] = useState("");
+  const [city, setCity] = useState("");
+  const [street, setStreet] = useState("");
 
   const [updateProfile, { isLoading }] = useProfileMutation();
+
+  // Districts in Bagmati Province
+  const bagmatiDistricts = [
+    "Kathmandu", "Lalitpur", "Bhaktapur", "Kavrepalanchok", "Dhading", 
+    "Sindhupalchok", "Rasuwa", "Nuwakot", "Dhankuta", "Sindhuli", 
+    "Ramechhap", "Dolakha", "Chitwan", "Makwanpur", "Rautahat", 
+    "Bara", "Parsa"
+  ];
+
+  // Cities based on selected district (simplified mapping)
+  const districtCities = {
+    "Kathmandu": ["Kathmandu", "Budhanilkantha", "Tokha", "Kageshwari", "Gokarneshwor"],
+    "Lalitpur": ["Lalitpur", "Mahalaxmi", "Godawari"],
+    "Bhaktapur": ["Bhaktapur", "Changunarayan", "Madhyapur Thimi"],
+    "Kavrepalanchok": ["Dhulikhel", "Banepa", "Panauti", "Khopasi"],
+    "Chitwan": ["Bharatpur", "Kalika", "Rapti", "Ratnanagar"],
+    "Makwanpur": ["Hetauda", "Thaha", "Bhimphedi"],
+    "Rautahat": ["Gaur", "Paroha", "Brindaban"],
+    "Bara": ["Kalaiya", "Jeetpur Simara", "Nijgadh"],
+    "Parsa": ["Birgunj", "Bahudarmai", "Pakaha Mainpur"]
+  };
 
   useEffect(() => {
     if (userDetails) {
@@ -31,6 +58,14 @@ const UpdateProfile = () => {
       setShopName(userDetails.shopName || "");
       setProfilePicPreview(userDetails.profilePic || "");
       setCoverPicPreview(userDetails.coverPic || "");
+      
+      // Set address fields
+      if (userDetails.address) {
+        setProvince(userDetails.address.province || "Bagmati");
+        setDistrict(userDetails.address.district || "");
+        setCity(userDetails.address.city || "");
+        setStreet(userDetails.address.street || "");
+      }
     }
   }, [userDetails]);
 
@@ -58,6 +93,12 @@ const UpdateProfile = () => {
     }
   };
 
+  const handleDistrictChange = (e) => {
+    const value = e.target.value;
+    setDistrict(value);
+    setCity(""); // Reset city when district changes
+  };
+
   const updateHandler = async (e) => {
     e.preventDefault();
     try {
@@ -67,6 +108,15 @@ const UpdateProfile = () => {
       if (profilePicFile) {
         formData.append('profilePic', profilePicFile);
       }
+
+      // Add address information
+      const address = {
+        province: province,
+        district: district,
+        city: city,
+        street: street
+      };
+      formData.append('address', JSON.stringify(address));
 
       // Add vendor-specific fields if user is a vendor
       if (userDetails?.isVendor) {
@@ -85,67 +135,142 @@ const UpdateProfile = () => {
     }
   };
 
+  const availableCities = district ? districtCities[district] || [] : [];
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-teal-700">
-        <h1 className="text-3xl font-bold mb-6 text-center text-teal-700">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-8 border border-teal-700">
+        <h1 className="text-3xl font-bold mb-8 text-center text-teal-700">
           Edit Profile
         </h1>
-        <form onSubmit={updateHandler} className="space-y-5">
-          <div>
-            <label className="block text-lg font-semibold text-gray-800 mb-2">
-              Username *
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-lg font-semibold text-gray-800 mb-2">
-              Email *
-            </label>
-            <input
-              type="email"
-              value={email}
-              readOnly
-              className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg cursor-not-allowed opacity-80 text-base"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-lg font-semibold text-gray-800 mb-2">
-              Profile Picture *
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleProfilePicChange}
-              className="w-full px-4 py-2 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-700 file:text-white hover:file:bg-teal-800"
-            />
-            {profilePicPreview && (
-              <div className="mt-3">
-                <img
-                  src={profilePicPreview}
-                  alt="Profile preview"
-                  className="w-24 h-24 rounded-full object-cover mx-auto border-2 border-teal-700"
-                />
-              </div>
-            )}
-          </div>
+        <form onSubmit={updateHandler} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-lg font-semibold text-gray-800 mb-2">
+                Username *
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-lg font-semibold text-gray-800 mb-2">
+                Email *
+              </label>
+              <input
+                type="email"
+                value={email}
+                readOnly
+                className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg cursor-not-allowed opacity-80 text-base"
+              />
+            </div>
+            
+            <div className="md:col-span-2">
+              <label className="block text-lg font-semibold text-gray-800 mb-2">
+                Profile Picture *
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePicChange}
+                className="w-full px-4 py-2 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-700 file:text-white hover:file:bg-teal-800"
+              />
+              {profilePicPreview && (
+                <div className="mt-3 flex justify-center">
+                  <img
+                    src={profilePicPreview}
+                    alt="Profile preview"
+                    className="w-24 h-24 rounded-full object-cover border-2 border-teal-700"
+                  />
+                </div>
+              )}
+            </div>
 
-          {userDetails?.isVendor && (
-            <>
-              <div className="border-t border-gray-200 pt-5">
-                <h3 className="text-xl font-semibold text-emerald-600 mb-4 text-center">
-                  Vendor Information
-                </h3>
+            {/* Address Section */}
+            <div className="md:col-span-2">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+                Address Information
+              </h3>
+            </div>
+            
+            <div>
+              <label className="block text-lg font-semibold text-gray-800 mb-2">
+                Province *
+              </label>
+              <select
+                value={province}
+                disabled
+                className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed text-base"
+              >
+                <option value="Bagmati">Bagmati</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-lg font-semibold text-gray-800 mb-2">
+                District *
+              </label>
+              <select
+                value={district}
+                onChange={handleDistrictChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
+              >
+                <option value="">Select District</option>
+                {bagmatiDistricts.map(district => (
+                  <option key={district} value={district}>{district}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-lg font-semibold text-gray-800 mb-2">
+                City *
+              </label>
+              <select
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                required
+                disabled={!availableCities.length}
+                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base ${
+                  availableCities.length ? 'bg-white text-gray-800' : 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                <option value="">Select City</option>
+                {availableCities.map(city => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-lg font-semibold text-gray-800 mb-2">
+                Street Address *
+              </label>
+              <input
+                type="text"
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                required
+                placeholder="Enter your street address"
+                className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 focus:border-transparent text-base"
+              />
+            </div>
+
+            {userDetails?.isVendor && (
+              <>
+                <div className="md:col-span-2 border-t border-gray-200 pt-6">
+                  <h3 className="text-xl font-semibold text-emerald-600 mb-6 text-center">
+                    Vendor Information
+                  </h3>
+                </div>
                 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-lg font-semibold text-gray-800 mb-2">
                     Shop Name *
                   </label>
@@ -158,7 +283,7 @@ const UpdateProfile = () => {
                   />
                 </div>
                 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-lg font-semibold text-gray-800 mb-2">
                     Shop Description *
                   </label>
@@ -171,7 +296,7 @@ const UpdateProfile = () => {
                   />
                 </div>
                 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-lg font-semibold text-gray-800 mb-2">
                     Shop Banner/ Cover Picture *
                   </label>
@@ -191,17 +316,19 @@ const UpdateProfile = () => {
                     </div>
                   )}
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-gradient-to-r from-teal-700 to-emerald-400 hover:from-teal-800 hover:to-emerald-500 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200 text-lg tracking-wide"
-          >
-            {isLoading ? <LoadingScreen/> : "Update Profile"}
-          </button>
+          <div className="mt-6">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-teal-700 to-emerald-400 hover:from-teal-800 hover:to-emerald-500 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200 text-lg tracking-wide"
+            >
+              {isLoading ? <LoadingScreen/> : "Update Profile"}
+            </button>
+          </div>
         </form>
       </div>
     </div>
