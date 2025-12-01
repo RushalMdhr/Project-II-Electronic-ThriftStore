@@ -26,7 +26,7 @@ const Profile = () => {
   } = useGetUserDetailsQuery(userId, {
     skip: !userId,
   });
-
+  console.log("Profile", user);
   // Fetch user's products
   const {
     data: myProducts,
@@ -51,13 +51,44 @@ const Profile = () => {
           {user?.isVendor ? (
             // ---- Vendor: Show actual cover image ----
             <img
-              src={user.coverImage || "/uploads/cover/default.png"}
+              src={user.coverPic || "/uploads/cover/default.png"}
               alt="Cover"
               className="w-full h-56 md:h-72 object-cover"
             />
           ) : (
             // ---- Non-vendor: Show a pattern background ----
-            <div className="w-full h-56 md:h-72 bg-[radial-gradient(circle_at_20%_20%,#d1fae5,transparent),radial-gradient(circle_at_80%_80%,#a7f3d0,transparent),radial-gradient(circle_at_50%_50%,#f0fdfa,transparent)]"></div>
+            <Link to="/vendor/register">
+              <div
+                className="relative w-full h-56 md:h-72 
+    bg-gray-200 
+    bg-[linear-gradient(to_right,rgba(0,0,0,0.05)_1px,transparent_1px),
+        linear-gradient(to_bottom,rgba(0,0,0,0.05)_1px,transparent_1px)]
+    bg-[size:40px_40px]"
+              >
+                <button
+                  className="absolute bottom-4 right-4 flex items-center gap-2 
+             px-5 py-2.5 bg-emerald-600 text-white font-medium 
+             rounded-xl shadow-md hover:bg-emerald-700 
+             transition-all duration-200 active:scale-95"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 9l1-5h16l1 5M4 9h16v11H4V9z"
+                    />
+                  </svg>
+                  Be a Seller
+                </button>
+              </div>
+            </Link>
           )}
         </div>
 
@@ -66,7 +97,7 @@ const Profile = () => {
           <div className="flex items-center gap-6 ml-[20%]">
             {/* Profile Image */}
             <img
-              src={user.profileImage || "/uploads/profile/default.png"}
+              src={user.profilePic || "/uploads/profile/default.png"}
               alt={user.username}
               className="w-40 h-40 rounded-full ring-4 ring-white shadow-2xl object-cover"
             />
