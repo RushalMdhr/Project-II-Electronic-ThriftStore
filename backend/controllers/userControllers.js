@@ -284,7 +284,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
 
       // Handle cover picture (vendors only)
       if (coverPicFile) {
-        user.CoverPic = coverPicFile.path; // e.g., "uploads/cover/cover-123456.jpg"
+        user.coverPic = coverPicFile.path; // e.g., "uploads/cover/cover-123456.jpg"
       }
     }
 
