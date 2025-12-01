@@ -235,26 +235,56 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const { shopName, shopDescription, username } = req.body;
+    const {
+      shopName,
+      shopDescription,
+      username,
+      address: addressString,
+    } = req.body;
 
-    // Handle file uploads
-    const profilePicPath = req.files?.profilePic?.[0]?.path || null;
-    const coverPicPath = req.files?.coverPic?.[0]?.path || null;
+    // Parse address from string to object
+    let address = {};
+    if (addressString) {
+      try {
+        address = JSON.parse(addressString);
+      } catch (error) {
+        console.error("Error parsing address:", error);
+      }
+    }
+
+    // Handle file uploads - they will be in req.files
+    const profilePicFile = req.files?.profilePic?.[0];
+    const coverPicFile = req.files?.coverPic?.[0];
 
     // Update basic fields
     if (username !== undefined) user.username = username;
 
-    // Always allow profile picture update for all users
-    if (profilePicPath) {
-      user.profilePic = profilePicPath;
+    // Update address fields
+    if (address) {
+      user.shippingAddress = {
+        ...user.shippingAddress,
+        province:
+          address.province || user.shippingAddress?.province || "Bagmati",
+        district: address.district || user.shippingAddress?.district || "",
+        city: address.city || user.shippingAddress?.city || "",
+        street: address.street || user.shippingAddress?.street || "",
+        phone: user.shippingAddress?.phone || "",
+      };
     }
 
-    // Vendor-specific updates
+    // Handle profile picture (all users)
+    if (profilePicFile) {
+      user.profilePic = profilePicFile.path; // e.g., "uploads/profile/profile-123456.jpg"
+    }
+
+    // Handle vendor-specific updates
     if (user.isVendor) {
       if (shopName !== undefined) user.shopName = shopName;
       if (shopDescription !== undefined) user.shopDescription = shopDescription;
-      if (coverPicPath) {
-        user.CoverPic = coverPicPath; // Allow cover pic for vendors only
+
+      // Handle cover picture (vendors only)
+      if (coverPicFile) {
+        user.CoverPic = coverPicFile.path; // e.g., "uploads/cover/cover-123456.jpg"
       }
     }
 
@@ -266,6 +296,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
         _id: updatedUser._id,
         username: updatedUser.username,
         profilePic: updatedUser.profilePic,
+        shippingAddress: updatedUser.shippingAddress,
         isVendor: updatedUser.isVendor,
         ...(updatedUser.isVendor && {
           shopName: updatedUser.shopName,
@@ -276,6 +307,20 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Profile update error:", error);
+
+    // Handle multer errors specifically
+    if (error.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        message: "File too large. Profile max 5MB, Cover max 10MB",
+      });
+    }
+
+    if (error.message.includes("Only image files")) {
+      return res.status(400).json({
+        message: "Only image files (JPEG, PNG, WebP, GIF) are allowed",
+      });
+    }
+
     res.status(500).json({ message: "Internal server error" });
   }
 });
