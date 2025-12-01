@@ -319,7 +319,7 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
 const getPendingPaymentUsers = asyncHandler(async (req, res) => {
   const users = await User.find({
     "income.pending": { $gt: 0 },
-    "income.lastPaid": { $lt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) },
+    "income.lastPaid": { $lt: new Date(Date.now() - 0 * 24 * 60 * 60 * 1000) },
   }).select("username email shopName status income shippingAddress");
   res.status(200).json(users);
 });
