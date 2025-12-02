@@ -4,8 +4,9 @@ import {
   useMakeVendorMutation,
 } from "../../redux/api/usersApiSlice";
 import { useDispatch } from "react-redux";
-import { setCredentials } from "../../redux/features/auth/authSlice";
+import { setCredentials, setRole } from "../../redux/features/auth/authSlice";
 import { toast } from "react-toastify";
+
 
 export default function SellerRegister() {
   const [formData, setFormData] = useState({
@@ -70,7 +71,10 @@ export default function SellerRegister() {
       const res = await fetch("/api/users/profile", { credentials: "include" });
       if (res.ok) {
         const user = await res.json();
-        dispatch(setCredentials(user));
+          dispatch(setCredentials(user));
+
+  // Also update role separately
+  dispatch(setRole("seller"));
       }
       toast.info("Seller shop info updated!");
       toast.success("You are now a seller!");
@@ -214,6 +218,7 @@ export default function SellerRegister() {
           
           <button
             type="submit"
+            
             className="w-full bg-gradient-to-r from-teal-700 to-emerald-400 hover:from-teal-800 hover:to-emerald-500 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200 text-lg tracking-wide"
           >
             Become a Seller
