@@ -77,7 +77,7 @@ const Register = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="username" className="text-white">
-                  Username
+                  Username <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="username"
@@ -91,7 +91,7 @@ const Register = () => {
               </div>
               <div>
                 <Label htmlFor="email" className="text-white">
-                  Email
+                  Email<span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="email"
@@ -123,7 +123,7 @@ const Register = () => {
               </div>
               <div>
                 <Label htmlFor="password" className="text-white">
-                  Password
+                  Password <span className="text-red-500">*</span>
                 </Label>
                 <div className="relative">
                   <Input
@@ -148,7 +148,7 @@ const Register = () => {
               </div>
               <div>
                 <Label htmlFor="confirmPassword" className="text-white">
-                  Confirm Password
+                  Confirm Password <span className="text-red-500">*</span>
                 </Label>
                 <div className="relative">
                   <Input
