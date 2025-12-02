@@ -122,7 +122,7 @@ export default function SellerRegister() {
               htmlFor="shopName"
               className="block text-lg font-semibold text-gray-800 mb-2"
             >
-              Shop Name *
+              Shop Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -141,7 +141,7 @@ export default function SellerRegister() {
               htmlFor="shopDescription"
               className="block text-lg font-semibold text-gray-800 mb-2"
             >
-              Shop Description *
+              Shop Description <span className="text-red-500">*</span>
             </label>
             <textarea
               name="shopDescription"
@@ -160,7 +160,7 @@ export default function SellerRegister() {
               htmlFor="phone"
               className="block text-lg font-semibold text-gray-800 mb-2"
             >
-              Phone Number *
+              Phone Number <span className="text-red-500">*</span>
             </label>
             <input
               type="tel"
@@ -182,7 +182,7 @@ export default function SellerRegister() {
               htmlFor="province"
               className="block text-lg font-semibold text-gray-800 mb-2"
             >
-              Province *
+              Province <span className="text-red-500">*</span>
             </label>
             <select
               name="province"
@@ -201,7 +201,7 @@ export default function SellerRegister() {
               htmlFor="district"
               className="block text-lg font-semibold text-gray-800 mb-2"
             >
-              District *
+              District <span className="text-red-500">*</span>
             </label>
             <select
               name="district"
@@ -225,7 +225,7 @@ export default function SellerRegister() {
               htmlFor="city"
               className="block text-lg font-semibold text-gray-800 mb-2"
             >
-              City *
+              City <span className="text-red-500">*</span>
             </label>
             <select
               name="city"
