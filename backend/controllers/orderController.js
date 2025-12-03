@@ -618,6 +618,7 @@ const deleteErrorOrder = asyncHandler(async (req, res) => {
           await User.findByIdAndUpdate(item.vendor, {
             $inc: {
               "income.pending": pending,
+              "income.total": pending,
               sales: 1,
             },
             $set: { "income.lastPaid": new Date() },
@@ -626,6 +627,7 @@ const deleteErrorOrder = asyncHandler(async (req, res) => {
           await User.findByIdAndUpdate(item.vendor, {
             $inc: {
               "income.pending": pending,
+              "income.total": pending,
               sales: 1,
             },
           });

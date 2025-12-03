@@ -615,12 +615,8 @@ const addToBlackList = asyncHandler(async (req, res) => {
     user.blackListStreak = (user.blackListStreak || 0) + 1;
 
     // Check if user should be blacklisted based on sales to blacklist ratio
-    if (user.sales && user.blackListStreak > 0) {
-      const salesToBlacklistRatio = user.sales / user.blackListStreak;
-      if (salesToBlacklistRatio <= 0.2) {
+    if(user.blackListStreak>user.sales/5){
         user.status = "banned";
-        // 20% threshold
-      }
     }
 
     await user.save();
