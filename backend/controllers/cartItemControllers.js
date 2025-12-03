@@ -1,8 +1,8 @@
-import asyncHandler from "../middlewares/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js"; 
 import CartItem from "../models/cartitemModel.js";
-// Add a product to cart
 import Product from "../models/productModel.js";
 
+// Add a product to cart
 export const addToCart = async (req, res) => {
   try {
     const { userId, productId, quantity } = req.body;
@@ -12,19 +12,35 @@ export const addToCart = async (req, res) => {
       product: productId,
     });
 
-    if (existing) {
-      existing.quantity += quantity || 1;
-      await existing.save();
-      return res.status(201).json(existing);
-    }
-
-    // 🟡 Fetch price from Product model
+    // 🔍 Fetch product to check stock
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // ✅ Create cart item
+    if (existing) {
+      const newQty = existing.quantity + (quantity || 1);
+
+      // 🔥 NEW STOCK CHECK ADDED
+      if (newQty > product.countInStock) {
+        return res.status(400).json({
+          message: `Only ${product.countInStock} items in stock. Cannot add more.`,
+        });
+      }
+
+      existing.quantity = newQty;
+      await existing.save();
+      return res.status(201).json(existing);
+    }
+
+    // 🔥 CHECK STOCK BEFORE CREATING NEW ITEM
+    if ((quantity || 1) > product.countInStock) {
+      return res.status(400).json({
+        message: `Only ${product.countInStock} items in stock.`,
+      });
+    }
+
+    // Create cart item
     const cartItem = await CartItem.create({
       user: userId,
       product: productId,
@@ -52,11 +68,11 @@ export const getCartItems = async (req, res) => {
   try {
     const cartItems = await CartItem.find({ user: userId }).populate({
       path: "product",
-      select: "name price countInStock uploadedBy images category", // Include category
+      select: "name price countInStock uploadedBy images category",
       populate: [
         {
           path: "uploadedBy",
-          select: "username shippingAddress", // select entire shippingAddress
+          select: "username shippingAddress",
         },
         {
           path: "category",
@@ -64,7 +80,6 @@ export const getCartItems = async (req, res) => {
         },
       ],
     });
-    console.log(cartItems.map((item) => item.product.uploadedBy));
 
     res.status(200).json(cartItems);
   } catch (error) {
@@ -77,10 +92,16 @@ export const getCartItems = async (req, res) => {
 export const updateCartItem = asyncHandler(async (req, res) => {
   const { action } = req.body;
 
-  const cartItem = await CartItem.findById(req.params.id);
+  const cartItem = await CartItem.findById(req.params.id).populate("product");
   if (!cartItem) return res.status(404).json({ error: "Cart item not found" });
 
   if (action === "increment") {
+    // 🔥 STOCK CHECK HERE TOO
+    if (cartItem.quantity + 1 > cartItem.product.countInStock) {
+      return res.status(400).json({
+        message: `Only ${cartItem.product.countInStock} items in stock.`,
+      });
+    }
     cartItem.quantity += 1;
   } else if (action === "decrement") {
     cartItem.quantity = Math.max(1, cartItem.quantity - 1);
