@@ -8,10 +8,20 @@ const ProfileDropdown = () => {
     <div className="fixed right-0 mt-1 w-70 bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 z-50 overflow-hidden ">
       {/* User Info */}
       <div className="p-4 border-b border-slate-700 text-center">
-        <div className="w-20 h-20 mx-auto rounded-full bg-slate-700 flex items-center justify-center mb-2 shadow-lg">
-          <span className="text-3xl text-white font-bold">
-            {userInfo?.username?.charAt(0).toUpperCase() || "U"}
-          </span>
+        <div className="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-2 shadow-lg overflow-hidden">
+          {userInfo?.profilePic ? (
+            <img
+              src={userInfo.profilePic}
+              alt="User avatar"
+              className="w-20 h-20 rounded-full object-cover"
+            />
+          ) : (
+            <span className="w-20 h-20 rounded-full bg-emerald-600 flex items-center justify-center">
+              <span className="text-3xl text-white font-bold">
+                {userInfo?.username?.charAt(0).toUpperCase() || "U"}
+              </span>
+            </span>
+          )}
         </div>
         <h2 className="text-white text-lg font-bold">
           {userInfo?.username || "User Name"}
