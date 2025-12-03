@@ -70,7 +70,7 @@ const VendorDashboard = () => {
         <div className="bg-gray-800 p-6 shadow rounded-2xl">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-yellow-900/50 rounded-xl">
-              <DollarSign size={28} className="text-yellow-400" />
+              <span className="text-yellow-400 text-2xl font-bold">Rs</span>
             </div>
             <div>
               <p className="text-sm text-gray-300">Pending Revenue</p>
