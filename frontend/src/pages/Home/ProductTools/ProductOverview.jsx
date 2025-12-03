@@ -234,43 +234,43 @@ const ProductOverview = () => {
 
             {/* ===== Action Buttons ===== */}
             <div className="space-y-4">
-              {(!userInfo ||
-                (!userInfo.isAdmin &&
-                  userInfo._id !== product.uploadedBy?._id?.toString() &&
-                  userInfo._id !== product.uploadedBy?.toString())) && (
-                <div className="flex gap-4">
-                  {/* Add to Cart Button Wrapper */}
-                  <div className="flex-1">
-                    <AddToCart
-                      productId={product._id}
-                      disabled={!product.countInStock}
-                      quantity={1}
-                    />
+              {product.countInStock > 0 &&
+                (!userInfo ||
+                  (!userInfo.isAdmin &&
+                    userInfo._id !== product.uploadedBy?._id?.toString() &&
+                    userInfo._id !== product.uploadedBy?.toString())) && (
+                  <div className="flex gap-4">
+                    {/* Add to Cart Button Wrapper */}
+                    <div className="flex-1">
+                      <AddToCart
+                        productId={product._id}
+                        disabled={!product.countInStock}
+                        quantity={1}
+                      />
+                    </div>
                   </div>
-
-                  
-                </div>
-              )}
-              {(!userInfo ||
-                (userInfo._id !== product.uploadedBy?._id?.toString() &&
-                  userInfo._id !== product.uploadedBy?.toString())) && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!userInfo) {
-                      toast.error("Login required");
-                      navigate("/login");
-                    } else if (userInfo._id === product.uploadedBy._id) {
-                      toast.error("Can't report  own product");
-                    } else {
-                      setShowPopup(true);
-                    }
-                  }}
-                  className="w-full px-8 py-3 bg-white border border-gray-300 text-gray-800 rounded-xl font-medium hover:bg-gray-100 transition-all"
-                >
-                  Report Product
-                </button>
-              )}
+                )}
+              {product.countInStock > 0 &&
+                (!userInfo ||
+                  (userInfo._id !== product.uploadedBy?._id?.toString() &&
+                    userInfo._id !== product.uploadedBy?.toString())) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!userInfo) {
+                        toast.error("Login required");
+                        navigate("/login");
+                      } else if (userInfo._id === product.uploadedBy._id) {
+                        toast.error("Can't report  own product");
+                      } else {
+                        setShowPopup(true);
+                      }
+                    }}
+                    className="w-full px-8 py-3 bg-white border border-gray-300 text-gray-800 rounded-xl font-medium hover:bg-gray-100 transition-all"
+                  >
+                    Report Product
+                  </button>
+                )}
             </div>
           </div>
         </div>
