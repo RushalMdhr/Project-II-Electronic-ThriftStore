@@ -22,7 +22,7 @@ const AddToCart = ({ productId, disabled }) => {
       await addToCart({ userId, productId, quantity: 1 }).unwrap();
       alert("✅ Product added to cart!");
     } catch (error) {
-      console.error("❌ Fail to add to cart:", error);
+      console.error("❌ Failed to add to cart:", error);
       toast.error(error?.data?.message || "Failed to add to cart");
     }
   };
