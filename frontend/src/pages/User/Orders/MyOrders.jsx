@@ -344,13 +344,14 @@ const MyOrders = () => {
                                   </div>
 
                                   {/* RIGHT COLUMN — Review Button / Form */}
-                                  <div className="md:ml-auto w-full md:w-auto md:justify-self-end">
-                                    <CreateReview
-                                      productId={it.product._id}
-                                      orderId={order._id}
-                                      sellerId={it.product.uploadedBy}
-                                    />
-                                  </div>
+                                  {order.status === "delivered" && (
+                                    <div className="md:ml-auto w-full md:w-auto md:justify-self-end">
+                                      <CreateReview
+                                        productId={it.product._id}
+                                        orderId={order._id}
+                                        sellerId={it.product.uploadedBy}
+                                      />
+                                    </div>)}
                                 </div>
                               </div>
                             </div>
