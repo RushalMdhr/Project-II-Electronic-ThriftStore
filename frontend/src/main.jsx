@@ -5,6 +5,7 @@ import { Route, RouterProvider, createRoutesFromElements } from "react-router";
 import { createBrowserRouter } from "react-router";
 import Login from "./pages/Auth/Login.jsx";
 import Register from "./pages/Auth/Register.jsx";
+import AuthSuccess from "./pages/Auth/GoogleAuthSuccess.jsx"
 import { Provider } from "react-redux";
 import store from "./redux/store.js";
 import PrivateRoute from "./components/PrivateRoute.jsx";
@@ -86,6 +87,7 @@ const router = createBrowserRouter(
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/auth-success" element={<AuthSuccess />} />
       <Route path="/become-admin" element={<BecomeAdmin />} />
       <Route path="/aboutus" element={<AboutUs />} />
       <Route path="/products" element={<Products />} />
