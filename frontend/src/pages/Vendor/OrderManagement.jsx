@@ -25,7 +25,7 @@ function sum(items = []) {
 }
 
 
-export default function OrderManagement({ limit = 5 }) {
+export default function OrderManagement({ limit, heading = "Orders" }) {
   const { data } = useGetSoldOrdersQuery();
   const [updateOrder] = useUpdateOrderStatusMutation();
   const soldOrders = data?.map((order) => ({
@@ -188,7 +188,7 @@ export default function OrderManagement({ limit = 5 }) {
   return (
     <div
       style={{ background: COLORS.black }}
-      className="min-h-screen p-6 text-white font-sans"
+      className=" p-6 text-white font-sans"
     >
       <style>{`
         .card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.04); }
@@ -207,7 +207,7 @@ export default function OrderManagement({ limit = 5 }) {
       `}</style>
 
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Orders</h1>
+        <h1 className="text-2xl font-bold">{heading}</h1>
         <div className="flex items-center gap-3">
           {/* <div className="badge-pending">Pending</div>
           <button

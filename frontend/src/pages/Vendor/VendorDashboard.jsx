@@ -175,7 +175,9 @@ const VendorDashboard = () => {
       </div>
 
       {/* Recent Orders Table */}
-      {recentOrders?.length > 0 && <OrderManagement limit={5} />}
+      <div className="pb-2">
+        {recentOrders?.length > 0 && <OrderManagement limit={5} heading="Recent Orders" />}
+      </div>
     </div>
   );
 };
