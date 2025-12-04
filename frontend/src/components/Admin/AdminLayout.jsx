@@ -127,7 +127,7 @@ const AdminLayout = () => {
           >
             <i className="ri-file-list-3-line text-2xl"></i>
 
-            {!collapsed && <span>Transaction Histry</span>}
+            {!collapsed && <span>Transaction History</span>}
           </Link>
         </nav>
       </aside>
