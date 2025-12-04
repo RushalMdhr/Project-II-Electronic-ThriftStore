@@ -6,6 +6,7 @@ import {
   useProfileMutation,
 } from "../../redux/api/usersApiSlice";
 import LoadingScreen from "../../components/ui/Loading";
+import { useNavigate } from "react-router";
 
 const UpdateProfile = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -23,6 +24,7 @@ const UpdateProfile = () => {
   const [profilePicPreview, setProfilePicPreview] = useState("");
   const [coverPicFile, setCoverPicFile] = useState(null);
   const [coverPicPreview, setCoverPicPreview] = useState("");
+const navigate = useNavigate();
 
   // Address state
   const [province, setProvince] = useState(
@@ -164,6 +166,7 @@ const UpdateProfile = () => {
 
       await updateProfile(formData).unwrap();
       toast.success("Profile updated successfully!");
+      navigate("/");
     } catch (error) {
       console.log(error);
       toast.error(error?.data?.message || "Update failed");
