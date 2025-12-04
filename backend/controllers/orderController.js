@@ -11,6 +11,7 @@ const createOrder = asyncHandler(async (req, res) => {
   console.time("createOrder");
   const { orderItems, method, address } = req.body;
   console.log("as u can see", req.body);
+  console.log("address : ", address);
   if (!orderItems || orderItems.length === 0) {
     return res.status(400).json({ error: "No order items" });
   }
@@ -63,8 +64,12 @@ const createOrder = asyncHandler(async (req, res) => {
         method: method,
       },
       shippingAddress: {
-        city: address.city,
         street: address.street,
+        city: address.city,
+        district: address.district,
+        province: address.province,
+        zipCode: address.zipCode,
+        phone: address.phone,
       },
       shipping, // include shipping
       tax, // include tax
