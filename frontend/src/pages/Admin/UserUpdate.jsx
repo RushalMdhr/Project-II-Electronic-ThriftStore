@@ -33,21 +33,19 @@ const UserUpdate = () => {
   // Good chance calculation (inverse risk)
   let goodChance = 100;
 
-  if(sales===0 && blackListStreak>0){
+  if (sales === 0 && blackListStreak > 0) {
     goodChance = 0;
-  }
-  else if(sales===0 && blackListStreak===0){
+  } else if (sales === 0 && blackListStreak === 0) {
     goodChance = 100;
-  }
-  else{
-    goodChance = 100 - (blackListStreak / sales * 100).toFixed(2);
+  } else {
+    goodChance = 100 - ((blackListStreak / sales) * 100).toFixed(2);
   }
 
   let riskColor = "text-green-400";
   let riskLabel = "Good";
 
-  if (goodChance < 80) {
-    riskColor = "text-orange-400";
+  if (goodChance >= 80 && goodChance < 95) {
+    riskColor = "text-yellow-400";
     riskLabel = "Okay";
   }
 
