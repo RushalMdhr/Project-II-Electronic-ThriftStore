@@ -229,6 +229,7 @@ const getMyOrders = asyncHandler(async (req, res) => {
         _id: 1,
         subtotal: 1,
         shipping: 1,
+        shippingAddress : 1,
         tax: 1,
         total: 1,
         status: 1,
@@ -552,6 +553,7 @@ const getSoldOrders = asyncHandler(async (req, res) => {
           // total: 1,
           status: 1,
           payment: 1,
+          shippingAddress : 1,
           createdAt: 1,
           orderItems: {
             _id: 1,
