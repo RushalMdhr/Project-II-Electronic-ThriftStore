@@ -235,6 +235,7 @@ const getMyOrders = asyncHandler(async (req, res) => {
         status: 1,
         payment: 1,
         createdAt: 1,
+        shippingAddress: 1,
         orderItems: {
           _id: 1,
           status: 1,
@@ -555,6 +556,7 @@ const getSoldOrders = asyncHandler(async (req, res) => {
           payment: 1,
           shippingAddress : 1,
           createdAt: 1,
+          shippingAddress: 1,
           orderItems: {
             _id: 1,
             status: 1,

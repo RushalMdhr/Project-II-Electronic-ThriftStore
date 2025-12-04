@@ -481,6 +481,27 @@ const ManageOrders = () => {
                                 </div>
                               ))}
                             </div>
+                            <div className="mt-6 p-4 bg-gray-900 rounded-lg border border-gray-700">
+                              <div className="flex items-center space-x-2">
+                                <CheckCircle className="w-5 h-5 text-emerald-400" />
+                                <span className="text-sm font-medium text-emerald-400">
+                                  Order ID: {order._id}
+                                </span>
+                              </div>
+                              <div className="mt-2 flex items-center space-x-4 text-xs text-gray-400">
+                                <span>
+                                  Created: {formatDate(order.createdAt)}
+                                </span>
+                                <span>
+                                  Updated: {formatDate(order.updatedAt)}
+                                </span>
+                              </div>
+                              <div className="mt-2">
+                                <span className="text-xs text-gray-400">
+                                  Customer: {order.customer?.email}
+                                </span>
+                              </div>
+                            </div>
                           </div>
 
                           {/* Order Summary */}
@@ -515,27 +536,23 @@ const ManageOrders = () => {
                                   </span>
                                 </div>
                               </div>
-                            </div>
-
-                            <div className="mt-6 p-4 bg-gray-900 rounded-lg border border-gray-700">
-                              <div className="flex items-center space-x-2">
-                                <CheckCircle className="w-5 h-5 text-emerald-400" />
-                                <span className="text-sm font-medium text-emerald-400">
-                                  Order ID: {order._id}
+                              <div className="text-sm bg-green-800/40 p-2 rounded-md">
+                                <span className="text-gray-300 block mb-1">
+                                  <h4 className="text-md font-semibold text-emerald-400 mb-4">
+                                    Shipping Address
+                                  </h4>
+                                  
                                 </span>
-                              </div>
-                              <div className="mt-2 flex items-center space-x-4 text-xs text-gray-400">
-                                <span>
-                                  Created: {formatDate(order.createdAt)}
-                                </span>
-                                <span>
-                                  Updated: {formatDate(order.updatedAt)}
-                                </span>
-                              </div>
-                              <div className="mt-2">
-                                <span className="text-xs text-gray-400">
-                                  Customer: {order.customer?.email}
-                                </span>
+                                <div className="font-medium leading-tight">
+                                  {order.shippingAddress?.street}
+                                  <br />
+                                  {order.shippingAddress?.city},{" "}
+                                  {order.shippingAddress?.district}
+                                  <br />
+                                  {order.shippingAddress?.province}
+                                  <br />
+                                  {order.shippingAddress?.phone}
+                                </div>
                               </div>
                             </div>
                           </div>
