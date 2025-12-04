@@ -58,6 +58,7 @@ import VendorPayments from "./pages/Admin/VendorPayments.jsx";
 import ReviewList from "./components/Admin/ReviewList.jsx";
 import TransactionHistoryAdmin from "./pages/Admin/TransactionList.jsx";
 import BecomeAdmin from "./pages/Auth/BecomeAdmin.jsx";
+import TermsAndConditions from "./pages/User/TermsAndConditions.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -92,6 +93,7 @@ const router = createBrowserRouter(
       <Route path="/aboutus" element={<AboutUs />} />
       <Route path="/products" element={<Products />} />
       <Route path="/contactus" element={<ContactUs />} />
+      <Route path="/terms" element={<TermsAndConditions />} />
       <Route path="/overview/:productId" element={<ProductOverView />} />
       <Route path="/faq" element={<FAQ />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
