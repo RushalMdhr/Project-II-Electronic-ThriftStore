@@ -128,12 +128,74 @@ const ProductOverview = () => {
           {/* ===== Left: Image Gallery ===== */}
           <div className="space-y-6">
             <div className="relative">
-              {product.images && product.images.length > 0 && (
-                <img
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  className="w-full object-contain shadow-lg"
-                />
+              {product.images &&
+                product.images.length > 0 &&
+                !product.blackListed && (
+                  <img
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    className="w-full object-contain shadow-lg"
+                  />
+                )}
+              {product.blackListed && (
+                <div className="relative">
+                  {/* — your existing product content (image, title, etc.) — */}
+                  <img
+                    src={product.images?.[0]}
+                    alt={product.name}
+                    className="w-full h-56 object-cover rounded-xl"
+                  />
+
+                  {/* BLOCKED OVERLAY */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 flex items-center justify-center bg-black/85 backdrop-blur-sm rounded-xl shadow-2xl border-4 border-red-800"
+                    role="alert"
+                  >
+                    <div className="text-center px-6">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-900/90 mb-4 shadow-lg">
+                        {/* ban icon */}
+                        <svg
+                          className="w-8 h-8 text-white"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M18.364 5.636A9 9 0 105.636 18.364 9 9 0 0018.364 5.636z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15 9l-6 6"
+                          />
+                        </svg>
+                      </div>
+
+                      <h3 className="text-white text-lg md:text-2xl font-extrabold uppercase tracking-wide">
+                        PRODUCT IS BLOCKED
+                      </h3>
+
+                      <p className="text-red-200 text-sm md:text-base mt-2 max-w-xs mx-auto">
+                        This item has been blocked for violations. Contact
+                        support for details.
+                      </p>
+
+                      {/* optional admin action — hide for non-admins */}
+                      {/* <div className="mt-4 flex justify-center gap-3">
+                        <button className="px-4 py-2 rounded-lg bg-red-700/90 text-white text-sm font-semibold shadow hover:bg-red-700/100">
+                          View Reason
+                        </button>
+                        <button className="px-4 py-2 rounded-lg bg-gray-800/70 text-white text-sm font-medium border border-gray-700 hover:bg-gray-800">
+                          Contact Support
+                        </button>
+                      </div> */}
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 
@@ -182,7 +244,11 @@ const ProductOverview = () => {
                 <span className="text-3xl font-bold text-green-600">
                   Rs.{product.price}
                 </span>
-                {product.countInStock > 0 ? (
+                {product.blackListed ? (
+                  <p className="text-red-700 font-black tracking-widest uppercase text-2xl drop-shadow-[0_2px_8px_rgba(127,29,29,0.9)]">
+                    PRODUCT IS BLOCKED
+                  </p>
+                ) : product.countInStock > 0 ? (
                   <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-100 border border-green-200 text-green-700">
                     In Stock ({product.countInStock})
                   </span>
@@ -235,6 +301,7 @@ const ProductOverview = () => {
             {/* ===== Action Buttons ===== */}
             <div className="space-y-4">
               {product.countInStock > 0 &&
+                !product.blackListed &&
                 (!userInfo ||
                   (!userInfo.isAdmin &&
                     userInfo._id !== product.uploadedBy?._id?.toString() &&
@@ -251,6 +318,7 @@ const ProductOverview = () => {
                   </div>
                 )}
               {product.countInStock > 0 &&
+                !product.blackListed &&
                 (!userInfo ||
                   (userInfo._id !== product.uploadedBy?._id?.toString() &&
                     userInfo._id !== product.uploadedBy?.toString())) && (

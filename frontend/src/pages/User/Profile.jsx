@@ -1,9 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import Tabs from "../../components/Product/Tabs";
-import {
-  useGetUserDetailsQuery,
-} from "../../redux/api/usersApiSlice";
+import { useGetUserDetailsQuery } from "../../redux/api/usersApiSlice";
 import ProductGrid from "../Home/ProductTools/ProductGrid";
 import { useParams } from "react-router-dom";
 import { useGetMyProductsQuery } from "../../redux/api/productsApiSlice";
@@ -64,12 +62,17 @@ const Profile = () => {
   };
 
   // Handle loading
-  if (userLoading) return <LoadingScreen color="emerald"  text="user loading..." />;
+  if (userLoading)
+    return <LoadingScreen color="emerald" text="user loading..." />;
 
   // Handle error (user not found)
   if (userError || !user) return <p>User not found</p>;
 
-  return (
+  return user && user.status === "banned" ? (
+    <p className="flex items-center justify-center min-h-screen text-red-700 font-black tracking-widest uppercase text-2xl drop-shadow-[0_2px_8px_rgba(127,29,29,0.9)]">
+      USER HAS BEEN BANNED
+    </p>
+  ) : (
     <div className="min-h-screen bg-gray-50">
       {/* ---------- COVER + AVATAR SECTION ---------- */}
       <section className="px-4 pt-4">
