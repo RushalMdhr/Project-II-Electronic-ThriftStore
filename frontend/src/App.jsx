@@ -14,7 +14,7 @@ function App() {
         <ToastContainer
           position="bottom-right" // or "bottom-left", "bottom-center"
           autoClose={3000}
-          style={{ bottom: "550px" }} // Adjust distance from bottom
+          style={{ bottom: "10px" }} // Adjust distance from bottom
         />
         <Navbar />
         <ScrollToTop />
