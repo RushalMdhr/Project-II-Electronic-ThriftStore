@@ -53,7 +53,6 @@ router.delete(
 router.get(
   "/getmyproducts/:vendorId",
   authenticate,
-  authorizeVendor,
   getMyProducts
 );
 
