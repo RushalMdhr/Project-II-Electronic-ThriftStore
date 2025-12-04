@@ -8,6 +8,7 @@ import {
 } from "../../redux/api/vendorApiSlice";
 import { Package, ShoppingCart, DollarSign, Users, TrendingUp } from "lucide-react";
 import LoadingScreen from "../../components/ui/Loading";
+import OrderManagement from "./OrderManagement";
 
 const VendorDashboard = () => {
   const { data: dashboard, isLoading: loadingDashboard } = useGetDashboardQuery();
@@ -46,7 +47,9 @@ const VendorDashboard = () => {
             </div>
             <div>
               <p className="text-sm text-gray-300">Products</p>
-              <p className="text-2xl font-bold">{dashboard?.productsCount || 0}</p>
+              <p className="text-2xl font-bold">
+                {dashboard?.productsCount || 0}
+              </p>
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-4">Active listings</p>
@@ -60,7 +63,9 @@ const VendorDashboard = () => {
             </div>
             <div>
               <p className="text-sm text-gray-300">Orders</p>
-              <p className="text-2xl font-bold">{dashboard?.totalOrders || 0}</p>
+              <p className="text-2xl font-bold">
+                {dashboard?.totalOrders || 0}
+              </p>
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-4">Total orders</p>
@@ -74,7 +79,9 @@ const VendorDashboard = () => {
             </div>
             <div>
               <p className="text-sm text-gray-300">Pending Revenue</p>
-              <p className="text-2xl font-bold">Rs. {pendingRevenue.toLocaleString()}</p>
+              <p className="text-2xl font-bold">
+                Rs. {pendingRevenue.toLocaleString()}
+              </p>
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-4">Awaiting payment</p>
@@ -88,7 +95,9 @@ const VendorDashboard = () => {
             </div>
             <div>
               <p className="text-sm text-gray-300">Received Revenue</p>
-              <p className="text-2xl font-bold">Rs. {receivedRevenue.toLocaleString()}</p>
+              <p className="text-2xl font-bold">
+                Rs. {receivedRevenue.toLocaleString()}
+              </p>
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-4">Paid to you</p>
@@ -130,8 +139,12 @@ const VendorDashboard = () => {
         <div className="bg-gray-800 p-4 rounded-xl">
           <div className="flex justify-between items-center">
             <span className="text-gray-300">Payment Status</span>
-            <span className={`text-lg font-medium ${pendingRevenue > 0 ? 'text-yellow-400' : 'text-emerald-400'}`}>
-              {pendingRevenue > 0 ? 'Pending' : 'All Clear'}
+            <span
+              className={`text-lg font-medium ${
+                pendingRevenue > 0 ? "text-yellow-400" : "text-emerald-400"
+              }`}
+            >
+              {pendingRevenue > 0 ? "Pending" : "All Clear"}
             </span>
           </div>
         </div>
@@ -149,7 +162,7 @@ const VendorDashboard = () => {
             type="line"
           />
         )}
-        
+
         {categoryData.length > 0 && (
           <DashboardChart
             title="Category Distribution"
@@ -162,52 +175,7 @@ const VendorDashboard = () => {
       </div>
 
       {/* Recent Orders Table */}
-      {recentOrders?.length > 0 && (
-        <div className="bg-gray-800 p-6 shadow rounded-2xl">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Recent Orders</h2>
-            <span className="text-sm text-gray-400">
-              Showing {Math.min(recentOrders.length, 10)} orders
-            </span>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-gray-200">
-              <thead>
-                <tr className="border-b border-gray-700">
-                  <th className="p-3 font-medium">Order ID</th>
-                  <th className="p-3 font-medium">Status</th>
-                  <th className="p-3 font-medium">Items</th>
-                  <th className="p-3 font-medium">Total</th>
-                  <th className="p-3 font-medium">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentOrders.slice(0, 10).map((order) => (
-                  <tr key={order._id} className="hover:bg-gray-700/50 border-b border-gray-700/30">
-                    <td className="p-3 font-mono text-sm">{order._id.slice(-8)}</td>
-                    <td className="p-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        order.status === 'delivered' ? 'bg-emerald-900/50 text-emerald-300' :
-                        order.status === 'shipped' ? 'bg-blue-900/50 text-blue-300' :
-                        order.status === 'pending' ? 'bg-yellow-900/50 text-yellow-300' :
-                        'bg-gray-700 text-gray-300'
-                      }`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="p-3">{order.orderItems?.length || 0} items</td>
-                    <td className="p-3 font-medium">Rs. {order.total?.toLocaleString()}</td>
-                    <td className="p-3 text-gray-400">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      {recentOrders?.length > 0 && <OrderManagement limit={5} />}
     </div>
   );
 };
