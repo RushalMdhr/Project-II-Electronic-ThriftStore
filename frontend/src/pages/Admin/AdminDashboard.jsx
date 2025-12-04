@@ -1,7 +1,7 @@
 import { useGetAdminSummaryQuery } from "../../redux/api/adminApiSlice.js";
 import StatCard from "../../components/Admin/StatCard";
 import DashboardChart from "../../components/Admin/DashboardChart";
-import OrderList from "../../components/Admin/OrderList";
+// import OrderList from "../../components/Admin/OrderList";
 import LoadingScreen from "../../components/ui/Loading.jsx";
 
 const AdminDashboard = () => {
@@ -51,7 +51,7 @@ const AdminDashboard = () => {
                   
 
               {/* Orders */}
-              {summary?.orders && <OrderList orders={summary.orders} />}
+              {/* {summary?.orders && <OrderList orders={summary.orders} />} */}
             </>
           )}
         </main>

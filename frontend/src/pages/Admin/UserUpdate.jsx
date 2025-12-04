@@ -10,6 +10,7 @@ const UserUpdate = () => {
   const navigate = useNavigate();
 
   const { data: user, isLoading, isError, error } = useGetUserDetailsQuery(id);
+  user && console.log("Fetched user data:", user);
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
 
   const [formData, setFormData] = useState({
@@ -21,6 +22,37 @@ const UserUpdate = () => {
     status: "active",
     password: "",
   });
+
+  // ===== Admin Risk Calculation =====
+  const sales = user?.sales || 0;
+  const blackListStreak = user?.blackListStreak || 0;
+
+  const riskLimit = sales / 5;
+  const isBannedRisk = blackListStreak > riskLimit;
+
+  // Good chance calculation (inverse risk)
+  let goodChance = 100;
+
+  if (sales === 0 && blackListStreak > 0) {
+    goodChance = 0;
+  } else if (sales === 0 && blackListStreak === 0) {
+    goodChance = 100;
+  } else {
+    goodChance = 100 - ((blackListStreak / sales) * 100).toFixed(2);
+  }
+
+  let riskColor = "text-green-400";
+  let riskLabel = "Good";
+
+  if (goodChance >= 80 && goodChance < 95) {
+    riskColor = "text-yellow-400";
+    riskLabel = "Okay";
+  }
+
+  if (goodChance < 30 || isBannedRisk) {
+    riskColor = "text-red-500";
+    riskLabel = isBannedRisk ? "BANNED RISK" : "Bad";
+  }
 
   useEffect(() => {
     if (user) {
@@ -78,6 +110,7 @@ const UserUpdate = () => {
           <input
             type="text"
             value={formData.username}
+            disabled
             onChange={(e) =>
               setFormData({ ...formData, username: e.target.value })
             }
@@ -89,6 +122,7 @@ const UserUpdate = () => {
           <input
             type="email"
             value={formData.email}
+            disabled
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
@@ -96,11 +130,45 @@ const UserUpdate = () => {
             placeholder="Email"
           />
 
+          {/* ===== Admin Risk Analytics ===== */}
+          <div className="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 space-y-2">
+            <h3 className="text-sm font-semibold text-gray-300">
+              Risk Analytics (Admin Only)
+            </h3>
+
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Sales</span>
+              <span className="text-white font-semibold">{sales}</span>
+            </div>
+
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Blacklist Streak</span>
+              <span className="text-white font-semibold">
+                {blackListStreak}
+              </span>
+            </div>
+
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Banned Threshold</span>
+              <span className="text-white font-semibold">
+                {riskLimit.toFixed(2)}
+              </span>
+            </div>
+
+            <div className="flex justify-between text-sm pt-2 border-t border-gray-700">
+              <span className="text-gray-300 font-medium">Good Chance</span>
+              <span className={`font-bold ${riskColor}`}>
+                {goodChance}% — {riskLabel}
+              </span>
+            </div>
+          </div>
+
           {/* Status segmented control */}
           <div className="w-full">
             <label className="block mb-2 text-sm font-semibold text-gray-300">
               Status
             </label>
+
             <div className="inline-flex rounded-lg bg-gray-800 shadow-sm overflow-hidden select-none">
               {["active", "inactive", "banned"].map((statusOption) => (
                 <button
