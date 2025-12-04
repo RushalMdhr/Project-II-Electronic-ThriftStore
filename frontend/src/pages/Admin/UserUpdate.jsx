@@ -112,6 +112,7 @@ const UserUpdate = () => {
           <input
             type="text"
             value={formData.username}
+            disabled
             onChange={(e) =>
               setFormData({ ...formData, username: e.target.value })
             }
