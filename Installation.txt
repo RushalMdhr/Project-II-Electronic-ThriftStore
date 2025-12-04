@@ -20,6 +20,12 @@ npm i bcrypt
 npm i joi
 npm i esewajs
 
+FOR VERIFICATION -- DO NOT INSTALL THIS RIGHT NOW --
+npm i crypto nodemailer
+
+-- FOR LOGIN WITH GOOGLE -- INSTALL THIS ONE 
+npm i npm install passport passport-google-oauth20 
+
 ________ FRONTEND ________
 npm i slick-carousel react-slick react-toastify react-router react-router-dom react-redux react-icons apexcharts react-apexcharts moment flowbite axios @reduxjs/toolkit
 

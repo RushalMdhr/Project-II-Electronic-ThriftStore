@@ -23,6 +23,9 @@ import esewaRoutes from "./routes/esewaRoutes.js";
 import vendorRoutes from "./routes/vendorRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import { deleteErrorOrder } from "./controllers/orderController.js";
+import googleAuthRoutes from "./routes/googleAuthRoutes.js";
+import "./utils/googleStrategy.js"; // ✅ THIS ACTIVATES THE STRATEGY
+
 
 //db connection
 connectDB();
@@ -55,6 +58,7 @@ app.use("/api/cart", cartitemRoutes);
 app.use("/api/esewa", esewaRoutes);
 app.use("/api/vendor", vendorRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/auth", googleAuthRoutes);
 
 // __________________IMAGE________________________________________
 app.use("/api/upload", uploadRoutes);
