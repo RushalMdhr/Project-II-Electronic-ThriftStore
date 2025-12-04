@@ -240,12 +240,49 @@ const fetchProducts = asyncHandler(async (req, res) => {
     if (req.query.productId) {
       dbFilter._id = { $ne: req.query.productId };
     }
+
     // Only add search if keyword is present and not empty
+    let userIds = [];
     if (keyword && keyword !== "null" && keyword !== "undefined") {
-      dbFilter.$or = [
-        { name: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } },
-      ];
+      if (keyword[0] === "*" && keyword[keyword.length - 1] === "*") {
+        const exactKeyword = keyword.slice(1, -1).trim();
+        console.log("exactKeyword", exactKeyword);
+
+        // Find users by username OR email (case-insensitive, partial match)
+        const users = await User.find({
+          $or: [
+            { username: { $regex: exactKeyword, $options: "i" } }, // "sel" finds "Seller"
+            { email: { $regex: exactKeyword, $options: "i" } }, // "gmail" finds emails
+          ],
+        }).select("_id");
+
+        console.log("user", users);
+
+        // userIds = users.map((u) => u._id.toString());
+        userIds = users.map((u) => u._id.toString());
+
+        console.log("userIds", userIds);
+
+        if (userIds.length > 0) {
+          dbFilter.$or = [
+            // { name: { $regex: keyword, $options: "i" } },
+            // { description: { $regex: keyword, $options: "i" } },
+            { uploadedBy: { $in: userIds } },
+          ];
+        } else {
+          // No vendor found - just search products
+          dbFilter.$or = [
+            { name: { $regex: keyword, $options: "i" } },
+            { description: { $regex: keyword, $options: "i" } },
+          ];
+        }
+      } else {
+        // Normal product search
+        dbFilter.$or = [
+          { name: { $regex: keyword, $options: "i" } },
+          { description: { $regex: keyword, $options: "i" } },
+        ];
+      }
     }
     // console.log(keyword, "keyword");
 
@@ -615,8 +652,8 @@ const addToBlackList = asyncHandler(async (req, res) => {
     user.blackListStreak = (user.blackListStreak || 0) + 1;
 
     // Check if user should be blacklisted based on sales to blacklist ratio
-    if(user.blackListStreak>user.sales/5){
-        user.status = "banned";
+    if (user.blackListStreak > user.sales / 5) {
+      user.status = "banned";
     }
 
     await user.save();
