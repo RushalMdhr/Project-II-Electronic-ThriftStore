@@ -25,7 +25,7 @@ function sum(items = []) {
 }
 
 
-export default function OrderManagement() {
+export default function OrderManagement({ limit = 5 }) {
   const { data } = useGetSoldOrdersQuery();
   const [updateOrder] = useUpdateOrderStatusMutation();
   const soldOrders = data?.map((order) => ({
@@ -234,7 +234,7 @@ export default function OrderManagement() {
           </thead>
 
           <tbody>
-            {soldOrders?.map((o) => (
+            {soldOrders?.slice(0, limit).map((o) => (
               <tr
                 key={o._id}
                 className="row"
@@ -299,7 +299,7 @@ export default function OrderManagement() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-bold">
-                  Order {shortIds(selected._id)} 
+                  Order {shortIds(selected._id)}
                 </h2>
                 <div className="text-sm opacity-80">
                   {formatDate(selected.createdAt)}
@@ -337,22 +337,29 @@ export default function OrderManagement() {
                   }}
                 >
                   <div>
-                    <div className="font-semibold"><Link to={`/overview/${it.product._id}`}>{it.product.name}</Link></div>
+                    <div className="font-semibold">
+                      <Link to={`/overview/${it.product._id}`}>
+                        {it.product.name}
+                      </Link>
+                    </div>
                     <div>Quantity:{it.quantity}</div>
-                    <div className="text-sm opacity-70 mb-2">Price Breakdown</div>
-              <div className="flex justify-between text-white">
-                
-                <div>Original Sum:</div>
-                <div>Rs. {sum(selected.orderItems).original}</div>
-              </div>
-              <div className="flex justify-between text-white">
-                <div>Charge (10%):</div>
-                <div>Rs. {sum(selected.orderItems).commission.toFixed(2)}</div>
-              </div>
-              <div className="flex justify-between font-semibold text-white mt-1">
-                <div>Final Total:</div>
-                <div>Rs. {sum(selected.orderItems).final}</div>
-              </div>
+                    <div className="text-sm opacity-70 mb-2">
+                      Price Breakdown
+                    </div>
+                    <div className="flex justify-between text-white">
+                      <div>Original Sum:</div>
+                      <div>Rs. {sum(selected.orderItems).original}</div>
+                    </div>
+                    <div className="flex justify-between text-white">
+                      <div>Charge (10%):</div>
+                      <div>
+                        Rs. {sum(selected.orderItems).commission.toFixed(2)}
+                      </div>
+                    </div>
+                    <div className="flex justify-between font-semibold text-white mt-1">
+                      <div>Final Total:</div>
+                      <div>Rs. {sum(selected.orderItems).final}</div>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-4">
@@ -379,12 +386,15 @@ export default function OrderManagement() {
 
                       <div
                         className={
-                          it.status==="confirmed" | it.status==="pending"
+                          (it.status === "confirmed") |
+                          (it.status === "pending")
                             ? "text-green-300 font-semibold"
                             : "text-red-300 font-semibold"
                         }
                       >
-                        {it.status==="confirmed" | it.status==="pending" ? "Confirmed" : "Rejected"}
+                        {(it.status === "confirmed") | (it.status === "pending")
+                          ? "Confirmed"
+                          : "Rejected"}
                       </div>
                     </div>
 
