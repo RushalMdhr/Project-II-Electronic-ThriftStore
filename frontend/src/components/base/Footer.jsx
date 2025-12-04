@@ -124,6 +124,14 @@ export default function Footer() {
                   About Us
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/terms"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  Terms & Conditions
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
