@@ -204,7 +204,7 @@ const Navbar = () => {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search for products..."
+                  placeholder="productName, *SellerName*"
                   className="pl-10 bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-400"
                 />
               </div>
