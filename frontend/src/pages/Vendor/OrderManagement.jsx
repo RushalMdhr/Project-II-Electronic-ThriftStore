@@ -18,12 +18,11 @@ const COLORS = {
 
 function sum(items = []) {
   const original = items.reduce((s, it) => s + (it.price || 0), 0);
-  const commission = original * 0.10;
+  const commission = original * 0.1;
   const final = original - commission;
 
   return { original, commission, final };
 }
-
 
 export default function OrderManagement({ limit, heading = "Orders" }) {
   const { data } = useGetSoldOrdersQuery();
@@ -343,6 +342,11 @@ export default function OrderManagement({ limit, heading = "Orders" }) {
                       </Link>
                     </div>
                     <div>Quantity:{it.quantity}</div>
+                    <div>
+                      Shipping Address: {selected?.shippingAddress?.district},
+                      {selected?.shippingAddress?.city},
+                      {selected?.shippingAddress?.province}
+                    </div>
                     <div className="text-sm opacity-70 mb-2">
                       Price Breakdown
                     </div>
