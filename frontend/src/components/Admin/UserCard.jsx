@@ -27,14 +27,23 @@ const UserCard = ({ user, onDelete, onView }) => {
       <div className="flex flex-col sm:flex-row sm:items-center bg-[#0a101e] rounded-xl px-6 py-5 transition-colors duration-300 hover:bg-[#202532] shadow-sm gap-4 sm:gap-0 flex-wrap">
         {/* Avatar and user info */}
         <div className="flex items-center gap-4 flex-1 min-w-[200px]">
-          <img
-            src={
-              `http://localhost:5000/${user.profilePic}` ||
-              "/uploads/profile/default.png"
-            }
-            alt={user.username}
-            className="w-12 h-12 rounded-full object-cover"
-          />
+          {user.profilePic ? (
+            <img
+              src={
+                `http://localhost:5000/${user.profilePic}` ||
+                "/uploads/profile/default.png"
+              }
+              alt={user.username}
+              className="w-12 h-12 rounded-full object-cover"
+            />
+          ) : (
+            <span className="w-12 h-12 rounded-full bg-emerald-600 flex items-center justify-center">
+              <span className="text-2xl text-white font-bold">
+                {user?.username?.charAt(0).toUpperCase() || "U"}
+              </span>
+            </span>
+          )}
+
           <div>
             <h3 className="text-gray-100 font-semibold text-lg">
               {user.username}

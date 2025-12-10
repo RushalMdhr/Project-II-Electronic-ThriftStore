@@ -21,7 +21,7 @@ const HeroSection = () => {
     vendorButtonText = "Become Customer";
     vendorButtonLink = "/register"; // or your customer registration page
   } else if (!localStorage.userInfo.isVendor) {
-    vendorButtonText = "Join as Vendor";
+    vendorButtonText = "Join as Seller";
     vendorButtonLink = "/vendor/register";
   } else {
     vendorButtonText = "Start Selling";
@@ -41,7 +41,7 @@ const HeroSection = () => {
           filter: admin ? "brightness(0.6) contrast(1)" : "",
         }}
       >
-        <div className="absolute inset-0 bg-gray-900/40"></div>
+        <div className="absolute inset-0 bg-gray-900/50"></div>
       </div>
 
       {/* Content */}
@@ -53,7 +53,7 @@ const HeroSection = () => {
           </span>
         </h1>
 
-        <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
+        <p className="text-xl md:text-2xl text-white mb-8 max-w-2xl mx-auto">
           {admin
             ? "Manage users, vendors, products, and insights — all from one place."
             : "Discover premium second-hand electronics from verified vendors that won't break the bank"}
