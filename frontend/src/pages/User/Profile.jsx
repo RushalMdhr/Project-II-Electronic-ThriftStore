@@ -129,14 +129,22 @@ const Profile = () => {
         <div className="relative -mt-4">
           <div className="flex items-center gap-6 ml-[20%]">
             {/* Profile Image */}
-            <img
-              src={
-                `http://localhost:5000/${user.profilePic}` ||
-                "/uploads/profile/default.png"
-              }
-              alt={user.username}
-              className="w-40 h-40 rounded-full ring-4 ring-emerald-600 shadow-2xl object-cover"
-            />
+            {user.profilePic ? (
+              <img
+                src={
+                  `http://localhost:5000/${user.profilePic}` ||
+                  userInfo?.username?.charAt(0).toUpperCase()
+                }
+                alt={user.username}
+                className="w-40 h-40 rounded-full ring-4 ring-emerald-600 shadow-2xl object-cover"
+              />
+            ) : (
+              <span className="w-40 h-40 rounded-full bg-emerald-600 flex items-center justify-center">
+                <span className="text-8xl text-white font-bold">
+                  {userInfo?.username?.charAt(0).toUpperCase() || "U"}
+                </span>
+              </span>
+            )}
 
             {/* LEFT COLUMN – Username / Email / Vendor Badge / Edit */}
             <div className="flex flex-col justify-center gap-2">

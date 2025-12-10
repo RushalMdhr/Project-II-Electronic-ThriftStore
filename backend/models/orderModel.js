@@ -57,7 +57,7 @@ const OrderSchema = new mongoose.Schema(
       },
       district: {
         type: String,
-        enum: ["Kathmandu", "Lalitpur", "Bhaktapur", "Kavrepalanchowk"],
+        enum: ["Kathmandu", "Lalitpur", "Bhaktapur", "Kavrepalanchok"],
         default: "Bhaktapur",
       },
       province: {

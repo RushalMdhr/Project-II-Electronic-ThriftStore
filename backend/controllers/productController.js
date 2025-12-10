@@ -304,6 +304,7 @@ const fetchProducts = asyncHandler(async (req, res) => {
       dbFilter.condition = condition;
     }
 
+    dbFilter.blackListed = { $ne: true };
     const count = await Product.countDocuments(dbFilter);
     const products = await Product.find(dbFilter)
       .sort(sortOption)
@@ -395,7 +396,7 @@ const addProductReview = asyncHandler(async (req, res) => {
 
 const fetchTopProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await Product.find({})
+    const products = await Product.find({blackListed : {$ne: true}})
       .sort({ views: -1 })
       .limit(4)
       .populate("category", "name")
@@ -654,6 +655,10 @@ const addToBlackList = asyncHandler(async (req, res) => {
     // Check if user should be blacklisted based on sales to blacklist ratio
     if (user.blackListStreak > user.sales / 5) {
       user.status = "banned";
+      Product.updateMany(
+        { uploadedBy: user._id },
+        { $set: { blackListed: true } }
+      ).exec();
     }
 
     await user.save();
