@@ -13,7 +13,6 @@ import AboutUs from "./pages/User/AboutUs.jsx";
 import ContactUs from "./pages/User/ContactUs.jsx";
 import FAQ from "./pages/User/FAQ.jsx";
 
-import OrderList from "./components/Admin/OrderList.jsx";
 import UploadPageTest from "./pages/Vendor/UploadPageTest.jsx";
 import VendorProducts from "./pages/Vendor/ProductTools/VendorProducts.jsx";
 import VendorRoutes from "./components/Vendor/VendorRoutes.jsx";
@@ -57,6 +56,7 @@ import VendorPayments from "./pages/Admin/VendorPayments.jsx";
 import ReviewList from "./components/Admin/ReviewList.jsx";
 import TransactionHistoryAdmin from "./pages/Admin/TransactionList.jsx";
 import BecomeAdmin from "./pages/Auth/BecomeAdmin.jsx";
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(

@@ -8,8 +8,13 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-// import Navbar from "../../components/base/Navbar"; // Uncomment if you want the navbar on login
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -50,7 +55,9 @@ const Login = () => {
       <div className="pt-20 flex items-center justify-center min-h-screen px-4">
         <Card className="w-full max-w-md bg-gray-800 border-gray-700">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-white">Welcome Back</CardTitle>
+            <CardTitle className="text-2xl font-bold text-white">
+              Welcome Back
+            </CardTitle>
             <p className="text-gray-400">Sign in to your ThriftTech account</p>
           </CardHeader>
           <CardContent>
@@ -91,7 +98,11 @@ const Login = () => {
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
                   </Button>
                 </div>
               </div>
@@ -101,7 +112,10 @@ const Login = () => {
                   <input type="checkbox" className="mr-2" />
                   <span className="text-sm text-gray-400">Remember me</span>
                 </label>
-                <Link to="/forgot-password" className="text-sm text-emerald-400 hover:text-emerald-300">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-emerald-400 hover:text-emerald-300"
+                >
                   Forgot password?
                 </Link>
               </div>
@@ -113,6 +127,20 @@ const Login = () => {
               >
                 {isLoading ? "Logging in..." : "Sign In"}
               </Button>
+
+              {/* Google Login Button */}
+              <div className="mt-6">
+                <a
+                  href="http://localhost:5000/api/auth/google"
+                  className="flex items-center justify-center gap-2 bg-white border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50"
+                >
+                  <img
+                    src="https://img.icons8.com/color/24/000000/google-logo.png"
+                    alt="Google"
+                  />
+                  Continue with Google
+                </a>
+              </div>
 
               <div className="text-center">
                 <span className="text-gray-400">Don't have an account? </span>

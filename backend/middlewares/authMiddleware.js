@@ -85,10 +85,19 @@ const authorizeAdminOrVendor = (req, res, next) => {
   }
 };
 
+const checkEmailVerified = (req, res, next) => {
+  if (!req.user.isEmailVerified) {
+    return res.status(403).json({ 
+      error: 'Please verify your email first' 
+    });
+  }
+  next();
+};
 export {
   authenticate,
   authorizeAdmin,
   authorizeVendor,
   authorizeAdminOrVendor,
   isAuthenticated,
+  checkEmailVerified,
 };

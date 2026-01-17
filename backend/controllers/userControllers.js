@@ -5,6 +5,8 @@ import createToken from "../utils/createToken.js";
 import mongoose from "mongoose";
 import Joi from "joi";
 import { formatUserResponse } from "../utils/formatUserResponse.js";
+import crypto from "crypto";
+import nodemailer from "nodemailer";
 
 // const SECRET_KEY = "bgtery";
 // salt is random
@@ -36,16 +38,60 @@ const createUser = asyncHandler(async (req, res) => {
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-  const newUser = new User({ username, email, password: hashedPassword });
+  const user = new User({
+    username,
+    email,
+    password: hashedPassword,
+    emailVerificationToken: crypto.randomBytes(20).toString("hex"),
+    emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+  });
+  
+  const verificationUrl = `http://localhost:5000/api/users/verify-email/${user.emailVerificationToken}`;
+  
+  // const transporter = nodemailer.createTransport({
+  //   service: "gmail",
+  //   auth: {
+  //     user: process.env.EMAIL_USER,
+  //     pass: process.env.EMAIL_PASS,
+  //   },
+  // });
+  
+  // await transporter.sendMail({
+  //   to: user.email,
+  //   subject: "Verify Your Email",
+  //   html: `<h3>Click to verify:</h3>
+  //   <a href="${verificationUrl}">${verificationUrl}</a>
+  //   <p>Link expires in 24 hours</p>`,
+  // });
+  
+  await user.save();
+  res.status(201).json({
+    message: "User registered! Check email for verification link.",
+    userId: user._id,
+  });
+});
 
-  try {
-    await newUser.save();
-    createToken(res, newUser._id);
-    res.status(201).json(formatUserResponse(newUser));
-  } catch (error) {
-    res.status(400);
-    throw new Error(error);
+const verifyEmail = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+
+  const user = await User.findOne({
+    emailVerificationToken: token,
+    emailVerificationExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res.status(400).json({ error: "Invalid or expired token" });
   }
+
+  user.isEmailVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpires = undefined;
+  await user.save();
+  createToken(res, user._id); // Set token in cookies
+  res.json({ 
+    message: "Email verified successfully!", 
+    user: formatUserResponse(user) 
+  });
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -53,7 +99,10 @@ const loginUser = asyncHandler(async (req, res) => {
 
   try {
     const exitingUser = await User.findOne({ email });
-
+    console.log(exitingUser)
+    if(!exitingUser.isEmailVerified){
+      return res.status(401).json({ message: "Please verify your email before logging in." });
+    }
     if (!exitingUser) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -252,7 +301,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
         console.error("Error parsing address:", error);
       }
     }
-    console.log('address : ',address)
+    console.log("address : ", address);
 
     // Handle file uploads - they will be in req.files
     const profilePicFile = req.files?.profilePic?.[0];
@@ -397,4 +446,5 @@ export {
   getCurrentUserProfile,
   getPendingPaymentUsers,
   becomeAdmin,
+  verifyEmail,
 };

@@ -53,7 +53,7 @@ const Register = () => {
           password: formData.password,
           // userType: formData.userType,
         }).unwrap();
-        dispatch(setCredentials({ ...res }));
+        // dispatch(setCredentials({ ...res }));
         toast.success("Registration Successful");
         toast.success(`Logged in as '${formData.username}'`);
         navigate(redirect);

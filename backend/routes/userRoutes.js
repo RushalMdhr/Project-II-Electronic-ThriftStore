@@ -1,5 +1,9 @@
 import express from "express";
-import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
+import {
+  authenticate,
+  authorizeAdmin,
+  checkEmailVerified,
+} from "../middlewares/authMiddleware.js";
 import {
   createUser,
   loginUser,
@@ -13,6 +17,7 @@ import {
   getCurrentUserProfile,
   getPendingPaymentUsers,
   becomeAdmin,
+  verifyEmail,
 } from "../controllers/userControllers.js";
 import { uploadBothPics } from "../middlewares/multer.js";
 // router using
@@ -22,6 +27,8 @@ router
   .route("/")
   .get(authenticate, authorizeAdmin, getAllUsers)
   .post(createUser);
+router.get("/verify-email/:token", verifyEmail);
+router.get("/dashboard", authenticate, checkEmailVerified);
 
 router.route("/login").post(loginUser);
 router.route("/logout").post(authenticate, logout);
