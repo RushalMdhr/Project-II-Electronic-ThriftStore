@@ -13,7 +13,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
+} from "../../components/ui/Card";
 // import Navbar from "../../components/base/Navbar"; // Uncomment if you want the navbar on login
 
 const Login = () => {
