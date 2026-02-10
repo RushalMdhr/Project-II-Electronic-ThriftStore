@@ -8,8 +8,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card";
 // import Navbar from "../../components/base/Navbar"; // Uncomment if you want the navbar on register
 
 const Register = () => {
