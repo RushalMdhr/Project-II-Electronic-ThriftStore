@@ -157,13 +157,13 @@ Make sure you have the following installed:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/re-electro.git
+git clone https://github.com/RushalMdhr/Project-II-Electronic-ThriftStore.git
 ```
 
 Navigate to the project directory:
 
 ```bash
-cd re-electro
+cd Project-II-Electronic-ThriftStoreo
 ```
 
 ### Install Dependencies
@@ -191,6 +191,11 @@ PAYMENT_GATEWAY_KEY=your_payment_gateway_key
 > Never commit your `.env` file or expose API keys and secret credentials in a public repository.
 
 ### Run the Application
+
+Start Both Concurrently
+```
+npm run dev
+```
 
 Start the backend server:
 
